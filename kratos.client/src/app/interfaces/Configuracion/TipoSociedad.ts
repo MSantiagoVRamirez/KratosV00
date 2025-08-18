@@ -1,0 +1,6 @@
+export interface TipoSociedad {
+    id: number;
+    nombre: string;
+    codigo: string;
+    descripcion: string;
+}

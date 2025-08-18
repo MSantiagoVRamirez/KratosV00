@@ -1,0 +1,2389 @@
+// Interfaces
+import { ODS } from "../../interfaces/contratos-ods/ODS";
+import { Usuario } from "../../interfaces/seguridad/Usuario";
+import { Contrato } from "../../interfaces/contratos-ods/Contrato";
+import { Empresa } from "../../interfaces/seguridad/Empresa";
+import { Planta } from "../../interfaces/contratos-ods/Planta"
+import { Sistema } from "../../interfaces/contratos-ods/Sistema"
+import { IndicadorSECS } from '../../interfaces/secs/IndicadorSECS'
+import { HallazgoODS } from '../../interfaces/secs/HallazgoODS'
+import { NoConformidadODS } from '../../interfaces/secs/NoConformidadODS'
+import { DocumentoODS } from '../../interfaces/secs/DocumentoODS'
+
+// Services
+import odsService from "../../services/contratos-ods/odsService";
+import usuarioService from "../../services/seguridad/usuarioService";
+import contratoService from "../../services/contratos-ods/contratoService";
+import empresaService from "../../services/seguridad/empresaService";
+import plantaService from "../../services/contratos-ods/plantaService"
+import sistemaService from "../../services/contratos-ods/sistemaService"
+import indicadorSECSService from '../../services/secs/indicadorSECSService'
+import hallazgoODSService from '../../services/secs/hallazgoODSService'
+import noConformidadODSService from '../../services/secs/noConformidadODSService'
+import documentoODSService from '../../services/secs/documentoODSService'
+import spiService from "../../services/secs/spiService";
+
+// Components
+import { ActasODSWidget } from "./ActasODSWidget";
+import { OrdenesCambioWidget } from "./OrdenesCambioWidget";
+import { SuspensionesWidget } from "./SuspensionesWidget";
+import { SubOrdenesServicioWidget } from "./SubOrdenesServicioWidget";
+import { TalleresWidget } from "../talleres-hallazgos/TalleresWidget";
+import { HitosPagoWidget } from "./HitosPagoWidget";
+import { ModalDialog } from "../components/ModalDialog";
+
+// Helpers
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { KTIcon } from "../../../_metronic/helpers";
+import { useAuth } from "../../modules/auth/AuthContext";
+import GanttChart from "../components/GanttChart";
+import { DocumentosODSWidget } from "../secs/DocumentosODSWidget";
+import { NoConformidadesODSWidget } from "../secs/NoConformidadesODSWidget";
+import { SPIWidget } from "../secs/SPIWidget";
+import { HallazgosODSWidget } from "../secs/HallazgosODSWidget";
+
+// Charts
+import AreaChart from '../components/AreaChart'
+import RadialBarChart from '../components/RadialBarChart'
+
+export function ODSDetails({ propsODSId }: { propsODSId: number }) {
+
+  const location = useLocation();
+  const selectedODSId = location.state?.propsODSId || propsODSId;
+
+  const { role } = useAuth();
+  const currentRole = role || '';
+  const esOriginador = currentRole === 'Administrador' || currentRole === 'Funcionario Contratista';
+  const esAprobador = currentRole === 'Administrador' || currentRole === 'Funcionario Cenit';
+
+  const defaultODS: ODS = {
+    id: 0,
+    nombre: 'ODS000',
+    numeroSeguimientoCenit: '',
+    numeroSeguimientoContratista: '',
+    descripcion: '',
+    contratoId: 0,
+    contratista: '',
+    tipoODS: 0,
+    valorHH: 0,
+    valorViaje: 0,
+    valorEstudio: 0,
+    valorSumaGlobalFija: 0,
+    valorInicialHH: 0,
+    valorInicialViaje: 0,
+    valorInicialEstudio: 0,
+    valorInicialSumaGlobalFija: 0,
+    valorGastoReembolsable: 0,
+    porcentajeGastoReembolsable: 0,
+    valorDisponible: 0,
+    valorHabilitado: 0,
+    valorPagado: 0,
+    valorFaltaPorPagar: 0,
+    fechaInicio: '',
+    fechaFinalOriginal: '',
+    fechaFin: '',
+    fechaRealCierre: null,
+    porcentajeRequerimientosCumplidos: null,
+    porcentajeAccionesCumplidas: null,
+    horasHombre: null,
+    estaAprobada: false,
+    estaCancelada: false,
+    estaSuspendida: false,
+    estaRechazada: false,
+    comentarioAprobacion: null,
+    estado: 0,
+    avance: 0,
+    plantaSistema: false,
+    listaPlanta: null,
+    listaSistema: null,
+    conexoObra: false,
+    odsId: null,
+    liderServicioId: null,
+    supervisorTecnicoId: null,
+    coordinadorODSId: 0,
+    SyCcontratistaId: null,
+    especialidad: null,
+    recurso: null,
+    areaSupervisionTecnica: null,
+    complejidad: null,
+    paqueteModular: null
+  }
+  
+  const [editedODS, setEditedODS] = useState<ODS>(defaultODS)
+  const [deleteODSId, setDeleteODSId] = useState<number>(defaultODS.id)
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
+  const [contratos, setContratos] = useState<Contrato[]>([])
+  const [empresas, setEmpresas] = useState<Empresa[]>([])
+  const [plantas, setPlantas] = useState<Planta[]>([])
+  const [sistemas, setSistemas] = useState<Sistema[]>([])
+  const [indicadoresSECS, setIndicadoresSECS] = useState<IndicadorSECS[]>([])
+  const [hallazgosODS, setHallazgosODS] = useState<HallazgoODS[]>([])
+  const [noConformidadesODS, setNoConformidadesODS] = useState<NoConformidadODS[]>([])
+  const [documentosODS, setDocumentosODS] = useState<DocumentoODS[]>([])
+  const [selectedDocumentType, setSelectedDocumentType] = useState<string>('total')
+  const [modalType, setModalType] = useState<'delete' | 'edit' | 'approve' | 'disapprove' | 'cancel' | 'uncancel' | 'suspend' | 'unsuspend' | 'reject' | 'unreject' | 'close' | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [plazoEnDiasForm, setPlazoEnDiasForm] = useState<number | null>(null);
+  const [spis, setSPIs] = useState<any[]>([]); // Usar el tipo correcto si tienes la interfaz SPI
+
+  const closeModal = () => setModalType(null)
+
+  const formatCurrency = (number: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(number);
+  };
+
+  const handleChangeCurrency = (fieldName: keyof ODS, rawInput: string) => {
+    if (!isEditing) return;
+    const numericValue = parseInt(rawInput.replace(/[^0-9]/g, ''), 10);
+    setEditedODS((prev) => ({
+      ...prev,
+      [fieldName]: isNaN(numericValue) ? 0 : numericValue,
+    }));
+  };
+
+  // Funciones helper para obtener nombres y estados
+  const getUsuarioName = (id: number | null) => {
+    if (!id) return 'No asignado';
+    const usuario = usuarios.find(u => u.id === id);
+    return usuario ? `${usuario.nombres} ${usuario.apellidos}` : 'No asignado';
+  };
+
+  const getContratoNumero = (id: number) => {
+    const contrato = contratos.find(c => c.id === id);
+    return contrato ? contrato.numero : 'No asignado';
+  };
+
+  const getTipoODSText = (tipo: number) => {
+    switch (tipo) {
+      case 0: return 'Dedicada';
+      case 1: return 'De Agregación de Demanda';
+      default: return 'No definido';
+    }
+  };
+
+  const getComplejidadText = (complejidad: number | null) => {
+    switch (complejidad) {
+      case 0: return 'Baja';
+      case 1: return 'Media';
+      case 2: return 'Alta';
+      default: return 'No definida';
+    }
+  };
+
+  const getAreaSupervisionText = (area: number | null) => {
+    switch (area) {
+      case 0: return 'Jefatura Ingeniería';
+      case 1: return 'Jefatura Planeación de Proyectos';
+      default: return 'No asignada';
+    }
+  };
+
+  const getPaqueteModularText = (paquete: number | null) => {
+    switch (paquete) {
+      case 0: return 'A';
+      case 1: return 'B';
+      case 2: return 'C';
+      default: return 'No asignado';
+    }
+  };
+
+  const getEstadoText = (estado: number) => {
+    switch (estado) {
+      case 0: return 'Pendiente';
+      case 1: return 'En Proceso';
+      case 2: return 'Completada';
+      case 3: return 'Cancelada';
+      case 4: return 'Suspendida';
+      case 5: return 'Rechazada';
+      default: return 'Desconocido';
+    }
+  };
+
+  const getEstadoBadgeClass = (estado: number) => {
+    switch (estado) {
+      case 0: return 'badge-warning';
+      case 1: return 'badge-primary';
+      case 2: return 'badge-success';
+      case 3: return 'badge-danger';
+      case 4: return 'badge-secondary';
+      case 5: return 'badge-danger';
+      default: return 'badge-light';
+    }
+  };
+
+  const calcularPlazo = () => {
+    if (editedODS.fechaFin && editedODS.fechaInicio) {
+      const inicio = new Date(editedODS.fechaInicio);
+      const fin = new Date(editedODS.fechaFin);
+      const dias = Math.ceil((fin.getTime() - inicio.getTime()) / (1000 * 3600 * 24)) + 1;
+      return `${dias} días`;
+    }
+    return '0 días';
+  };
+
+  const fetchUsuarios = () => {
+    usuarioService.getAll()
+      .then((response) => {
+        setUsuarios(response.data)
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener los usuarios", error)
+      })
+  }
+
+  const fetchContratos = () => {
+    contratoService.getAll()
+      .then((response) => {
+        setContratos(response.data)
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener los contratos", error)
+      })
+  }
+
+  const fetchEmpresas = () => {
+    empresaService.getAll()
+      .then((response) => {
+        setEmpresas(response.data)
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener las empresas", error)
+      })
+  }
+
+  const fetchPlantas = () => {
+    plantaService.getAll()
+      .then((response) => {
+        setPlantas(response.data)
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener las plantas", error)
+      })
+  }
+
+  const fetchSistemas = () => {
+    sistemaService.getAll()
+      .then((response) => {
+        setSistemas(response.data)
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener los sistemas", error)
+      })
+  }
+
+  const fetchHallazgosODS = () => {
+    hallazgoODSService.getAll()
+      .then((response) => {
+        setHallazgosODS(response.data)
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener los hallazgos ODS", error)
+      })
+  }
+
+  const fetchNoConformidadesODS = () => {
+    noConformidadODSService.getAll()
+      .then((response) => {
+        setNoConformidadesODS(response.data)
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener las no conformidades ODS", error)
+      })
+  }
+
+  const fetchDocumentosODS = () => {
+    documentoODSService.getAll()
+      .then((response) => {
+        setDocumentosODS(response.data)
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener los documentos ODS", error)
+      })
+  }
+
+  const fetchODS = (id: number) => {
+    odsService.get(id)
+      .then((response) => {
+        const fetchedODSData = response.data as ODS;
+        if (fetchedODSData.fechaInicio && fetchedODSData.fechaFin) {
+          const inicioParts = fetchedODSData.fechaInicio.split('-');
+          const finParts = fetchedODSData.fechaFin.split('-');
+
+          if (inicioParts.length === 3 && finParts.length === 3) {
+            const inicioYear = parseInt(inicioParts[0], 10);
+            const inicioMonth = parseInt(inicioParts[1], 10) - 1;
+            const inicioDay = parseInt(inicioParts[2], 10);
+
+            const finYear = parseInt(finParts[0], 10);
+            const finMonth = parseInt(finParts[1], 10) - 1;
+            const finDay = parseInt(finParts[2], 10);
+
+            if (![inicioYear, inicioMonth, inicioDay, finYear, finMonth, finDay].some(isNaN)) {
+              const inicioMs = Date.UTC(inicioYear, inicioMonth, inicioDay);
+              const finMs = Date.UTC(finYear, finMonth, finDay);
+
+              if (finMs >= inicioMs) {
+                const diffTime = finMs - inicioMs;
+                const plazoCalculado = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                setPlazoEnDiasForm(plazoCalculado);
+              } else {
+                setPlazoEnDiasForm(1);
+              }
+            } else {
+              setPlazoEnDiasForm(null);
+            }
+          } else {
+            setPlazoEnDiasForm(null);
+          }
+        } else {
+          setPlazoEnDiasForm(null);
+        }
+        setEditedODS(fetchedODSData);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener la orden de servicio", error)
+      })
+  }
+
+  useEffect(() => {
+    fetchUsuarios()
+    fetchContratos()
+    fetchEmpresas()
+    fetchPlantas()
+    fetchSistemas()
+    fetchODS(selectedODSId)
+    fetchSECSByODSId(selectedODSId)
+    fetchSPIsByODSId(selectedODSId)
+    fetchHallazgosODS()
+    fetchNoConformidadesODS()
+    fetchDocumentosODS()
+  }, [])
+
+  useEffect(() => {
+    if (isEditing && editedODS.fechaInicio && plazoEnDiasForm !== null && plazoEnDiasForm > 0) {
+      const parts = editedODS.fechaInicio.split('-');
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+
+        if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+          const fechaInicioObj = new Date(Date.UTC(year, month, day));
+          fechaInicioObj.setUTCDate(fechaInicioObj.getUTCDate() + (plazoEnDiasForm - 1));
+          setEditedODS(prev => ({
+            ...prev,
+            fechaFin: fechaInicioObj.toISOString().split('T')[0]
+          }));
+        } else {
+          setEditedODS(prev => ({ ...prev, fechaFin: '' }));
+        }
+      } else {
+        setEditedODS(prev => ({ ...prev, fechaFin: '' }));
+      }
+    } else if (isEditing && editedODS.fechaInicio && (plazoEnDiasForm === null || plazoEnDiasForm <= 0)) {
+      setEditedODS(prev => ({ ...prev, fechaFin: '' }));
+    } else if (isEditing && !editedODS.fechaInicio) {
+      setEditedODS(prev => ({ ...prev, fechaFin: '' }));
+    }
+  }, [editedODS.fechaInicio, plazoEnDiasForm, isEditing]);
+
+  useEffect(() => {
+    fetchSECSByODSId(selectedODSId);
+    fetchSPIsByODSId(selectedODSId);
+  }, [selectedODSId]);
+
+  const updateODS = (data: ODS) => {
+    const valorSumaGlobalFija = data.valorHH + data.valorViaje + data.valorEstudio;
+    const valorDisponible = data.valorDisponible !== null ? data.valorDisponible : valorSumaGlobalFija;
+    const dataToSend = {
+      ...data,
+      valorSumaGlobalFija,
+      valorDisponible
+    };
+    if (data.contratoId === undefined || data.contratoId === null) {
+      console.error("Error: ID de contrato no válido en updateODS", data.contratoId);
+      alert("Error: El contrato seleccionado no es válido.");
+      return;
+    }
+    odsService.update(dataToSend)
+      .then(() => {
+        fetchODS(selectedODSId)
+        setIsEditing(false)
+        closeModal()
+        alert("Orden de servicio actualizada exitosamente")
+      })
+      .catch((error) => {
+        console.error("Hubo un error al actualizar la orden de servicio", error)
+        alert(`Error al actualizar ODS: ${error.response?.data || error.response?.data?.message || error.message}`);
+      })
+  }
+
+  const closeODS = (data: ODS) => {
+    const valorSumaGlobalFija = data.valorHH + data.valorViaje + data.valorEstudio;
+    const valorDisponible = data.valorDisponible !== null ? data.valorDisponible : valorSumaGlobalFija;
+    const dataToSend = {
+      ...data,
+      valorSumaGlobalFija,
+      valorDisponible,
+      fechaRealCierre: data.fechaRealCierre // Usar la fecha ingresada por el usuario
+    };
+    if (data.contratoId === undefined || data.contratoId === null) {
+      console.error("Error: ID de contrato no válido en closeODS", data.contratoId);
+      alert("Error: El contrato seleccionado no es válido.");
+      return;
+    }
+    odsService.update(dataToSend)
+      .then(() => {
+        fetchODS(selectedODSId)
+        closeModal()
+        alert("Orden de servicio cerrada exitosamente")
+      })
+      .catch((error) => {
+        console.error("Hubo un error al cerrar la orden de servicio", error)
+        alert(`Error al cerrar ODS: ${error.response?.data || error.response?.data?.message || error.message}`);
+      })
+  }
+
+  const deleteODS = () => {
+    odsService.remove(deleteODSId)
+      .then(() => {
+        setDeleteODSId(defaultODS.id)
+        alert("Orden de servicio eliminada exitosamente")
+        navigate(-1)
+      })
+      .catch((error) => {
+        console.error("Hubo un error al eliminar la orden de servicio", error)
+        alert(`Error al eliminar ODS: ${error.response?.data || error.response?.data?.message || error.message}`);
+      })
+  }
+
+  const openDeleteModal = (id: number) => {
+    setDeleteODSId(id)
+    setModalType('delete')
+  }
+
+  const navigate = useNavigate();
+
+  const usuariosCenit = usuarios.filter(usuario => usuario.empresaId === 1).sort((a, b) => `${a.nombres} ${a.apellidos}`.localeCompare(`${b.nombres} ${b.apellidos}`))
+  const usuariosContratista = usuarios.filter(usuario => usuario.empresaId === empresas.find(e => e.nombre === editedODS.contratista)?.id || 0).sort((a, b) => `${a.nombres} ${a.apellidos}`.localeCompare(`${b.nombres} ${b.apellidos}`))
+
+  // Opciones para el dropdown de documentos
+  const documentOptions = [
+    { value: 'total', label: 'Total General' },
+    { value: 'informeSemanal', label: 'Informe Semanal' },
+    { value: 'informeMensual', label: 'Informe Mensual' },
+    { value: 'informeEstimado', label: 'Informe Estimado' },
+    { value: 'informeHSEEstadistico', label: 'Informe HSE Estadístico' },
+    { value: 'informeHSEGestion', label: 'Informe HSE Gestión' },
+    { value: 'actaInicio', label: 'Acta de Inicio' },
+    { value: 'actaOC', label: 'Acta de Orden de Cambio' },
+    { value: 'actaSuspensionReinicio', label: 'Acta de Suspensión/Reinicio' },
+    { value: 'actaTerminacion', label: 'Acta de Terminación' },
+    { value: 'actaBalanceCierre', label: 'Acta de Balance y Cierre' }
+  ]
+
+  // Funciones para procesar datos de SECS y usarlos en los gráficos
+  const getLatestSECSData = () => {
+    if (!Array.isArray(indicadoresSECS) || indicadoresSECS.length === 0) return null;
+    // Obtener el registro más reciente
+    const sortedData = [...indicadoresSECS].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+    return sortedData[0];
+  }
+
+  const getTripleRestriccionData = () => {
+    const latestSECS = getLatestSECSData();
+    if (!latestSECS) return { data: [0, 0, 0, 0], labels: ['Sin datos', 'Sin datos', 'Sin datos', 'Sin datos'] };
+    
+    return {
+      data: [
+        latestSECS.indicadorCumplimientoPlazo || 0,
+        latestSECS.indicadorRequerimientos || 0, 
+        latestSECS.indicadorSPI || 0,
+        latestSECS.indicadorHitos || 0
+      ],
+      labels: [
+        'Plazo de ejecución y dossier',
+        'Cumplimiento del alcance', 
+        'Ejecución de Programa',
+        'Cumplimiento de hitos'
+      ]
+    };
+  }
+
+  const getCalidadData = () => {
+    const latestSECS = getLatestSECSData();
+    if (!latestSECS) return { data: [0, 0, 0, 0, 0], labels: ['Sin datos', 'Sin datos', 'Sin datos', 'Sin datos', 'Sin datos'] };
+    
+    return {
+      data: [
+        latestSECS.indicadorComentarios || 0,
+        latestSECS.indicadorGestionCalidad || 0,
+        latestSECS.indicadorPlanCalidad || 0,
+        latestSECS.indicadorNoConformidades || 0,
+        latestSECS.indicadorHallazgos || 0
+      ],
+      labels: [
+        'Cierre de comentarios y acciones NM',
+        'Efectividad de gestión de calidad',
+        'Cumplimiento del plan de calidad',
+        'Cierre de no conformidades',
+        'Cierre de hallazgos'
+      ]
+    };
+  }
+
+  const getEntregablesData = () => {
+    const latestSECS = getLatestSECSData();
+    if (!latestSECS) return { data: [0], labels: ['Sin datos'] };
+    
+    return {
+      data: [latestSECS.indicadorDocumentos || 0],
+      labels: ['Cumplimiento de entregables']
+    };
+  }
+
+  // const getSECSTimeSeriesData = () => {
+  //   if (!Array.isArray(indicadoresSECS) || indicadoresSECS.length === 0) return { series: [], categories: [] };
+    
+  //   // Ordenar por fecha
+  //   const sortedSECS = [...indicadoresSECS].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+    
+  //   const categories = sortedSECS.map(item => new Date(item.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }));
+    
+  //   return {
+  //     series: [
+  //       { name: 'Plazo de ejecución', data: sortedSECS.map(item => item.indicadorCumplimientoPlazo || 0) },
+  //       { name: 'Ejecución de Programa', data: sortedSECS.map(item => item.indicadorSPI || 0) },
+  //       { name: 'Hitos', data: sortedSECS.map(item => item.indicadorHitos || 0) },
+  //       { name: 'Alcance', data: sortedSECS.map(item => item.indicadorRequerimientos || 0) },
+  //       { name: 'Plan de calidad', data: sortedSECS.map(item => item.indicadorPlanCalidad || 0) },
+  //       { name: 'Gestión de calidad', data: sortedSECS.map(item => item.indicadorGestionCalidad || 0) },
+  //       { name: 'Cierre de comentarios y acciones no mandatorias', data: sortedSECS.map(item => item.indicadorComentarios || 0) },
+  //       { name: 'Cierre de hallazgos', data: sortedSECS.map(item => item.indicadorHallazgos || 0) },
+  //       { name: 'Cierre de no conformidades', data: sortedSECS.map(item => item.indicadorNoConformidades || 0) },
+  //       { name: 'Entrega de informes, reportes y actas', data: sortedSECS.map(item => item.indicadorDocumentos || 0) }
+  //     ],
+  //     categories
+  //   };
+  // }
+
+  const getPromedioSECSData = () => {
+    if (!Array.isArray(indicadoresSECS) || indicadoresSECS.length === 0) return { data: [], categories: [] };
+    
+    const sortedSECS = [...indicadoresSECS].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+    
+    return {
+      data: sortedSECS.map(item => item.totalPonderado || 0),
+      categories: sortedSECS.map(item => new Date(item.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }))
+    };
+  }
+
+  // Función para obtener datos del SPI (Índice de Ejecución del Programa) usando el arreglo de SPI
+  const getSPITimeSeriesData = () => {
+    if (!Array.isArray(spis) || spis.length === 0) return { series: [], categories: [] };
+    
+    // Ordenar por fecha
+    const sortedSPIs = [...spis].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+    
+    // Calcular el promedio de todos los valores SPI
+    const validSPIValues = sortedSPIs.map(item => item.spi || 0).filter(value => value > 0);
+    const promedioSPI = validSPIValues.length > 0 
+      ? validSPIValues.reduce((sum, value) => sum + value, 0) / validSPIValues.length 
+      : 0;
+    
+    // Crear las categorías originales
+    const categories = sortedSPIs.map(item => new Date(item.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }));
+    
+    // Agregar una categoría adicional para el promedio
+    const promedioLabel = 'Promedio';
+    const extendedCategories = [...categories, promedioLabel];
+    
+    // Crear los datos originales
+    const originalData = sortedSPIs.map(item => item.spi || 0);
+    
+    // Crear una serie con los datos originales + null para el punto del promedio
+    const spiData = [...originalData, null];
+    
+    // Crear una serie solo para el punto del promedio
+    const promedioData = new Array(originalData.length).fill(null);
+    promedioData.push(Math.round(promedioSPI * 100) / 100); // Redondear a 2 decimales
+    
+    return {
+      series: [
+        { 
+          name: 'Índice de Ejecución del Programa (SPI)', 
+          data: spiData,
+          type: 'line'
+        },
+        {
+          name: `Promedio General (${Math.round(promedioSPI * 100) / 100})`,
+          data: promedioData,
+          type: 'scatter',
+          marker: {
+            size: 8,
+            fillColor: '#FF6B6B',
+            strokeColor: '#FF6B6B',
+            strokeWidth: 2
+          },
+          color: '#FF6B6B'
+        }
+      ],
+      categories: extendedCategories
+    };
+  }
+
+  // Función para obtener datos de hallazgos
+  const getHallazgosTimeSeriesData = () => {
+    if (!Array.isArray(hallazgosODS) || hallazgosODS.length === 0) return { series: [], categories: [] };
+    
+    // Filtrar hallazgos por la ODS seleccionada
+    const hallazgosFiltrados = hallazgosODS.filter(hallazgo => hallazgo.odsId === selectedODSId);
+    
+    if (hallazgosFiltrados.length === 0) return { series: [], categories: [] };
+    
+    // Ordenar por fecha
+    const sortedHallazgos = [...hallazgosFiltrados].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+    
+    const categories = sortedHallazgos.map(item => new Date(item.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }));
+    
+    return {
+      series: [
+        { name: 'Total de Hallazgos', data: sortedHallazgos.map(item => item.cantidadTotal) },
+        { name: 'Hallazgos Cerrados', data: sortedHallazgos.map(item => item.cantidadCerradas) }
+      ],
+      categories
+    };
+  }
+
+  // Función para obtener datos de no conformidades
+  const getNoConformidadesTimeSeriesData = () => {
+    if (!Array.isArray(noConformidadesODS) || noConformidadesODS.length === 0) return { series: [], categories: [] };
+    
+    // Filtrar no conformidades por la ODS seleccionada
+    const noConformidadesFiltradas = noConformidadesODS.filter(noConformidad => noConformidad.odsId === selectedODSId);
+    
+    if (noConformidadesFiltradas.length === 0) return { series: [], categories: [] };
+    
+    // Ordenar por fecha
+    const sortedNoConformidades = [...noConformidadesFiltradas].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+    
+    const categories = sortedNoConformidades.map(item => new Date(item.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }));
+    
+    return {
+      series: [
+        { name: 'Total de No Conformidades', data: sortedNoConformidades.map(item => item.cantidadTotal) },
+        { name: 'No Conformidades Cerradas', data: sortedNoConformidades.map(item => item.cantidadCerradas) }
+      ],
+      categories
+    };
+  }
+
+  // Función para obtener datos de documentos
+  const getDocumentosTimeSeriesData = () => {
+    if (!Array.isArray(documentosODS) || documentosODS.length === 0) return { series: [], categories: [] };
+    
+    // Filtrar documentos por la ODS seleccionada
+    const documentosFiltrados = documentosODS.filter(documento => documento.odsId === selectedODSId);
+    
+    if (documentosFiltrados.length === 0) return { series: [], categories: [] };
+    
+    // Ordenar por fecha
+    const sortedDocumentos = [...documentosFiltrados].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+    
+    const categories = sortedDocumentos.map(item => new Date(item.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }));
+    
+    // Función helper para obtener los datos según el tipo seleccionado
+    const getDocumentData = (documento: DocumentoODS) => {
+      switch (selectedDocumentType) {
+        case 'total':
+          return {
+            planeado: documento.totalPlaneado,
+            real: documento.totalReal
+          };
+        case 'informeSemanal':
+          return {
+            planeado: documento.informeSemanalPlaneado,
+            real: documento.informeSemanalReal
+          };
+        case 'informeMensual':
+          return {
+            planeado: documento.informeMensualPlaneado,
+            real: documento.informeMensualReal
+          };
+        case 'informeEstimado':
+          return {
+            planeado: documento.informeEstimadoPlaneado,
+            real: documento.informeEstimadoReal
+          };
+        case 'informeHSEEstadistico':
+          return {
+            planeado: documento.informeHSEEstadísticoPlaneado,
+            real: documento.informeHSEEstadísticoReal
+          };
+        case 'informeHSEGestion':
+          return {
+            planeado: documento.informeHSEGestionPlaneado,
+            real: documento.informeHSEGestionReal
+          };
+        case 'actaInicio':
+          return {
+            planeado: documento.actaInicioPlaneado,
+            real: documento.actaInicioReal
+          };
+        case 'actaOC':
+          return {
+            planeado: documento.actaOCPlaneado,
+            real: documento.actaOCReal
+          };
+        case 'actaSuspensionReinicio':
+          return {
+            planeado: documento.actaSuspensionReinicioPaneado,
+            real: documento.actaSuspensionReinicioRea
+          };
+        case 'actaTerminacion':
+          return {
+            planeado: documento.actaTerminacionPlaneado,
+            real: documento.actaTerminacionReal
+          };
+        case 'actaBalanceCierre':
+          return {
+            planeado: documento.actaBalanceCierrePlaneado,
+            real: documento.actaBalanceCierreReal
+          };
+        default:
+          return {
+            planeado: documento.totalPlaneado,
+            real: documento.totalReal
+          };
+      }
+    };
+
+    // Obtener el nombre del documento seleccionado
+    const selectedDocument = documentOptions.find(option => option.value === selectedDocumentType);
+    const documentName = selectedDocument ? selectedDocument.label : 'Total General';
+    
+    return {
+      series: [
+        { name: `${documentName} - Planeado`, data: sortedDocumentos.map(item => getDocumentData(item).planeado) },
+        { name: `${documentName} - Real`, data: sortedDocumentos.map(item => getDocumentData(item).real) }
+      ],
+      categories
+    };
+  }
+
+  // Obtener los SECS asociados a la ODS seleccionada
+  const fetchSECSByODSId = (odsId: number) => {
+    indicadorSECSService.getSECS(odsId)
+      .then((response) => {
+        
+        let secsData: IndicadorSECS[] = [];
+        
+        if (response.data) {
+          // Si la respuesta es un array
+          if (Array.isArray(response.data)) {
+            secsData = response.data;
+          } 
+          // Si la respuesta es un objeto que contiene un array
+          else if (typeof response.data === 'object') {
+            // Buscar si hay una propiedad que contenga el array de datos
+            if (response.data.data && Array.isArray(response.data.data)) {
+              secsData = response.data.data;
+            } else if (response.data.indicadores && Array.isArray(response.data.indicadores)) {
+              secsData = response.data.indicadores;
+            } else if (response.data.items && Array.isArray(response.data.items)) {
+              secsData = response.data.items;
+            } else {
+              // Si es un objeto con las propiedades del IndicadorSECS, convertirlo a array
+              if (response.data.id !== undefined) {
+                secsData = [response.data];
+              } else {
+                console.warn("Estructura de datos no reconocida:", response.data);
+                secsData = [];
+              }
+            }
+          }
+        }
+        setIndicadoresSECS(secsData);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener los indicadores SECS", error);
+        console.error("Detalles del error:", error.response?.data || error.message);
+        setIndicadoresSECS([]);
+      });
+  }
+
+  // Obtener los SPI asociados a la ODS seleccionada
+  const fetchSPIsByODSId = (odsId: number) => {
+    spiService.getAll()
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          setSPIs(response.data.filter((spi: any) => spi.odsId === odsId));
+        } else {
+          setSPIs([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener los SPIs", error);
+        setSPIs([]);
+      });
+  }
+
+  // Efecto para mostrar información adicional cuando los SECS se cargan
+  useEffect(() => {
+    if (Array.isArray(indicadoresSECS) && indicadoresSECS.length > 0) {
+      const latestSECS = getLatestSECSData();
+    } else if (indicadoresSECS && !Array.isArray(indicadoresSECS)) {
+      console.warn("Los datos SECS no son un array:", indicadoresSECS);
+    }
+  }, [indicadoresSECS]);
+
+  return (
+    <>
+      <div className="d-flex flex-column p-5 gap-5">
+        {/* Header con botones de acción */}
+        <div className="d-flex justify-content-between align-items-center">
+          <button onClick={() => navigate(-1)} className="btn btn-sm btn-light-primary" style={{ width: "fit-content" }}>
+            <KTIcon iconName="arrow-left" className="fs-1" />{" "}
+            Volver
+          </button>
+          <div className="d-flex gap-3">
+            {isEditing && (
+              <button onClick={() => setModalType('edit')} className="btn btn-sm btn-light-success" style={{ width: "fit-content" }}>
+                <KTIcon iconName="check" className="fs-1" />{" "}
+                Guardar Cambios
+              </button>
+            )}
+            {isEditing ? (
+              <button onClick={() => {
+                setIsEditing(false);
+                fetchODS(selectedODSId);
+              }} className="btn btn-sm btn-light-info" style={{ width: "fit-content" }}>
+                <KTIcon iconName="x" className="fs-2" />{" "}
+                Cancelar
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="btn btn-sm btn-light-info"
+                style={{ width: "fit-content" }}
+                disabled={editedODS.estado !== 0 && editedODS.estado !== 5}
+              >
+                <KTIcon iconName="pencil" className="fs-2" />{" "}
+                Editar
+              </button>
+            )}
+            <button
+              onClick={() => openDeleteModal(selectedODSId)}
+              className="btn btn-sm btn-light-danger"
+              style={{ width: "fit-content" }}
+              disabled={editedODS.estado !== 0 && editedODS.estado !== 5}
+            >
+              <KTIcon iconName="trash" className="fs-2" />{" "}
+              Eliminar
+            </button>
+          </div>
+        </div>
+
+        {/* Título y estado */}
+        <div className="d-flex justify-content-between align-items-center">
+          <h1 className="fw-bolder my-5 ms-5">Detalles de la ODS</h1>
+          <div className="d-flex gap-3 align-items-center">
+            <span className={`badge fs-6 ${getEstadoBadgeClass(editedODS.estado)}`}>
+              {getEstadoText(editedODS.estado)}
+            </span>
+          </div>
+        </div>
+
+        {/* Sección de Cierre - Solo visible cuando la ODS está completada */}
+        {/* {editedODS.estado === 2 && ( */}
+          <div className="card mb-8 border-success">
+            <div className="card-header border-0 py-6 bg-success bg-opacity-10">
+              <div className="card-title">
+                <div className="d-flex align-items-center position-relative my-1">
+                  <KTIcon iconName="check-circle" className="fs-1 position-absolute ms-6 text-success" />
+                  <h3 className="fw-bold ms-15 text-success">Cierre de ODS</h3>
+                </div>
+              </div>
+            </div>
+            <div className="card-body pt-0">
+              <div className="alert alert-success d-flex align-items-center p-5 mb-5">
+                <KTIcon iconName="information-5" className="fs-2hx text-success me-4" />
+                <div className="d-flex flex-column">
+                  <h4 className="mb-1 text-success">Esta ODS está lista para cerrar</h4>
+                  <span>Complete la información requerida para finalizar la ODS y registrar el cierre en Horus.</span>
+                </div>
+              </div>
+
+              {/* Información de cierre existente */}
+              {/* {editedODS.fechaRealCierre && ( */}
+                {/* <div className="row g-6 mb-6">
+                  <div className="col-12">
+                    <div className="card border-info">
+                      <div className="card-body">
+                        <div className="d-flex align-items-center mb-3">
+                          <KTIcon iconName="calendar" className="fs-2 text-info me-3" />
+                          <h5 className="fw-bold text-info mb-0">Información de Cierre</h5>
+                        </div>
+                        <div className="row g-3">
+                          <div className="col-lg-6">
+                            <label className="form-label fw-semibold fs-6">Fecha de cierre:</label>
+                            <div className="bg-light rounded p-3">
+                              <span className="fw-bold">{editedODS.fechaRealCierre ? new Date(editedODS.fechaRealCierre).toLocaleDateString('es-CO') : 'No definida'}</span>
+                            </div>
+                          </div>
+                          <div className="col-lg-6">
+                            <label className="form-label fw-semibold fs-6">Estado de cierre:</label>
+                            <div className="bg-light rounded p-3">
+                              <span className="badge badge-success">Cerrada</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div> */}
+              {/* )} */}
+
+              {/* {esOriginador && ( */}
+                <div className="row g-6">
+                  {/* Toggle para cargue de Dossier en Horus */}
+                  <div className="col-12 mb-6">
+                    <div className="form-check form-switch form-check-custom form-check-success form-check-solid d-flex align-items-center">
+                      <input
+                        className="form-check-input me-3"
+                        type="checkbox"
+                        role="switch"
+                        id="odsCierreSwitch"
+                        checked={!!editedODS.fechaRealCierre}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            // Si se activa el toggle, establecer la fecha actual por defecto si no hay una fecha
+                            if (!editedODS.fechaRealCierre) {
+                              setEditedODS(prev => ({ 
+                                ...prev, 
+                                fechaRealCierre: new Date().toISOString().split('T')[0] 
+                              }));
+                            }
+                          } else {
+                            // Si se desactiva el toggle, limpiar la fecha de cierre
+                            setEditedODS(prev => ({ ...prev, fechaRealCierre: null }));
+                          }
+                        }}
+                        disabled={!isEditing && !!editedODS.fechaRealCierre}
+                      />
+                      <label className="form-check-label fw-bold fs-4" htmlFor="odsCierreSwitch">
+                        {editedODS.fechaRealCierre ? 'ODS Cerrada' : 'Marcar como ODS cerrada con cargue del Dossier final en Horus'}
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Campo de fecha de cierre - Solo visible si el toggle está activado */}
+                  {editedODS.fechaRealCierre && (
+                    <div className="col-12 mb-6">
+                      <label className="form-label fw-semibold fs-6 required">Fecha Real de Cierre</label>
+                      <div className="form-text text-muted mb-2">
+                        Ingrese la fecha en la que se cargó el Dossier final en Horus
+                      </div>
+                      {isEditing ? (
+                        <input
+                          type="date"
+                          value={editedODS.fechaRealCierre ? editedODS.fechaRealCierre.split('T')[0] : ''}
+                          onChange={(e) => setEditedODS(prev => ({ 
+                            ...prev, 
+                            fechaRealCierre: e.target.value || null 
+                          }))}
+                          className="form-control"
+                          required
+                        />
+                      ) : (
+                        <div className="bg-success bg-opacity-10 rounded p-3 border border-success border-opacity-25">
+                          <div className="d-flex align-items-center">
+                            <KTIcon iconName="calendar" className="fs-2 text-success me-3" />
+                            <div>
+                              <span className="fw-bold fs-4 text-success">
+                                {new Date(editedODS.fechaRealCierre).toLocaleDateString('es-CO', {
+                                  weekday: 'long',
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric'
+                                })}
+                              </span>
+                              <div className="fs-7 text-muted">Fecha de cargue del Dossier en Horus</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Botón para confirmar cierre - Solo visible si hay fecha y se está editando */}
+                  {editedODS.fechaRealCierre && isEditing && (
+                    <div className="col-12 mb-6">
+                      <button
+                        type="button"
+                        className="btn btn-success btn-sm"
+                        onClick={() => setModalType('close')}
+                        disabled={!editedODS.fechaRealCierre || 
+                                  editedODS.porcentajeRequerimientosCumplidos === null || 
+                                  editedODS.porcentajeAccionesCumplidas === null}
+                      >
+                        <KTIcon iconName="check-circle" className="fs-2" />
+                        Confirmar cierre de ODS
+                      </button>
+                      {(!editedODS.fechaRealCierre || 
+                        editedODS.porcentajeRequerimientosCumplidos === null || 
+                        editedODS.porcentajeAccionesCumplidas === null) && (
+                        <div className="form-text text-danger mt-2">
+                          Complete la fecha de cierre y los porcentajes de cumplimiento antes de confirmar
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Campos de porcentajes - Solo visibles si no está cerrada */}
+                  {/* {!editedODS.fechaRealCierre && ( */}
+                    <>
+                      <div className="col-lg-6">
+                        <label className="form-label fw-semibold fs-6 required">Porcentaje de Requerimientos Cumplidos (%)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          placeholder="Ingrese el porcentaje de requerimientos cumplidos"
+                          value={editedODS.porcentajeRequerimientosCumplidos ?? ''}
+                          onChange={(e) => setEditedODS(prev => ({ ...prev, porcentajeRequerimientosCumplidos: parseFloat(e.target.value) || null }))}
+                          className="form-control"
+                          required
+                        />
+                      </div>
+
+                      <div className="col-lg-6">
+                        <label className="form-label fw-semibold fs-6 required">Porcentaje de Acciones Cumplidas (%)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          placeholder="Ingrese el porcentaje de acciones cumplidas"
+                          value={editedODS.porcentajeAccionesCumplidas ?? ''}
+                          onChange={(e) => setEditedODS(prev => ({ ...prev, porcentajeAccionesCumplidas: parseFloat(e.target.value) || null }))}
+                          className="form-control"
+                          required
+                        />
+                      </div>
+                    </>
+                  {/* // )} */}
+                </div>
+              {/* )} */}
+            </div>
+          </div>
+        {/* )} */}
+
+        {/* Sección 6: Estado y Aprobación */}
+        <div className="card mb-8">
+          <div className="card-header border-0 py-6">
+            <div className="card-title">
+              <div className="d-flex align-items-center position-relative my-1">
+                <KTIcon iconName="check-square" className="fs-1 position-absolute ms-6" />
+                <h3 className="fw-bold ms-15">Estado y Aprobación</h3>
+              </div>
+            </div>
+          </div>
+          <div className="card-body pt-0">
+            <div className="row g-6">
+              {/* Controles de aprobación - Visibles para aprobadores */}
+              {esAprobador && (
+                <>
+                  <div className="col-lg-4">
+                    <div className="form-check form-switch form-check-custom form-check-success form-check-solid h-100 d-flex align-items-center">
+                      <div>
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="odsDetailAprobadaSwitch"
+                          checked={editedODS.estaAprobada}
+                          onChange={(e) => isEditing && (e.target.checked ? setModalType('approve') : setModalType('disapprove'))}
+                          disabled={!isEditing}
+                        />
+                        <label className="form-check-label fw-semibold fs-6 ms-3" htmlFor="odsDetailAprobadaSwitch">
+                          Aprobada
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-lg-4">
+                    <div className="form-check form-switch form-check-custom form-check-danger form-check-solid h-100 d-flex align-items-center">
+                      <div>
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="odsDetailRechazadaSwitch"
+                          checked={editedODS.estaRechazada}
+                          onChange={(e) => isEditing && (e.target.checked ? setModalType('reject') : setModalType('unreject'))}
+                          disabled={!isEditing}
+                        />
+                        <label className="form-check-label fw-semibold fs-6 ms-3" htmlFor="odsDetailRechazadaSwitch">
+                          Rechazada
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Controles para originadores */}
+              {esOriginador && (
+                <div className="col-lg-4">
+                  <div className="form-check form-switch form-check-custom form-check-warning form-check-solid h-100 d-flex align-items-center">
+                    <div>
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="odsDetailCanceladaSwitch"
+                        checked={editedODS.estaCancelada}
+                        onChange={(e) => isEditing && (e.target.checked ? setModalType('cancel') : setModalType('uncancel'))}
+                        disabled={!isEditing}
+                      />
+                      <label className="form-check-label fw-semibold fs-6 ms-3" htmlFor="odsDetailCanceladaSwitch">
+                        Cancelada
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Comentario de aprobación */}
+              <div className="col-12">
+                <label className="form-label fw-semibold fs-6">Comentario de Aprobación</label>
+                {isEditing && esAprobador ? (
+                  <textarea
+                    value={editedODS.comentarioAprobacion || ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, comentarioAprobacion: e.target.value }))}
+                    className="form-control"
+                    rows={3}
+                    placeholder="Comentario sobre la aprobación, rechazo o estado de la ODS"
+                  />
+                ) : (
+                  <div className="bg-light rounded p-4">
+                    <span>{editedODS.comentarioAprobacion || 'Sin comentarios'}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección 1: Información Básica */}
+        <div className="card mb-8">
+          <div className="card-header border-0 py-6">
+            <div className="card-title">
+              <div className="d-flex align-items-center position-relative my-1">
+                <KTIcon iconName="document" className="fs-1 position-absolute ms-6" />
+                <h3 className="fw-bold ms-15">Información Básica</h3>
+              </div>
+            </div>
+          </div>
+          <div className="card-body pt-0">
+            <div className="row g-6">
+              {/* Número de Consecutivo - Solo lectura siempre */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6">Número de Consecutivo</label>
+                <div className="bg-light rounded p-3">
+                  <span className="fw-bold fs-4 text-primary">{editedODS.nombre || 'Sin asignar'}</span>
+                </div>
+              </div>
+
+              {/* Número ODS - Editable por originador */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6 required">Número Seguimiento Cenit</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="text"
+                    value={editedODS.numeroSeguimientoCenit || ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, numeroSeguimientoCenit: e.target.value }))}
+                    className="form-control"
+                    placeholder="Ingrese número de seguimiento Cenit"
+                    required
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span>{editedODS.numeroSeguimientoCenit || 'No asignado'}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Número Seguimiento Contratista - Editable por originador */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6 required">Número Seguimiento Contratista</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="text"
+                    value={editedODS.numeroSeguimientoContratista || ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, numeroSeguimientoContratista: e.target.value }))}
+                    className="form-control"
+                    placeholder="Ingrese número de seguimiento contratista"
+                    required
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span>{editedODS.numeroSeguimientoContratista || 'No asignado'}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Tipo de ODS - Editable por originador */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6 required">Tipo de ODS</label>
+                {isEditing && esOriginador ? (
+                  <select
+                    value={editedODS.tipoODS ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, tipoODS: parseInt(e.target.value) ?? null }))}
+                    className="form-select"
+                    required
+                  >
+                    <option value="">Seleccione un tipo</option>
+                    <option value={0}>Dedicada</option>
+                    <option value={1}>De Agregación de Demanda</option>
+                  </select>
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-semibold">{getTipoODSText(editedODS.tipoODS)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Complejidad - Editable por originador */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6 required">Complejidad</label>
+                {isEditing && esOriginador ? (
+                  <select
+                    value={editedODS.complejidad ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, complejidad: parseInt(e.target.value) ?? null }))}
+                    className="form-select"
+                    required
+                  >
+                    <option value="">Seleccione una complejidad</option>
+                    <option value={2}>Alta</option>
+                    <option value={0}>Baja</option>
+                    <option value={1}>Media</option>
+                  </select>
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-semibold">{getComplejidadText(editedODS.complejidad)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Contrato - Solo lectura siempre */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6">Contrato</label>
+                <div className="bg-light rounded p-3">
+                  <span className="fw-semibold">{getContratoNumero(editedODS.contratoId)}</span>
+                </div>
+              </div>
+
+              {/* Contratista - Solo lectura siempre */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6">Contratista</label>
+                <div className="bg-light rounded p-3">
+                  <span className="fw-semibold">
+                    {editedODS.contratista || empresas.find(e => e.id === contratos.find(c => c.id === editedODS.contratoId)?.empresaId)?.nombre || 'No asignado'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Objeto - Editable por originador */}
+              <div className="col-12">
+                <label className="form-label fw-semibold fs-6">Objeto</label>
+                {isEditing && esOriginador ? (
+                  <textarea
+                    value={editedODS.descripcion}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, descripcion: e.target.value }))}
+                    className="form-control"
+                    rows={3}
+                    placeholder="Describa el objeto de la ODS"
+                  />
+                ) : (
+                  <div className="bg-light rounded p-4">
+                    <span>{editedODS.descripcion || 'No definido'}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección 2: Asignaciones */}
+        <div className="card mb-8">
+          <div className="card-header border-0 py-6">
+            <div className="card-title">
+              <div className="d-flex align-items-center position-relative my-1">
+                <KTIcon iconName="people" className="fs-1 position-absolute ms-6" />
+                <h3 className="fw-bold ms-15">Asignaciones</h3>
+              </div>
+            </div>
+          </div>
+          <div className="card-body pt-0">
+            <div className="row g-6">
+              {/* Coordinador ODS - Editable por originador */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6 required">Coordinador ODS</label>
+                {isEditing && esOriginador ? (
+                  <select
+                    value={editedODS.coordinadorODSId ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, coordinadorODSId: parseInt(e.target.value) ?? null }))}
+                    className="form-select"
+                    required
+                  >
+                    <option value="">Seleccione</option>
+                    {usuariosContratista.map((usuario) => (
+                      <option key={usuario.id} value={usuario.id}>
+                        {usuario.nombres} {usuario.apellidos}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-semibold">{getUsuarioName(editedODS.coordinadorODSId)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Supervisor Técnico - Editable por originador */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6 required">Supervisor Técnico</label>
+                {isEditing && esOriginador ? (
+                  <select
+                    value={editedODS.supervisorTecnicoId ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, supervisorTecnicoId: parseInt(e.target.value) ?? null }))}
+                    className="form-select"
+                    required
+                  >
+                    <option value="">Seleccione</option>
+                    {usuariosCenit.map((usuario) => (
+                      <option key={usuario.id} value={usuario.id}>
+                        {usuario.nombres} {usuario.apellidos}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-semibold">{getUsuarioName(editedODS.supervisorTecnicoId)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* S&C Contratista - Solo para tipo agregación */}
+              {editedODS.tipoODS === 1 && (
+                <div className="col-lg-6">
+                  <label className="form-label fw-semibold fs-6 required">S&C Contratista</label>
+                  {isEditing && esOriginador ? (
+                    <select
+                      value={editedODS.SyCcontratistaId ?? ''}
+                      onChange={(e) => setEditedODS(prev => ({ ...prev, SyCcontratistaId: parseInt(e.target.value) ?? null }))}
+                      className="form-select"
+                      required
+                    >
+                      <option value="">Seleccione</option>
+                      {usuariosContratista.map((usuario) => (
+                        <option key={usuario.id} value={usuario.id}>
+                          {usuario.nombres} {usuario.apellidos}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="bg-light rounded p-3">
+                      <span className="fw-semibold">{getUsuarioName(editedODS.SyCcontratistaId)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Líder de Servicio - Solo para tipo agregación */}
+              {editedODS.tipoODS === 1 && (
+                <div className="col-lg-6">
+                  <label className="form-label fw-semibold fs-6 required">Líder de Servicio</label>
+                  {isEditing && esOriginador ? (
+                    <select
+                      value={editedODS.liderServicioId ?? ''}
+                      onChange={(e) => setEditedODS(prev => ({ ...prev, liderServicioId: parseInt(e.target.value) ?? null }))}
+                      className="form-select"
+                      required
+                    >
+                      <option value="">Seleccione</option>
+                      {usuariosCenit.map((usuario) => (
+                        <option key={usuario.id} value={usuario.id}>
+                          {usuario.nombres} {usuario.apellidos}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="bg-light rounded p-3">
+                      <span className="fw-semibold">{getUsuarioName(editedODS.liderServicioId)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Área Supervisión Técnica - Editable por originador */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6 required">Área Supervisión Técnica</label>
+                {isEditing && esOriginador ? (
+                  <select
+                    value={editedODS.areaSupervisionTecnica ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, areaSupervisionTecnica: parseInt(e.target.value) ?? null }))}
+                    className="form-select"
+                    required
+                  >
+                    <option value="">Seleccione un área</option>
+                    <option value={0}>Jefatura Ingeniería</option>
+                    <option value={1}>Jefatura Planeación de Proyectos</option>
+                  </select>
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-semibold">{getAreaSupervisionText(editedODS.areaSupervisionTecnica)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Paquete Modular - Editable por originador */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6 required">Paquete Modular</label>
+                {isEditing && esOriginador ? (
+                  <select
+                    value={editedODS.paqueteModular ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, paqueteModular: parseInt(e.target.value) ?? null }))}
+                    className="form-select"
+                    required
+                  >
+                    <option value="">Seleccione un paquete modular</option>
+                    <option value={0}>A</option>
+                    <option value={1}>B</option>
+                    <option value={2}>C</option>
+                  </select>
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-semibold">{getPaqueteModularText(editedODS.paqueteModular)}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección 3: Configuración Específica - Solo para ODS Dedicadas */}
+        {editedODS.tipoODS === 0 && (
+          <div className="card mb-8">
+            <div className="card-header border-0 py-6">
+              <div className="card-title">
+                <div className="d-flex align-items-center position-relative my-1">
+                  <KTIcon iconName="setting-3" className="fs-1 position-absolute ms-6" />
+                  <h3 className="fw-bold ms-15">Configuración Específica</h3>
+                </div>
+              </div>
+            </div>
+            <div className="card-body pt-0">
+              <div className="row g-6">
+                {/* Conexo a Obra */}
+                <div className="col-lg-6">
+                  <label className="form-label fw-semibold fs-6">Conexo a Obra</label>
+                  {isEditing && esOriginador ? (
+                    <select
+                      value={editedODS.conexoObra === true ? 'true' : 'false'}
+                      onChange={(e) => setEditedODS(prev => ({ ...prev, conexoObra: e.target.value === 'true' }))}
+                      className="form-select"
+                    >
+                      <option value="false">No</option>
+                      <option value="true">Sí</option>
+                    </select>
+                  ) : (
+                    <div className="bg-light rounded p-3">
+                      <span className="fw-semibold">{editedODS.conexoObra ? 'Sí' : 'No'}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Estaciones y Sistemas */}
+                <div className="col-12">
+                  <label className="form-label fw-semibold fs-6 required">Estaciones y Sistemas</label>
+                  <div className="form-text text-muted mb-2">
+                    Debe seleccionar al menos una estación o sistema para la ODS Dedicada.
+                  </div>
+                  
+                  {/* Selector de Estaciones */}
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold fs-7 text-muted mb-2">Estaciones</label>
+                    {isEditing && esOriginador ? (
+                      <select
+                        value={''}
+                        onChange={(e) => {
+                          const selectedName = e.target.value;
+                          if (!selectedName) return;
+
+                          const currentListString = editedODS.listaPlanta;
+                          const currentListArray = currentListString ? currentListString.split(',').map(name => name.trim()) : [];
+
+                          if (!currentListArray.includes(selectedName)) {
+                            const newListArray = [...currentListArray, selectedName];
+                            const concatenatedNames = newListArray.join(', ');
+                            setEditedODS(prev => ({ ...prev, listaPlanta: concatenatedNames || null }));
+                          }
+                          e.target.value = '';
+                        }}
+                        className="form-select"
+                      >
+                        <option value="">Seleccionar estación para añadir...</option>
+                        {plantas.sort((a, b) => a.nombre.localeCompare(b.nombre)).map((planta) => (
+                          <option key={planta.id} value={planta.nombre}>
+                            {planta.nombre}
+                          </option>
+                        ))}
+                      </select>
+                    ) : null}
+                    
+                    {(() => {
+                      const currentSelectedList = editedODS.listaPlanta;
+                      const selectedNamesArray = currentSelectedList ? currentSelectedList.split(',').map(name => name.trim()).filter(name => name) : [];
+
+                      if (selectedNamesArray.length > 0) {
+                        return (
+                          <div className="mt-2">
+                            <span className="fw-semibold fs-7 text-muted me-2">
+                              Estaciones seleccionadas:
+                            </span>
+                            <div className="mt-1">
+                              {selectedNamesArray.map((name, index) => (
+                                <span key={index} className="badge badge-light-primary mb-1 me-1 p-2">
+                                  {name}
+                                  {isEditing && esOriginador && (
+                                    <button
+                                      type="button"
+                                      className="btn btn-xs btn-icon btn-active-color-danger ms-2"
+                                      style={{ height: '20px', width: '20px' }}
+                                      onClick={() => {
+                                        const newListArray = selectedNamesArray.filter(n => n !== name);
+                                        const concatenatedNames = newListArray.join(', ');
+                                        setEditedODS(prev => ({ ...prev, listaPlanta: concatenatedNames || null }));
+                                      }}
+                                    >
+                                      <KTIcon iconName='cross' className='fs-7' />
+                                    </button>
+                                  )}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+
+                  {/* Selector de Sistemas */}
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold fs-7 text-muted mb-2">Sistemas</label>
+                    {isEditing && esOriginador ? (
+                      <select
+                        value={''}
+                        onChange={(e) => {
+                          const selectedName = e.target.value;
+                          if (!selectedName) return;
+
+                          const currentListString = editedODS.listaSistema;
+                          const currentListArray = currentListString ? currentListString.split(',').map(name => name.trim()) : [];
+
+                          if (!currentListArray.includes(selectedName)) {
+                            const newListArray = [...currentListArray, selectedName];
+                            const concatenatedNames = newListArray.join(', ');
+                            setEditedODS(prev => ({ ...prev, listaSistema: concatenatedNames || null }));
+                          }
+                          e.target.value = '';
+                        }}
+                        className="form-select"
+                      >
+                        <option value="">Seleccionar sistema para añadir...</option>
+                        {sistemas.sort((a, b) => a.nombre.localeCompare(b.nombre)).map((sistema) => (
+                          <option key={sistema.id} value={sistema.nombre}>
+                            {sistema.nombre}
+                          </option>
+                        ))}
+                      </select>
+                    ) : null}
+                    
+                    {(() => {
+                      const currentSelectedList = editedODS.listaSistema;
+                      const selectedNamesArray = currentSelectedList ? currentSelectedList.split(',').map(name => name.trim()).filter(name => name) : [];
+
+                      if (selectedNamesArray.length > 0) {
+                        return (
+                          <div className="mt-2">
+                            <span className="fw-semibold fs-7 text-muted me-2">
+                              Sistemas seleccionados:
+                            </span>
+                            <div className="mt-1">
+                              {selectedNamesArray.map((name, index) => (
+                                <span key={index} className="badge badge-light-info mb-1 me-1 p-2">
+                                  {name}
+                                  {isEditing && esOriginador && (
+                                    <button
+                                      type="button"
+                                      className="btn btn-xs btn-icon btn-active-color-danger ms-2"
+                                      style={{ height: '20px', width: '20px' }}
+                                      onClick={() => {
+                                        const newListArray = selectedNamesArray.filter(n => n !== name);
+                                        const concatenatedNames = newListArray.join(', ');
+                                        setEditedODS(prev => ({ ...prev, listaSistema: concatenatedNames || null }));
+                                      }}
+                                    >
+                                      <KTIcon iconName='cross' className='fs-7' />
+                                    </button>
+                                  )}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Sección 4: Fechas y Plazos */}
+        <div className="card mb-8">
+          <div className="card-header border-0 py-6">
+            <div className="card-title">
+              <div className="d-flex align-items-center position-relative my-1">
+                <KTIcon iconName="calendar" className="fs-1 position-absolute ms-6" />
+                <h3 className="fw-bold ms-15">Fechas y Plazos</h3>
+              </div>
+            </div>
+          </div>
+          <div className="card-body pt-0">
+            <div className="row g-6">
+              {/* Fecha Inicio - Editable por originador */}
+              <div className="col-lg-4">
+                <label className="form-label fw-semibold fs-6 required">Fecha de Inicio</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="date"
+                    value={editedODS.fechaInicio ? editedODS.fechaInicio.split('T')[0] : ''}
+                    onChange={(e) => {
+                      setEditedODS(prev => ({
+                        ...prev,
+                        fechaInicio: e.target.value,
+                      }));
+                    }}
+                    className="form-control"
+                    required
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span>{editedODS.fechaInicio ? new Date(editedODS.fechaInicio).toLocaleDateString('es-CO') : 'No definida'}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Fecha Fin - Solo lectura (calculada) */}
+              <div className="col-lg-4">
+                <label className="form-label fw-semibold fs-6 required">Fecha de Fin</label>
+                <div className="bg-light rounded p-3">
+                  <span>{editedODS.fechaFin ? new Date(editedODS.fechaFin).toLocaleDateString('es-CO') : 'No definida'}</span>
+                </div>
+              </div>
+
+              {/* Plazo en días - Editable por originador */}
+              <div className="col-lg-4">
+                <label className="form-label fw-semibold fs-6 required">Plazo de Ejecución (días)</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="number"
+                    placeholder="Plazo en días"
+                    value={plazoEnDiasForm ?? ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '') {
+                        setPlazoEnDiasForm(null);
+                      } else {
+                        const numValue = parseInt(value, 10);
+                        if (!isNaN(numValue) && numValue >= 1) {
+                          setPlazoEnDiasForm(numValue);
+                        } else if (value.length <= String(plazoEnDiasForm || '').length || value === "0") {
+                          setPlazoEnDiasForm(isNaN(numValue) || numValue < 1 ? null : numValue);
+                        }
+                      }
+                    }}
+                    className="form-control"
+                    min="1"
+                    required
+                  />
+                ) : (
+                  <div className="bg-primary bg-opacity-10 rounded p-3 border border-primary border-opacity-25">
+                    <span className="fw-bold text-primary fs-5">{calcularPlazo()}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Fecha Final Original - Solo lectura */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6">Fecha Final Original</label>
+                <div className="bg-light rounded p-3">
+                  <span>{editedODS.fechaFinalOriginal ? new Date(editedODS.fechaFinalOriginal).toLocaleDateString('es-CO') : 'No definida'}</span>
+                </div>
+              </div>
+
+              {/* Fecha Real de Cierre - Solo información, edición en sección de cierre */}
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6">Fecha Real de Cierre</label>
+                <div className={`rounded p-3 ${editedODS.fechaRealCierre ? 'bg-success bg-opacity-10 border border-success border-opacity-25' : 'bg-light'}`}>
+                  {editedODS.fechaRealCierre ? (
+                    <div className="d-flex align-items-center">
+                      <KTIcon iconName="calendar" className="fs-2 text-success me-2" />
+                      <div>
+                        <span className="fw-bold text-success">
+                          {new Date(editedODS.fechaRealCierre).toLocaleDateString('es-CO')}
+                        </span>
+                        <div className="fs-7 text-muted">ODS cerrada</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-muted">No definida - ODS sin cerrar</span>
+                  )}
+                </div>
+                {!editedODS.fechaRealCierre && (
+                  <div className="form-text text-muted mt-1">
+                    La fecha de cierre se establece en la sección "Cierre de ODS"
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección 5: Valores Económicos */}
+        <div className="card mb-8">
+          <div className="card-header border-0 py-6">
+            <div className="card-title">
+              <div className="d-flex align-items-center position-relative my-1">
+                <KTIcon iconName="dollar" className="fs-1 position-absolute ms-6" />
+                <h3 className="fw-bold ms-15">Valores Económicos</h3>
+              </div>
+            </div>
+          </div>
+          <div className="card-body pt-0">
+            {/* Valores principales editables */}
+            <div className="row g-6 mb-8">
+              <div className="col-lg-4">
+                <label className="form-label fw-semibold fs-6 required">Valor HH</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Valor Hora Hombre"
+                    value={formatCurrency(editedODS.valorHH)}
+                    onChange={(e) => handleChangeCurrency('valorHH', e.target.value)}
+                    className="form-control"
+                    required
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold fs-5 text-success">
+                      {formatCurrency(editedODS.valorHH)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="col-lg-4">
+                <label className="form-label fw-semibold fs-6 required">Valor Viajes</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Valor Viajes"
+                    value={formatCurrency(editedODS.valorViaje)}
+                    onChange={(e) => handleChangeCurrency('valorViaje', e.target.value)}
+                    className="form-control"
+                    required
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold fs-5 text-info">
+                      {formatCurrency(editedODS.valorViaje)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="col-lg-4">
+                <label className="form-label fw-semibold fs-6 required">Valor Estudios</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Valor Estudios"
+                    value={formatCurrency(editedODS.valorEstudio)}
+                    onChange={(e) => handleChangeCurrency('valorEstudio', e.target.value)}
+                    className="form-control"
+                    required
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold fs-5 text-warning">
+                      {formatCurrency(editedODS.valorEstudio)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Porcentaje Gasto Reembolsable - Editable por originador */}
+              <div className="col-lg-4">
+                <label className="form-label fw-semibold fs-6">Porcentaje Gasto Reembolsable (%)</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="number"
+                    placeholder="Porcentaje Gasto Reembolsable"
+                    value={editedODS.porcentajeGastoReembolsable ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, porcentajeGastoReembolsable: parseInt(e.target.value) || 0 }))}
+                    className="form-control"
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold fs-5">{editedODS.porcentajeGastoReembolsable ?? 0}%</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Valores iniciales (solo lectura) */}
+            <div className="mb-6">
+              <h4 className="fw-bold text-muted mb-4">Valores Iniciales</h4>
+              <div className="row g-6">
+                <div className="col-lg-3">
+                  <label className="form-label fw-semibold fs-6">Valor Inicial HH</label>
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold text-success">
+                      {formatCurrency(editedODS.valorInicialHH)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="col-lg-3">
+                  <label className="form-label fw-semibold fs-6">Valor Inicial Viajes</label>
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold text-info">
+                      {formatCurrency(editedODS.valorInicialViaje)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="col-lg-3">
+                  <label className="form-label fw-semibold fs-6">Valor Inicial Estudios</label>
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold text-warning">
+                      {formatCurrency(editedODS.valorInicialEstudio)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="col-lg-3">
+                  <label className="form-label fw-semibold fs-6">Valor Inicial Suma Global Fija</label>
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold text-primary">
+                      {formatCurrency(editedODS.valorInicialSumaGlobalFija ?? 0)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Valores calculados y de seguimiento */}
+            <div className="row g-6 mb-6">
+              <div className="col-lg-3">
+                <div className="card card-flush bg-success bg-opacity-10 border border-success border-opacity-25">
+                  <div className="card-body text-center py-6">
+                    <KTIcon iconName="dollar" className="fs-1 text-success mb-3" />
+                    <div className="fw-bold fs-6 text-gray-800 mb-2">Valor Suma Global Fija</div>
+                    <div className="fw-bolder fs-4 text-success">
+                      {formatCurrency(editedODS.valorHH + editedODS.valorViaje + editedODS.valorEstudio)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-lg-3">
+                <div className="card card-flush bg-info bg-opacity-10 border border-info border-opacity-25">
+                  <div className="card-body text-center py-6">
+                    <KTIcon iconName="wallet" className="fs-1 text-info mb-3" />
+                    <div className="fw-bold fs-6 text-gray-800 mb-2">Valor Disponible</div>
+                    <div className="fw-bolder fs-4 text-info">
+                      {editedODS.valorDisponible != null ? formatCurrency(editedODS.valorDisponible) : formatCurrency(0)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-lg-3">
+                <div className="card card-flush bg-warning bg-opacity-10 border border-warning border-opacity-25">
+                  <div className="card-body text-center py-6">
+                    <KTIcon iconName="chart-pie-simple" className="fs-1 text-warning mb-3" />
+                    <div className="fw-bold fs-6 text-gray-800 mb-2">Valor Pagado</div>
+                    <div className="fw-bolder fs-4 text-warning">
+                      {editedODS.valorPagado != null ? formatCurrency(editedODS.valorPagado) : formatCurrency(0)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-lg-3">
+                <div className="card card-flush bg-primary bg-opacity-10 border border-primary border-opacity-25">
+                  <div className="card-body text-center py-6">
+                    <KTIcon iconName="bank" className="fs-1 text-primary mb-3" />
+                    <div className="fw-bold fs-6 text-gray-800 mb-2">Valor Falta Por Pagar</div>
+                    <div className="fw-bolder fs-4 text-primary">
+                      {editedODS.valorFaltaPorPagar != null ? formatCurrency(editedODS.valorFaltaPorPagar) : formatCurrency(0)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Valores adicionales */}
+            <div className="row g-6">
+              <div className="col-lg-4">
+                <div className="card card-flush bg-secondary bg-opacity-10 border border-secondary border-opacity-25">
+                  <div className="card-body text-center py-6">
+                    <KTIcon iconName="percent" className="fs-1 text-secondary mb-3" />
+                    <div className="fw-bold fs-6 text-gray-800 mb-2">Valor Gasto Reembolsable</div>
+                    <div className="fw-bolder fs-4 text-secondary">
+                      {formatCurrency(editedODS.valorGastoReembolsable ?? 0)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-lg-4">
+                <div className="card card-flush bg-dark bg-opacity-10 border border-dark border-opacity-25">
+                  <div className="card-body text-center py-6">
+                    <KTIcon iconName="check-circle" className="fs-1 text-dark mb-3" />
+                    <div className="fw-bold fs-6 text-gray-800 mb-2">Valor Habilitado</div>
+                    <div className="fw-bolder fs-4 text-dark">
+                      {formatCurrency(editedODS.valorHabilitado ?? 0)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-lg-4">
+                <div className="card card-flush bg-light border border-light">
+                  <div className="card-body text-center py-6">
+                    <KTIcon iconName="calculator" className="fs-1 text-gray-600 mb-3" />
+                    <div className="fw-bold fs-6 text-gray-800 mb-2">Valor Inicial Calculado</div>
+                    <div className="fw-bolder fs-4 text-gray-600">
+                      {formatCurrency(editedODS.valorInicialHH + editedODS.valorInicialViaje + editedODS.valorInicialEstudio)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Avance de Hitos de Pago */}
+            <div className="row g-6 mt-6">
+              <div className="col-12">
+                <label className="form-label fw-semibold fs-6">Avance Hitos de Pago</label>
+                <div className="progress" style={{ height: "20px" }}>
+                  <div
+                    className="progress-bar bg-danger"
+                    role="progressbar"
+                    style={{ width: `${editedODS.avance}%` }}
+                    aria-valuenow={editedODS.avance}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >{Math.round(editedODS.avance)}%</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Campos de seguimiento adicionales */}
+            <div className="row g-6 mt-6">
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6">Porcentaje Requerimientos Cumplidos (%)</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="Porcentaje de requerimientos cumplidos"
+                    value={editedODS.porcentajeRequerimientosCumplidos ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, porcentajeRequerimientosCumplidos: parseFloat(e.target.value) || null }))}
+                    className="form-control"
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold fs-5">{editedODS.porcentajeRequerimientosCumplidos ?? 0}%</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6">Porcentaje Acciones Cumplidas (%)</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="Porcentaje de acciones cumplidas"
+                    value={editedODS.porcentajeAccionesCumplidas ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, porcentajeAccionesCumplidas: parseFloat(e.target.value) || null }))}
+                    className="form-control"
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold fs-5">{editedODS.porcentajeAccionesCumplidas ?? 0}%</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="col-lg-6">
+                <label className="form-label fw-semibold fs-6">Horas Hombre</label>
+                {isEditing && esOriginador ? (
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="Número de horas hombre"
+                    value={editedODS.horasHombre ?? ''}
+                    onChange={(e) => setEditedODS(prev => ({ ...prev, horasHombre: parseFloat(e.target.value) || null }))}
+                    className="form-control"
+                  />
+                ) : (
+                  <div className="bg-light rounded p-3">
+                    <span className="fw-bold fs-5">{editedODS.horasHombre ?? 0} horas</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Indicador de estado de carga de SECS */}
+      {(!Array.isArray(indicadoresSECS) || indicadoresSECS.length === 0) && (
+        <div className='row mb-5 p-5'>
+          <div className='col-12'>
+            <div className='alert alert-info d-flex align-items-center'>
+              <KTIcon iconName="information-2" className="fs-2 me-3" />
+              <div>
+                <strong>Cargando datos SECS...</strong> Los gráficos se actualizarán automáticamente cuando se obtengan los datos de los indicadores SECS para la ODS {selectedODSId}.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {Array.isArray(indicadoresSECS) && indicadoresSECS.length > 0 && (
+        <div className='row mb-5 p-5'>
+          <div className='col-12'>
+            <div className='alert alert-success d-flex align-items-center'>
+              <KTIcon iconName="check-circle" className="fs-2 me-3" />
+              <div>
+                <strong>Datos SECS cargados:</strong> Se encontraron {indicadoresSECS.length} registros de indicadores SECS para la ODS {selectedODSId}. 
+                {getLatestSECSData() && (
+                  <span> Última calificación: <strong>{getLatestSECSData()?.totalPonderado || 0}%</strong> ({new Date(getLatestSECSData()?.fecha || '').toLocaleDateString('es-ES')})</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className='row g-5 mb-10 p-5'>
+        <div className='col'>
+          <RadialBarChart 
+            title="SECS asociados al cumplimiento en la ejecución de proyectos"
+            data={getTripleRestriccionData().data}
+            labels={getTripleRestriccionData().labels}
+            totalLabel="Promedio"
+          />
+        </div>
+        <div className='col'>
+          <RadialBarChart 
+            title="SECS asociados a las obligaciones del contratista"
+            data={getCalidadData().data}
+            labels={getCalidadData().labels}
+            totalLabel="Promedio"
+          />
+        </div>
+        <div className='col'>
+          <RadialBarChart 
+            title="SECS asociado a la entrega de información contractual"
+            data={getEntregablesData().data}
+            labels={getEntregablesData().labels}
+            totalLabel="Promedio"
+          />
+        </div>
+      </div>
+
+      <div className='row g-5 g-xl-10 mb-10 p-5'>
+        <div className='col-xl-12'>
+          <AreaChart 
+            title="Avance semanal del puntaje total ponderado de los indicadores SECS"
+            series={[{ name: 'Puntaje total ponderado', data: getPromedioSECSData().data }]}
+            categories={getPromedioSECSData().categories}
+          />
+        </div>
+      </div>
+
+      {/* Widgets adicionales - Solo se muestran si la ODS no está en estado pendiente o rechazada */}
+      {(editedODS.estado !== 0 && editedODS.estado !== 5) && (
+        <>
+          <ActasODSWidget selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} />
+          <OrdenesCambioWidget selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} />
+          <SuspensionesWidget selectedOdsId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} />
+          {editedODS.tipoODS == 1 ? <SubOrdenesServicioWidget selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} /> : null}
+          {editedODS.tipoODS == 0 ? <HitosPagoWidget selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} /> : null}
+          {editedODS.tipoODS == 0 ? <TalleresWidget selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} /> : null}
+          {editedODS.tipoODS == 0 ? <GanttChart selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} /> : null}
+          <SPIWidget selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} />
+          <div className='row g-5 g-xl-10 mb-10 p-5'>
+            <div className='col-xl-12'>
+              <AreaChart 
+                title="Avance semanal del Índice de Ejecución del Programa (Ruta Crítica)"
+                series={getSPITimeSeriesData().series}
+                categories={getSPITimeSeriesData().categories}
+              />
+            </div>
+          </div>
+          <HallazgosODSWidget selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} />
+          <div className='row g-5 g-xl-10 mb-10 p-5'>
+            <div className='col-xl-12'>
+              <AreaChart 
+                title="Evolución semanal de hallazgos - Total vs Cerrados"
+                series={getHallazgosTimeSeriesData().series}
+                categories={getHallazgosTimeSeriesData().categories}
+              />
+            </div>
+          </div>
+          <NoConformidadesODSWidget selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} />
+          <div className='row g-5 g-xl-10 mb-10 p-5'>
+            <div className='col-xl-12'>
+              <AreaChart 
+                title="Evolución semanal de no conformidades - Total vs Cerradas"
+                series={getNoConformidadesTimeSeriesData().series}
+                categories={getNoConformidadesTimeSeriesData().categories}
+              />
+            </div>
+          </div>
+          <DocumentosODSWidget selectedODSId={selectedODSId} onUpdate={() => fetchODS(selectedODSId)} />
+          <div className='row g-5 g-xl-10 mb-10 p-5'>
+            <div className='col-xl-12'>
+              <div className="card">
+                <div className="card-header">
+                  <div className="card-title">
+                    <h3 className="fw-bold">Evolución semanal de documentos - Planeado vs Real</h3>
+                  </div>
+                  <div className="card-toolbar">
+                    <select
+                      className="form-select form-select-sm w-200px"
+                      value={selectedDocumentType}
+                      onChange={(e) => setSelectedDocumentType(e.target.value)}
+                    >
+                      {documentOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="card-body">
+                  <AreaChart 
+                    title=""
+                    series={getDocumentosTimeSeriesData().series}
+                    categories={getDocumentosTimeSeriesData().categories}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Modales de confirmación */}
+      {modalType === 'edit' && (
+        <ModalDialog
+          title="Editar Orden de Servicio"
+          content="¿Estás seguro de que deseas editar esta orden de servicio?"
+          textBtn="Editar"
+          onConfirm={() => updateODS(editedODS)}
+          closeModal={closeModal}
+        />
+      )}
+
+      {modalType === 'approve' && (
+        <ModalDialog
+          title="Aprobar Orden de Servicio"
+          content={`¿Estás seguro de que deseas aprobar la orden de servicio "${editedODS.nombre}"?`}
+          textBtn="Aprobar"
+          onConfirm={() => { setEditedODS({ ...editedODS, estaAprobada: true, estaRechazada: false }); closeModal() }}
+          closeModal={closeModal}
+        />
+      )}
+
+      {modalType === 'disapprove' && (
+        <ModalDialog
+          title="Desaprobar Orden de Servicio"
+          content={`¿Estás seguro de que deseas desaprobar la orden de servicio "${editedODS.nombre}"?`}
+          textBtn="Desaprobar"
+          onConfirm={() => { setEditedODS({ ...editedODS, estaAprobada: false }); closeModal() }}
+          closeModal={closeModal}
+        />
+      )}
+
+      {modalType === 'cancel' && (
+        <ModalDialog
+          title="Cancelar Orden de Servicio"
+          content={`¿Estás seguro de que deseas cancelar la orden de servicio "${editedODS.nombre}"?`}
+          textBtn="Cancelar"
+          onConfirm={() => { setEditedODS({ ...editedODS, estaCancelada: true }); closeModal() }}
+          closeModal={closeModal}
+        />
+      )}
+
+      {modalType === 'uncancel' && (
+        <ModalDialog
+          title="Descancelar Orden de Servicio"
+          content={`¿Estás seguro de que deseas descancelar la orden de servicio "${editedODS.nombre}"?`}
+          textBtn="Descancelar"
+          onConfirm={() => { setEditedODS({ ...editedODS, estaCancelada: false }); closeModal() }}
+          closeModal={closeModal}
+        />
+      )}
+
+      {modalType === 'reject' && (
+        <ModalDialog
+          title="Rechazar Orden de Servicio"
+          content={
+            <div>
+              <p>¿Estás seguro de que deseas rechazar la orden de servicio "{editedODS.nombre}"?</p>
+              <div className="form-group mt-3">
+                <label className="form-label">Comentario de Rechazo:</label>
+                <textarea
+                  placeholder="Ingrese el motivo del rechazo"
+                  value={editedODS.comentarioAprobacion || ''}
+                  onChange={(e) => setEditedODS(prev => ({ ...prev, comentarioAprobacion: e.target.value }))}
+                  className="form-control"
+                  rows={3}
+                  required
+                />
+              </div>
+            </div>
+          }
+          textBtn="Rechazar"
+          confirmButtonClass="btn-warning"
+          onConfirm={() => {
+            if (!editedODS.comentarioAprobacion?.trim()) {
+              alert("El comentario de rechazo es obligatorio");
+              return;
+            }
+            setEditedODS({ ...editedODS, estaRechazada: true, estaAprobada: false });
+            closeModal();
+          }}
+          closeModal={closeModal}
+        />
+      )}
+
+      {modalType === 'unreject' && (
+        <ModalDialog
+          title="Desrechazar Orden de Servicio"
+          content={`¿Estás seguro de que deseas quitar el rechazo de la orden de servicio "${editedODS.nombre}"?`}
+          textBtn="Desrechazar"
+          onConfirm={() => {
+            setEditedODS({ ...editedODS, estaRechazada: false, comentarioAprobacion: null });
+            closeModal();
+          }}
+          closeModal={closeModal}
+        />
+      )}
+
+      {modalType === 'close' && (
+        <ModalDialog
+          title="Cerrar Orden de Servicio"
+          content={
+            <div>
+              <p>¿Estás seguro de que deseas cerrar la orden de servicio "{editedODS.nombre}"?</p>
+              <div className="alert alert-info mt-3">
+                <div className="d-flex align-items-center">
+                  <KTIcon iconName="calendar" className="fs-2 text-info me-3" />
+                  <div>
+                    <strong>Fecha de cierre seleccionada:</strong>
+                    <br />
+                    <span className="fw-bold text-primary">
+                      {editedODS.fechaRealCierre ? 
+                        new Date(editedODS.fechaRealCierre).toLocaleDateString('es-CO', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) : 
+                        'No seleccionada'
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="form-group mt-3">
+                <label className="form-label fw-semibold">Porcentaje de Requerimientos Cumplidos: <span className="text-success">{editedODS.porcentajeRequerimientosCumplidos ?? 0}%</span></label>
+              </div>
+              <div className="form-group mt-2">
+                <label className="form-label fw-semibold">Porcentaje de Acciones Cumplidas: <span className="text-success">{editedODS.porcentajeAccionesCumplidas ?? 0}%</span></label>
+              </div>
+            </div>
+          }
+          textBtn="Cerrar ODS"
+          confirmButtonClass="btn-success"
+          onConfirm={() => {
+            if (!editedODS.fechaRealCierre) {
+              alert("Debe seleccionar una fecha de cierre antes de cerrar la ODS");
+              return;
+            }
+            if (editedODS.porcentajeRequerimientosCumplidos === null || editedODS.porcentajeAccionesCumplidas === null) {
+              alert("Debe completar los porcentajes de requerimientos y acciones cumplidas antes de cerrar la ODS");
+              return;
+            }
+            closeODS(editedODS);
+          }}
+          closeModal={closeModal}
+        />
+      )}
+
+      {modalType === 'delete' && (
+        <ModalDialog
+          title="Eliminar Orden de Servicio"
+          content={`¿Está seguro que desea eliminar la Orden de Servicio ${editedODS.nombre}? Tenga en cuenta que esta acción eliminará todos los Talleres asociados a esta ODS.`}
+          textBtn="Eliminar"
+          confirmButtonClass="btn-danger"
+          onConfirm={deleteODS}
+          closeModal={closeModal}
+        />
+      )}
+    </>
+  );
+} 

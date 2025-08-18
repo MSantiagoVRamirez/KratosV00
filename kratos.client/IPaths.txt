@@ -1,0 +1,20 @@
+// Para cambiarlos valores de las variables en CSS (primary, secondary, ...)
+metronic_react_v8/src/_metronic/assets/sass/core/components/_variables.scss
+metronic_react_v8/src/_metronic/assets/sass/core/components/_variables-dark.scss
+metronic_react_v8/src/_metronic/assets/sass/core/components/_utilities.scss
+
+// Para cambiar las urls definidas en el Router de React
+metronic_react_v8/src/app/routing/PrivateRoutes.tsx
+// Y cambiar la forma en la que se organizan en el Menu principal superior
+metronic_react_v8/src/_metronic/layout/components/header/header-menus/MenuInner.tsx
+// Y también en el menu de la Sidebar
+metronic_react_v8/src/_metronic/layout/components/sidebar/sidebar-menu/SidebarMenuMain.tsx
+
+// Para cambiar el tema por defecto de la sidebar:
+FrontEnd\frontend.client\src\_metronic\layout\core\_LayoutConfig.ts
+
+// Layout que se mantiene siempre de base en todass las páginas
+FrontEnd\frontend.client\src\_metronic\layout\MasterLayout.tsx
+
+// Para cambiar el contenido del menu en la parte superior derecha
+FrontEnd\frontend.client\src\_metronic\layout\components\header\Navbar.tsx
