@@ -21,7 +21,7 @@ function RegistroEmpresa({ onClose, onSuccess }: RegistroEmpresaProps) {
         nit: '',
         dv: '',
         telefono: '',
-        email: '',
+        email: '',  
         representanteLegal: '',
         activo: true,
         creadoEn: new Date().toISOString(),

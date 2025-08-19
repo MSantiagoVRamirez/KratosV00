@@ -8,28 +8,28 @@ $prefix: bs- !default; // Deprecated in v5.2.0 for the shorter `$prefix`
 
 // Custom coal colors
 $coal-100:  #15171C !default;
-$coal-200:  #13141A !default;
+$coal-200:  #1a1316 !default;
 $coal-300:  #111217 !default;
 $coal-400:  #0F1014 !default;
 $coal-500:  #0D0E12 !default;
 $coal-600:  #0B0C10 !default;
 $coal-black: #000000 !default;
-$coal-clarity:  rgba(#18191F, 50) !default;
+$coal-clarity:  rgba(#2b2022, 50) !default;
 
 
 // Bootstrap color system
-$white: rgba(10, 70, 120, 0.7) !default;
+$white: rgba(38, 98, 146) !default;
 $black:#ffffff !default;
 
 // Bootstrap grey colors
-$gray-100: rgba(10, 70, 120, 0.7) !default;
-$gray-200: #ffffff !default;
+$gray-100: rgba(10, 70, 120) !default;
+$gray-200: rgba(10, 70, 120) !default;
 $gray-300: #ffffff !default;
-$gray-400: #C4CADA !default;
-$gray-500: #99A1B7 !default;
-$gray-600: #31eb0c !default;
-$gray-700: #ffffff !default;
-$gray-800: #252F4A !default;
+$gray-400: #4be90d !default;
+$gray-500: #dadada !default;
+$gray-600: rgb(16, 212, 247) !default;
+$gray-700:  rgb(18, 211, 137)!default;
+$gray-800: #fafafa !default;
 $gray-900: #ffffff !default;
  
 // Bootstrap muted color
@@ -51,19 +51,19 @@ $grays: (
 // Bootstrap contextual colors
 
 // Primary colors
-$primary:						#ffffff !default;
-$primary-active:				#09e209 !default;
+$primary:						rgb(16, 212, 247)!default;
+$primary-active:				rgb(247, 247, 247) !default;
 $primary-clarity: 				 rgba(#6b3e0b, 0.2) !default;
 $primary-light: 				 rgba(#C8DE26, 0.1) !default;
 // $primary:					#1B84FF !default;
 // $primary-active:			#056EE9 !default;
 // $primary-clarity: 			 rgba(#1B84FF, 0.2) !default;
 // $primary-light: 			#E9F3FF !default;
-$primary-inverse: 				 $white !default; 
+$primary-inverse: 				 $gray-200 !default; 
 
 // Secondary colors
 $secondary: 					#ebe70c !default;
-$secondary-active: 			#016FD7 !default;
+$secondary-active: 			#d30c0c !default;
 $secondary-light: 				 rgba(#016FD7, 0.1) !default; 
 $secondary-clarity:				 rgba(#016FD7, 0.2) !default; 
 // $secondary: 					 $gray-200 !default;
@@ -73,14 +73,14 @@ $secondary-clarity:				 rgba(#016FD7, 0.2) !default;
 $secondary-inverse:				 $gray-800 !default; 
 
 // Light colors
-$light: 						 $gray-100 !default;
-$light-active: 					 $gray-200 !default;
+$light: 						 $white  !default;
+$light-active: 					 $gray-600 !default;
 $light-light: 					#eb0a0a !default;
 $light-clarity: 				 rgba($white, 0.2) !default;
 $light-inverse:					 $gray-800 !default;
 
 // Success colors
-$success: 						#59D500 !default; 
+$success: 						#d50000 !default; 
 $success-active: 				#59D500 !default;
 $success-light: 				 rgba(#59D500, 0.1) !default;
 $success-clarity: 				 rgba(#59D500, 0.2) !default;
@@ -104,12 +104,12 @@ $info-inverse: 					 $white !default;
 // Warning colors
 $warning: 						#F6C000 !default; 
 $warning-active: 				#DEAD00 !default;
-$warning-light: 				#FFF8DD !default;
+$warning-light: 				#e20808 !default;
 $warning-clarity: 				 rgba(#F6C000, 0.2) !default;
 $warning-inverse: 				 $white !default;
 
 // Danger colors
-$danger: 						#FF5955 !default; 
+$danger: 						#c4a51e !default; 
 $danger-active: 				#FF5955 !default;
 $danger-light: 					 rgba(#FF5955, 0.1) !default;
 $danger-clarity: 				 rgba(#FF5955, 0.2) !default;
@@ -120,10 +120,10 @@ $danger-clarity: 				 rgba(#FF5955, 0.2) !default;
 $danger-inverse: 				 $white !default;
 
 // Dark colors
-$dark: 						#1E2129 !default;
-$dark-active: 					#111318 !default;
-$dark-light: 					#F9F9F9 !default; 
-$dark-clarity: 					 rgba(#1E2129, 0.2) !default;
+$dark: 						#f10707 !default;
+$dark-active: 					#d11242 !default;
+$dark-light: 					#000000 !default; 
+$dark-clarity: 					 rgb(196, 20, 231) !default;
 $dark-inverse: 					 $white !default;
 
 // Contextual colors
@@ -153,7 +153,7 @@ $theme-active-colors: (
 // Contextual inverse state colors
 $theme-inverse-colors: (
 	"primary": $primary-inverse,
-	"secondary":  $secondary-inverse,
+	"secondary":  $secondary,
 	"light":   $light-inverse,
 	"success": $success-inverse,
 	"info":    $info-inverse,
@@ -512,7 +512,7 @@ $table-border-color:                        var(--#{$prefix}border-color) !defau
 
 $table-caption-color:                       $text-muted !default;
 
-$table-loading-message-box-shadow:          0px 0px 50px 0px rgba(82,63,105, 0.15) !default;
+$table-loading-message-box-shadow:          0px 0px 50px 0px rgba(110, 3, 241, 0.15) !default;
 $table-loading-message-bg:                  var(--#{$prefix}body-bg) !default;
 $table-loading-message-color:               var(--#{$prefix}gray-700) !default;
 

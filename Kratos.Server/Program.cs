@@ -61,7 +61,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(corsPolicyName,
         policy => policy
             .WithOrigins(
-                "https://localhost:49916",  // React desarrollo
+                "https://localhost:63586",  // React desarrollo
                 "http://localhost:3000",   // React alternativo
                 "https://tuproduccion.com"  // Producción
             )

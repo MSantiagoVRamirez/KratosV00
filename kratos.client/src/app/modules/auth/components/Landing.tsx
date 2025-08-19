@@ -1,27 +1,89 @@
 ﻿import React, { useState } from 'react';
 import '../../../Styles/estilos.css';
 import img1 from '../../../../../public/media/misc/portfolio.png';
-import RegistroEmpresa from './RegistroEmpresa';
-import RegistroUsuario from './RegistroUsuario';
-import Login from './Login';
-import LoginUsuario from './LoginUsuario';
-import { ModalDialog } from "../../../pages/components/ModalDialog"
+import { ActividadEconomica } from '../../../interfaces/Configuracion/ActividadEconomica';
+import { RegimenTributario } from '../../../interfaces/Configuracion/RegimenTributario';
+import { TipoSociedad } from '../../../interfaces/Configuracion/TipoSociedad';
+import {RegistroEmpresaStepper } from './RegistroEmpresaStepper';
+import { Empresa } from '../../../interfaces/seguridad/Empresa';
+import loginService from '../../../services/seguridad/loginService'
+import consultasRegistroService from '../../../services/seguridad/consultasRegistroService';
 
 function Landing() {
-    const [mostrarModalMidleRegistro, setMostrarMidleRegistro] = useState(false);
-    const [tipoRegistro, setTipoRegistro] = useState('usuario'); // 'empresa' o 'usuario'
-    const [mostrarModalMidleLogin, setMostrarMidleLogin] = useState(false);
-    const [tipoLogin, setTipoLogin] = useState('usuario'); // 'empresa' o 'usuario'
-
+    const [actividad, setActividad] = useState<ActividadEconomica[]>([])
+    const [rigimenes, setRigimenes] = useState<RegimenTributario[]>([])
+    const [tiposSociedad, setTiposSociedad] = useState<TipoSociedad[]>([])
     const [modalType, setModalType] = useState<'registroEmpresa' | 'registroUsuario' | 'loginEmpresa' | 'loginUsuario' | null>(null);
+    const defaultEmpresa: Empresa = {
+        id: 0,
+        contraseña: '',
+        confirmarContraseña: '',
+        tiposociedadId: 0,
+        actividadId: 0,
+        regimenId: 0,
+        token: '',
+        razonSocial: '',
+        nombreComercial: '',
+        nit: '',
+        dv: '',
+        telefono: '',
+        email: '',
+        representanteLegal: '',
+        activo: true,
+        creadoEn:  new Date().toISOString(),
+        actualizadoEn:  new Date().toISOString(),
+      }
+    
+    
+    const closeModal = () => setModalType(null)
 
-    const handleRegistroExitoso = () => {
-        setMostrarMidleRegistro(false);
-    };
-
-    const handleLoginExitoso = () => {
-        setMostrarMidleLogin(false);
-    };
+    // Registrar Empresa
+    const RegistrarEmpresa = (data: Empresa) => {
+        loginService.registroEmpresa(data)
+        .then(() => {
+            alert("Empresa registrada exitosamente");
+        })
+        .catch((error) => {
+            console.error("Hubo un error al registrar la empresa", error)
+         alert(`Error al Registrar la Empresa: ${error.response?.data || error.response?.data?.message || error.message}`);
+          })
+    }
+    // traer actividades economicas
+    const getActividadesEconomicas = () => {
+        consultasRegistroService.getActividadesEconomicas()
+            .then(response => {
+                setActividad(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener actividades económicas", error);
+            });
+    }
+    // traer regimenes tributarios
+    const getRegimenesTributarios = () => {
+        consultasRegistroService.getRegimenesTributarios()
+            .then(response => {
+                setRigimenes(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener regimenes tributarios", error);
+            });
+    }
+    // traer tipos de sociedad
+    const getTiposSociedad = () => {
+        consultasRegistroService.getTiposSociedad()
+            .then(response => {
+                setTiposSociedad(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener tipos de sociedad", error);
+            });
+    }
+    // Cargar datos al iniciar el componente
+    React.useEffect(() => {
+        getActividadesEconomicas();
+        getRegimenesTributarios();
+        getTiposSociedad();
+    }, []);
 
     return (
         <div className="content-2">
@@ -31,20 +93,13 @@ function Landing() {
                     <button
                         style={{ marginTop: '0px' }}
                         className="boton-formulario"
-                        onClick={() => {
-                            setTipoLogin('usuario');
-                            setMostrarMidleLogin(true);
-                        }}
                     >
                         Iniciar Sesión
                     </button>
                     <button
                         style={{ marginTop: '0px' }}
                         className="boton-formulario"
-                        onClick={() => {
-                            setTipoRegistro('usuario');
-                            setMostrarMidleRegistro(true);
-                        }}
+                        onClick={() => setModalType('registroEmpresa')}
                     >
                         Registro
                     </button>
@@ -141,14 +196,21 @@ function Landing() {
                     <a href="/registro" className="boton-formulario">¡Empezar Ahora!</a>
                 </div>
             </div>
-
-            {/* Modal para Registro Empresa/Usuario */}
-            {(modalType === 'registroEmpresa' || modalType === 'registroUsuario') && (
-                
-
-            )}
+        {/* Modal Stepper de Creación/Registro de Empresa */}
+        <RegistroEmpresaStepper
+          show={modalType === 'registroEmpresa' || modalType === 'registroUsuario'}
+          handleClose={closeModal}
+          onSubmit={(Empresa) => {
+            if (modalType === 'registroEmpresa') {
+              RegistrarEmpresa(Empresa);
+            }
+          }}
+          modalType={modalType === 'registroEmpresa' ? 'create' : 'edit'}
+          actividades={actividad}        
+          rigimenes={rigimenes}             
+          tiposSociedad={tiposSociedad} 
+        />
         </div>
-
     );
 }
 

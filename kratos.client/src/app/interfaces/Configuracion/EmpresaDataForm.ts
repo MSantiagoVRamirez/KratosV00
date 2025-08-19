@@ -3,7 +3,7 @@ export interface EmpresaDataForm {
         email: string
         contraseña: string
         confirmarContraseña: string 
-        Token: string
+        token: string
     };
     step2: {
         telefono: string
@@ -18,18 +18,13 @@ export interface EmpresaDataForm {
         nit: string
         dv: string
     };
-    step4:{
-        activo: boolean
-        creadoEn: string
-        actualizadoEn: string
-    };
 }
 export const defaultDataEmpresa : EmpresaDataForm = {
     step1: {
         email: '',
         contraseña: '',
         confirmarContraseña: '',
-        Token: ''
+        token: ''
     },
     step2: {
         telefono: '',
@@ -44,9 +39,4 @@ export const defaultDataEmpresa : EmpresaDataForm = {
         nit: '',
         dv: ''
     },
-    step4:{
-        activo: true,
-        creadoEn: new Date().toISOString(),
-        actualizadoEn: new Date().toISOString()
-    }
 } 
