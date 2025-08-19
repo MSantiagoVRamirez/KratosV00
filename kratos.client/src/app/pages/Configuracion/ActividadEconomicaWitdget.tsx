@@ -8,7 +8,7 @@ import { useFormValidation } from '../../hooks/useFormValidation'
 import { GridColDef, GridRenderCellParams, DataGrid } from '@mui/x-data-grid';
 import { IconButton, Box } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
-
+//revison
 export function ActividadEconomicaWitdget() {
 
   const defaultActividadEconomica: ActividadEconomica = {

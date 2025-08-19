@@ -8,6 +8,12 @@ import {RegistroEmpresaStepper } from './RegistroEmpresaStepper';
 import { Empresa } from '../../../interfaces/seguridad/Empresa';
 import loginService from '../../../services/seguridad/loginService'
 import consultasRegistroService from '../../../services/seguridad/consultasRegistroService';
+import { ModalDialog } from "../../../pages/components/ModalDialog"
+import { useFormValidation } from '../../../hooks/useFormValidation'
+import { grid2ColStyle } from "../../../utils"
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+
 
 function Landing() {
     const [actividad, setActividad] = useState<ActividadEconomica[]>([])
@@ -32,22 +38,70 @@ function Landing() {
         activo: true,
         creadoEn:  new Date().toISOString(),
         actualizadoEn:  new Date().toISOString(),
-      }
-    
-    
+      } 
+    const [login, setLogin] = useState({ email: '', contraseña: '' })
     const closeModal = () => setModalType(null)
+    const navigate = useNavigate();
+    
+    const isFormValid = useFormValidation({
+        email: { value: login.email, required: true, type: 'string' },
+        contraseña: { value: login.contraseña, required: true, type: 'string' }
+    });
+    const { invertAuth, saveUser, saveRole } = useAuth();
 
     // Registrar Empresa
     const RegistrarEmpresa = (data: Empresa) => {
         loginService.registroEmpresa(data)
         .then(() => {
             alert("Empresa registrada exitosamente");
+           
         })
         .catch((error) => {
             console.error("Hubo un error al registrar la empresa", error)
          alert(`Error al Registrar la Empresa: ${error.response?.data || error.response?.data?.message || error.message}`);
           })
     }
+    //llamar servicio para loguear se como empresa
+const handleLoginEmpresa = async () => {
+  try {
+    const { data } = await loginService.loginEmpresa(login.email, login.contraseña);
+    console.log('login ok', data);
+
+    // 1) Actualiza el contexto de auth como hacías antes
+    const emailResp =
+      data?.empresa?.email ?? data?.usuario?.email ?? login.email;
+    const roleResp =
+      data?.empresa ? 'Empresa' : (data?.usuario?.rol ?? 'Usuario');
+
+    saveUser(emailResp);
+    saveRole(roleResp);
+    // si invertAuth() solo “alterna”, asegúrate que parte de "false" -> "true"
+    invertAuth();
+
+    // 2) Cierra el modal (si aplica) y navega
+    closeModal?.();
+    navigate('/dashboard', { replace: true });
+  } catch (error: any) {
+    console.error('Hubo un error al iniciar sesión como Empresa', error);
+    alert(
+      `Error al iniciar sesión como Empresa: ${
+        error.response?.data || error.response?.data?.message || error.message
+      }`
+    );
+  }
+};
+    //llamar el servicio para loguearse como usuario
+    const handleLoginUsuario = () =>{
+        loginService.loginUsuario(login.email, login.contraseña)
+        .then(() => {
+            navigate('/dashboard', { replace: true });
+        })
+        .catch((error) => {
+            console.error("Hubo un error al iniciar sesión como Usuario", error);
+            alert(`Error al iniciar sesión como Usuario: ${error.response?.data || error.response?.data?.message || error.message}`);
+        });
+    }
+
     // traer actividades economicas
     const getActividadesEconomicas = () => {
         consultasRegistroService.getActividadesEconomicas()
@@ -93,6 +147,7 @@ function Landing() {
                     <button
                         style={{ marginTop: '0px' }}
                         className="boton-formulario"
+                        onClick={() => setModalType('loginEmpresa')}
                     >
                         Iniciar Sesión
                     </button>
@@ -210,7 +265,58 @@ function Landing() {
           rigimenes={rigimenes}             
           tiposSociedad={tiposSociedad} 
         />
-        </div>
+        {/* Formulario de Login */}
+            {(modalType === 'loginEmpresa' || modalType == 'loginUsuario') && (
+              <ModalDialog
+            title={modalType === 'loginEmpresa' ? "Iniciar Session como Empresa" : "Iniciar Sesion Como Usuario"}
+            isFormValid={isFormValid}
+            content={
+              <div style={grid2ColStyle}>
+                <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                  <label style={{color:'white'}} className="form-label required">Email</label>
+                  <input
+                    type="text"
+                    placeholder="Email"
+                    onChange={(e) =>
+                      setLogin(prev => ({
+                        ...prev,
+                        email: e.target.value  
+                      }))
+                    }
+                    className="form-control"
+                    required
+                  />
+                </div>
+
+                <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                  <label style={{color:'white'}} className="form-label required">Contraseña</label>
+                  <input
+                    type="password"
+                    placeholder="Contraseña"
+                    onChange={(e) =>
+                      setLogin(prev => ({
+                        ...prev,
+                        contraseña: e.target.value    
+                      }))
+                    }
+                    className="form-control"
+                    required
+                  />
+                </div>
+              </div>
+            }
+            textBtn="Iniciar Sesión"
+            onConfirm={() => { // Llamar a la función correcta con el estado unificado
+              if (modalType === 'loginEmpresa') {
+                handleLoginEmpresa();
+              } else if (modalType === 'loginUsuario') {
+                handleLoginUsuario();
+              }
+            }}
+            closeModal={closeModal}
+          />
+            )}
+          </div>
     );
 }
 

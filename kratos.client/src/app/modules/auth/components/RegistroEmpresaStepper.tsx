@@ -12,7 +12,6 @@ import { ActividadEconomica } from '../../../interfaces/Configuracion/ActividadE
 import { RegimenTributario } from '../../../interfaces/Configuracion/RegimenTributario';
 import { TipoSociedad } from '../../../interfaces/Configuracion/TipoSociedad';
 import { Empresa } from '../../../interfaces/seguridad/Empresa'
-import { Style } from '@mui/icons-material';
 import '../../../Styles/estilos.css';
 
 type Props = {

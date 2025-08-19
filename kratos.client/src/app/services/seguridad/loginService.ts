@@ -8,9 +8,22 @@ const API_URL = APIurls.Currennt_API_URL + "/api/Login";
 // Preservar estado de la sesión iniciada
 axios.defaults.withCredentials = true;
 
-const login = (usuario: string, password: string) => {
-  return axios.post(`${API_URL}/iniciarSesion`, { "usuario": usuario, "password": password });
-}
+// Opción clara usando params:
+const loginEmpresa = (email: string, contraseña: string) => {
+  return axios.post(
+    `${API_URL}/iniciarSesion`,
+    { email, contraseña },              
+    { params: { tipoLogin: 1 } }
+  );
+};
+
+const loginUsuario = (email: string, contraseña: string) => {
+  return axios.post(
+    `${API_URL}/iniciarSesion`,
+    { email, contraseña },              
+    { params: { tipoLogin: 2 } }
+  );
+};
 
 const registroEmpresa = (data: Empresa) => {
   return axios.post(`${API_URL}/registroEmpresa`, data);
@@ -20,12 +33,4 @@ const logout = () => {
   return axios.post(`${API_URL}/cerrarSesion`);
 }
 
-const consultar = (usuario: string) => {
-  return axios.get(`${API_URL}/consultar`, { params: { "nombreUsuario": usuario } });
-}
-
-const leerEmpresa = () => {
-  return axios.get(`${API_URL}/leerEmpresa`);
-}
-
-export default { login, registroEmpresa, logout, consultar, leerEmpresa };
+export default { loginEmpresa, loginUsuario, registroEmpresa, logout };
