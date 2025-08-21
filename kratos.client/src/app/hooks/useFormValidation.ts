@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 interface FormField {
   value: any;
   required: boolean;
-  type?: 'string' | 'number' | 'email' | 'select' | 'date';
+  type?: 'string' | 'number' | 'email' | 'select' | 'date' | 'boolean';
 }
 
 interface FormFields {

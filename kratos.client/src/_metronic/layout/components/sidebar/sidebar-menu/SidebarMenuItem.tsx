@@ -43,7 +43,7 @@ const SidebarMenuItem: FC<Props & WithChildren> = ({
         {fontIcon && app?.sidebar?.default?.menu?.iconType === 'font' && (
           <i className={clsx('bi fs-3', fontIcon)}></i>
         )}
-        <span style={{color: 'black'}}  className='menu-title'>{title}</span>
+        <span style={{color: 'White'}}  className='menu-title'>{title}</span>
       </Link>
       {children}
     </div>

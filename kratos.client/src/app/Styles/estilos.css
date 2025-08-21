@@ -1,4 +1,4 @@
-body {
+/*body {
     background: linear-gradient(45deg,
         rgba(10, 70, 120),
         rgba(21, 154, 230),
@@ -7,6 +7,9 @@ body {
         rgba(5, 50, 100));
     background-size: cover;
     background-position: center;
+}*/
+body{
+     background-image: url('fondo1.png');
 }
 
 .content-2 {

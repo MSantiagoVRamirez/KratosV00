@@ -15,9 +15,5 @@ namespace Kratos.Server.Models.Ventas
         [ForeignKey("Categoria")]
         public int categoriaProductoId { get; set; }
         public Categoria? categoriaTratamientoFk { get; set; }
-
-        [Required(ErrorMessage = "El campo {0} es obligatorio")]
-        [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
-        public string porcentaje { get; set; }
     }
 }

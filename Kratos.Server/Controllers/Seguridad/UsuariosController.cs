@@ -1,6 +1,7 @@
 ﻿using kratos.Server.Services.Seguridad;
 using Kratos.Server.Models.Contexto;
 using Kratos.Server.Models.Seguridad;
+using Kratos.Server.Services.Storage;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,14 +12,17 @@ namespace Kratos.Server.Controllers.Seguridad
     public class UsuariosController : ControllerBase
     {
         private readonly KratosContext _context;
+        private readonly IFilesHelper _filesHelper;
 
-        public UsuariosController(KratosContext context)
+        public UsuariosController(KratosContext context, IFilesHelper filesHelper)
         {
             _context = context;
+            _filesHelper = filesHelper;
         }
         [HttpPost]
         [Route("insertar")]
-        public async Task<IActionResult> insertar(Usuario usuario)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> insertar([FromForm]  Usuario usuario)
         {
             var nombreNormalizado = usuario.email.Trim().ToLower();
             var usuarioExistente = await _context.Usuario.AnyAsync(a => a.email.Trim().ToLower() == nombreNormalizado);
@@ -31,6 +35,12 @@ namespace Kratos.Server.Controllers.Seguridad
             {
                 return BadRequest("Error: La contraseña no coincide.");
             }
+            if (usuario.ImagenArchivo is { Length: > 0 })
+            {
+                await using Stream image = usuario.ImagenArchivo.OpenReadStream();
+                string urlimagen = await _filesHelper.SubirArchivo(image, usuario.ImagenArchivo.FileName);
+                usuario.ImagenUrl = urlimagen;
+            }
             // Encriptar la contraseña y token
             usuario.contraseña = Encriptar.EncriptarClave(usuario.contraseña);
             usuario.confirmarContraseña = Encriptar.EncriptarClave(usuario.confirmarContraseña);
@@ -42,7 +52,6 @@ namespace Kratos.Server.Controllers.Seguridad
                 return BadRequest("Error: Token Invalido, Verifique e intente nuevamente");
             }
             usuario.creadoEn = DateTime.Now;
-            usuario.rolesId = 2;
             // Agregar la empresa a la base de datos
             await _context.Usuario.AddAsync(usuario);
             await _context.SaveChangesAsync();

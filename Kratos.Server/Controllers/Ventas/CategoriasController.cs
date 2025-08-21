@@ -32,33 +32,14 @@ namespace Kratos.Server.Controllers.Ventas
         [HttpPost]
         [Route("insertar")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Insertar([FromForm] Categoria categoria)
+        public async Task<IActionResult> Insertar( Categoria categoria)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                // Subir imagen si llegó archivo
-                if (categoria.ImagenArchivo is { Length: > 0 })
-                {
-                    await using Stream image = categoria.ImagenArchivo.OpenReadStream();
-                    string urlimagen = await _filesHelper.SubirArchivo(image, categoria.ImagenArchivo.FileName);
-                    categoria.ImagenUrl = urlimagen;
-                }
-
+           
                 categoria.CreadoEn = DateTime.Now;
                 categoria.ActualizadoEn = DateTime.Now;
-
                 _context.Add(categoria);
                 await _context.SaveChangesAsync();
-
-                return Ok(new { Message = "Categoría registrada con éxito", Data = categoria });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "Error al insertar categoria.");
-            }
+                return Ok();
         }
 
         [HttpGet]
@@ -102,7 +83,7 @@ namespace Kratos.Server.Controllers.Ventas
             categoriaExistente.categoriapadreId = categoria.categoriapadreId;
             categoriaExistente.Nombre = categoria.Nombre;
             categoriaExistente.Descripcion = categoria.Descripcion;
-            categoriaExistente.ImagenUrl = categoria.ImagenUrl;
+            //categoriaExistente.ImagenUrl = categoria.ImagenUrl;
             categoriaExistente.Activo = categoria.Activo;
             categoriaExistente.CreadoEn = categoria.CreadoEn;
             categoriaExistente.ActualizadoEn = DateTime.Now;

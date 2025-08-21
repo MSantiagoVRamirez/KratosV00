@@ -29,12 +29,6 @@ const Footer = () => {
           </a>
         </li> */}
 
-        <li className='menu-item'>
-          <a href='https://devs.keenthemes.com/' target='_blank' className='menu-link px-2'>
-            Soporte
-          </a>
-        </li>
-
         {/* <li className='menu-item'>
           <a
             href='https://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469'

@@ -5,12 +5,14 @@ import { MasterLayout } from '../../_metronic/layout/MasterLayout'
 import {DashboardWrapper} from '../pages/dashboard/DashboardWrapper'
 
 // Seguridad
-import { RolesWidget } from '../pages/seguridad/RolesWidget'
-import { ModulosWidget } from '../pages/seguridad/ModulosWidget'
-import { PermisosWidget } from '../pages/seguridad/PermisosWidget'
+import { ModuloWidget } from '../pages/Configuracion/ModuloWidget'
+import { PermisoWidget } from '../pages/Configuracion/PermisosWidget'
 import { EmpresasWidget } from '../pages/seguridad/EmpresasWidget'
-import { UsuariosWidget } from '../pages/seguridad/UsuariosWidget'
+import { UsuarioWidget } from '../pages/Configuracion/UsuarioWidget'
 import { ActividadEconomicaWitdget } from '../pages/Configuracion/ActividadEconomicaWitdget'
+import { RegimenTributarioWidget } from '../pages/Configuracion/RegimenTributariaWidget'
+import { TipoSociedadWidget } from '../pages/Configuracion/TipoSociedadWidget'
+import { RolWidget } from '../pages/Configuracion/RolWidget'
 
 // Contratos y ODs
 import { TroncalesWidget } from '../pages/contratos-ods/TroncalesWidget'
@@ -50,12 +52,14 @@ const PrivateRoutes = () => {
         <Route path='*' element={<Navigate to='/error/404' />} />
 
         {/* Seguridad */}
-        <Route path="seguridad/roles-widget" element={<RolesWidget />} />
-        <Route path="seguridad/modulos-widget" element={<ModulosWidget />} />
-        <Route path="seguridad/permisos-widget" element={<PermisosWidget />} />
+        <Route path="seguridad/roles-widget" element={<RolWidget />} />
+        <Route path="seguridad/modulo-widget" element={<ModuloWidget />} />
+        <Route path="seguridad/permisos-widget" element={<PermisoWidget />} />
         <Route path="seguridad/empresas-widget" element={<EmpresasWidget />} />
-        <Route path="seguridad/usuarios-widget" element={<UsuariosWidget />} />
+        <Route path="seguridad/usuarios-widget" element={<UsuarioWidget />} />
         <Route path="seguridad/actividad-economica-widget" element={<ActividadEconomicaWitdget />} />
+        <Route path="seguridad/regimen-tributario-widget" element={<RegimenTributarioWidget />} />
+        <Route path="seguridad/tipo-sociedad-widget" element={<TipoSociedadWidget />} />
 
         {/* Contratos y ODS */}
         <Route path="contratos-ods/proyectos-widget" element={<ProyectosWidget />} />

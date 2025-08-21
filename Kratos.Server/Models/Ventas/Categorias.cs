@@ -16,13 +16,7 @@ public class Categoria
     [Required(ErrorMessage = "La descripción es obligatoria")]
     [MaxLength(500, ErrorMessage = "La descripción no puede exceder 500 caracteres")]
     public string Descripcion { get; set; }
-
-    public string? ImagenUrl { get; set; } // Ruta relativa de la imagen
     public bool Activo { get; set; } = true;
     public DateTime CreadoEn { get; set; } = DateTime.Now;
     public DateTime ActualizadoEn { get; set; } = DateTime.Now;
-    
-    [NotMapped] // evita que EF la mapee a la BD
-    public IFormFile? ImagenArchivo { get; set; }
-
 }

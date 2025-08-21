@@ -64,5 +64,9 @@ namespace Kratos.Server.Models.Seguridad
         [DataType(DataType.DateTime)]
         public DateTime actualizadoEn { get; set; }
 
+        public string? ImagenUrl { get; set; } // Ruta relativa de la imagen
+        
+        [NotMapped] // evita que EF la mapee a la BD
+        public IFormFile? ImagenArchivo { get; set; }
     }
 }
