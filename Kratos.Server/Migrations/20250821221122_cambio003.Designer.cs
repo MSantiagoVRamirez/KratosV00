@@ -4,6 +4,7 @@ using Kratos.Server.Models.Contexto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kratos.Server.Migrations
 {
     [DbContext(typeof(KratosContext))]
-    partial class KratosContextModelSnapshot : ModelSnapshot
+    [Migration("20250821221122_cambio003")]
+    partial class cambio003
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -637,6 +640,9 @@ namespace Kratos.Server.Migrations
                     b.Property<string>("imagenUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("impuestoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -648,14 +654,11 @@ namespace Kratos.Server.Migrations
                     b.Property<int>("stockMinimo")
                         .HasColumnType("int");
 
-                    b.Property<int>("subCategoriaId")
-                        .HasColumnType("int");
-
                     b.HasKey("id");
 
                     b.HasIndex("categoriaId");
 
-                    b.HasIndex("subCategoriaId");
+                    b.HasIndex("impuestoId");
 
                     b.ToTable("Producto");
                 });
@@ -1012,15 +1015,14 @@ namespace Kratos.Server.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Categoria", "subCategoriaFk")
+                    b.HasOne("Kratos.Server.Models.Ventas.Impuesto", "impuestoFk")
                         .WithMany()
-                        .HasForeignKey("subCategoriaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("impuestoId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("categoriaFk");
 
-                    b.Navigation("subCategoriaFk");
+                    b.Navigation("impuestoFk");
                 });
 
             modelBuilder.Entity("Kratos.Server.Models.Ventas.Proveedor", b =>

@@ -7,13 +7,15 @@ import {DashboardWrapper} from '../pages/dashboard/DashboardWrapper'
 // Seguridad
 import { ModuloWidget } from '../pages/Configuracion/ModuloWidget'
 import { PermisoWidget } from '../pages/Configuracion/PermisosWidget'
-import { EmpresasWidget } from '../pages/seguridad/EmpresasWidget'
+import { EmpresaWidget } from '../pages/Configuracion/EmpresaWidget'
 import { UsuarioWidget } from '../pages/Configuracion/UsuarioWidget'
 import { ActividadEconomicaWitdget } from '../pages/Configuracion/ActividadEconomicaWitdget'
 import { RegimenTributarioWidget } from '../pages/Configuracion/RegimenTributariaWidget'
 import { TipoSociedadWidget } from '../pages/Configuracion/TipoSociedadWidget'
 import { RolWidget } from '../pages/Configuracion/RolWidget'
 
+//Ventas
+import { ProductoCreateWidget } from '../pages/Ventas/RegistroProductoWidget'
 // Contratos y ODs
 import { TroncalesWidget } from '../pages/contratos-ods/TroncalesWidget'
 import { ProyectosWidget } from '../pages/contratos-ods/ProyectosWidget'
@@ -55,11 +57,15 @@ const PrivateRoutes = () => {
         <Route path="seguridad/roles-widget" element={<RolWidget />} />
         <Route path="seguridad/modulo-widget" element={<ModuloWidget />} />
         <Route path="seguridad/permisos-widget" element={<PermisoWidget />} />
-        <Route path="seguridad/empresas-widget" element={<EmpresasWidget />} />
+        <Route path="seguridad/empresa-widget" element={<EmpresaWidget />} />
         <Route path="seguridad/usuarios-widget" element={<UsuarioWidget />} />
         <Route path="seguridad/actividad-economica-widget" element={<ActividadEconomicaWitdget />} />
         <Route path="seguridad/regimen-tributario-widget" element={<RegimenTributarioWidget />} />
-        <Route path="seguridad/tipo-sociedad-widget" element={<TipoSociedadWidget />} />
+        <Route path="ventas/seguridad-tipo-sociedad-widget" element={<TipoSociedadWidget />} />
+
+        {/* Ventas */}
+        <Route path="ventas/registro-producto-widget" element={<ProductoCreateWidget />} />
+
 
         {/* Contratos y ODS */}
         <Route path="contratos-ods/proyectos-widget" element={<ProyectosWidget />} />

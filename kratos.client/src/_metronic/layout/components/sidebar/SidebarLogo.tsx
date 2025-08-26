@@ -5,10 +5,7 @@ import {KTIcon} from '../../../helpers'
 import {useLayout} from '../../core'
 import {MutableRefObject, useEffect, useRef} from 'react'
 import {ToggleComponent} from '../../../assets/ts/components'
-import LogoCenitClaroMini from '../../../../app/assets/images/logo-cenit-claro-mini.png'
-import LogoCenitOscuro from '../../../../app/assets/images/logo-cenit-oscuro.png'
-import logoKratos from '../../../../../public/media/logos/logoKratos.png'
-import logoKratosS from '../../../../../public/media/logos/logoKratosS.png'
+import logo from '../../../../../public/media/logos/logo-1.png'
 
 type PropsType = {
   sidebarRef: MutableRefObject<HTMLDivElement | null>
@@ -53,28 +50,31 @@ const SidebarLogo = (props: PropsType) => {
   }, [toggleRef, props.sidebarRef])
 
   return (
-    <div className='app-sidebar-logo px-6' id='kt_app_sidebar_logo'>
+    <div  style={{alignItems: 'center'}} className='app-sidebar-logo px-6' id='kt_app_sidebar_logo'>
       {/* <Link to='/dashboard'> */}
       <Link to='/home'>
         {config.layoutType === 'dark-sidebar' ? (
           <img
             alt='Logo'
             // src={toAbsoluteUrl('media/logos/default-dark.svg')}
-            src={logoKratos}
+            src={logo}
             className='h-45px app-sidebar-logo-default'
+            style={{ marginLeft: '120%', scale: '170%',}}
           />
         ) : (
           <>
             <img
               alt='Logo'
               // src={toAbsoluteUrl('media/logos/default.svg')}
-              src={logoKratos}
+              src={logo}
               className='h-45px app-sidebar-logo-default theme-light-show'
+              style={{ marginLeft: '120%',scale: '170%'}}
             />
             <img
               alt='Logo'
               // src={toAbsoluteUrl('media/logos/default-dark.svg')}
-              src={logoKratos}
+              src={logo}
+              style={{ marginLeft: '120%',scale: '170%'}}
               className='h-45px app-sidebar-logo-default theme-dark-show'
             />
           </>
@@ -83,8 +83,9 @@ const SidebarLogo = (props: PropsType) => {
         <img
           alt='Logo'
           // src={toAbsoluteUrl('media/logos/default-small.svg')}
-          src={logoKratosS}
+          src={logo}
           className='h-45px app-sidebar-logo-minimize'
+          style={{ }}
         />
       </Link>
 

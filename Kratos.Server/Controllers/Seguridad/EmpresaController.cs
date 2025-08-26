@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using kratos.Server.Services.Seguridad;
 using Kratos.Server.Models.Contexto;
 using Kratos.Server.Models.Seguridad;
+using System.Runtime.CompilerServices;
+using Kratos.Server.Services.Storage;
 
 namespace Kratos.Server.Controllers.Seguridad
 {
@@ -14,109 +16,93 @@ namespace Kratos.Server.Controllers.Seguridad
     public class EmpresaController : ControllerBase
     {
         private readonly KratosContext _context;
+        private readonly IUsuarioService _usuarioService;
+        private readonly IFilesHelper _filesHelper;
 
-        public EmpresaController(KratosContext context)
+        public EmpresaController(KratosContext context, IUsuarioService usuarioService, IFilesHelper filesHelper)
         {
             _context = context;
-        }
-        [HttpPost]
-        [Route("insertar")]
-        public async Task<IActionResult> insertar(Empresa empresa)
-        {
-            var nombreNormalizado = empresa.nombreComercial.Trim().ToLower();
-            var empresaExistente = await _context.Empresa.AnyAsync(a => a.nombreComercial.Trim().ToLower() == nombreNormalizado);
-            if (empresaExistente)
-            {
-                BadRequest($"Error: {nombreNormalizado} ya se encuentra registrada.");
-            }
-            // validar las contraseñas
-            if (empresa.contraseña != empresa.confirmarContraseña)
-            {
-                return BadRequest("Error: La contraseña no coincide.");
-            }
-            // Encriptar la contraseña y token
-            empresa.contraseña = Encriptar.EncriptarClave(empresa.contraseña);
-            empresa.confirmarContraseña = Encriptar.EncriptarClave(empresa.confirmarContraseña);
-            empresa.token = Encriptar.EncriptarClave(empresa.token);
-            empresa.creadoEn = DateTime.Now;
-            // Agregar la empresa a la base de datos
-            await _context.Empresa.AddAsync(empresa);
-            await _context.SaveChangesAsync();
-
-            return Ok();
+            _usuarioService = usuarioService;
+            _filesHelper = filesHelper;
         }
 
-        [HttpGet]
-        [Route("leer")]
-        public async Task<ActionResult<List<Empresa>>> leer()
-        {
-            var listaEmpresa = await _context.Empresa.ToListAsync();
-
-            return Ok(listaEmpresa);
-        }
         [HttpGet]
         [Route("consultar")]
-        public async Task<IActionResult> consultar(int id)
+        public async Task<IActionResult> consultar()
         {
-            Empresa empresa = await _context.Empresa.FindAsync(id);
+            var usuarioLog = await _usuarioService.ObtenerIdUsuarioLogueado();
+            if (usuarioLog == null)
+            {
+                return BadRequest("Error: No se ha encontrado el usuario logueado.");
+            }
+            Empresa empresa = await _context.Empresa.FindAsync(usuarioLog.id);
 
             if (empresa == null)
             {
-                return BadRequest($"No ha sido Encontrado el Registro con el ID: {id}");
+                return BadRequest($"No ha sido Encontrado");
             }
             return Ok(empresa);
         }
 
         [HttpPut]
         [Route("editar")]
-        public async Task<IActionResult> editar(Empresa empresa)
+        public async Task<IActionResult> editar([FromForm] EmpresaEditarDto dto)
         {
-            var empresaExistente = await _context.Empresa.FindAsync(empresa.id);
+            var empresaExistente = await _context.Empresa.FindAsync(dto.id);
             if (empresaExistente == null)
-            {
-                return BadRequest("Error: el Registro que intenta editar no existe,Verifique nuevamente la informacion");
-            }
-            //validar nombre ya existe
-            var nombreNormalizado = empresa.nombreComercial.Trim().ToLower();
-            var empresaNombreExistente = await _context.Empresa.AnyAsync(a => a.nombreComercial.Trim().ToLower() == nombreNormalizado && a.id != empresa.id);
-            if (empresaNombreExistente)
-            {
+                return BadRequest("Error: el Registro que intenta editar no existe, Verifique nuevamente la informacion");
+
+            // Nombre duplicado
+            var nombreNormalizado = dto.nombreComercial.Trim().ToLower();
+            var existeNombre = await _context.Empresa
+                .AnyAsync(a => a.nombreComercial.Trim().ToLower() == nombreNormalizado && a.id != dto.id);
+            if (existeNombre)
                 return BadRequest($"Error: {nombreNormalizado} ya se encuentra registrada.");
+
+            // Imagen: archivo tiene prioridad sobre ImagenUrl
+            if (dto.ImagenArchivo is { Length: > 0 })
+            {
+                await using var image = dto.ImagenArchivo.OpenReadStream();
+                string urlimagen = await _filesHelper.SubirArchivo(image, dto.ImagenArchivo.FileName);
+                empresaExistente.ImagenUrl = urlimagen;
             }
-            empresaExistente.tiposociedadId = empresa.tiposociedadId;
-            empresaExistente.actividadId = empresa.actividadId;
-            empresaExistente.regimenId = empresa.regimenId;
-            empresaExistente.razonSocial = empresa.razonSocial;
-            empresaExistente.nombreComercial = empresa.nombreComercial;
-            empresaExistente.nit = empresa.nit;
-            empresaExistente.dv = empresa.dv;
-            empresaExistente.telefono = empresa.telefono;
-            empresaExistente.email = empresa.email;
-            empresaExistente.representanteLegal = empresa.representanteLegal;
-            empresaExistente.activo = empresa.activo; 
+            else if (!string.IsNullOrWhiteSpace(dto.ImagenUrl))
+            {
+                empresaExistente.ImagenUrl = dto.ImagenUrl;
+            }
+
+            // Mapear campos editables
+            empresaExistente.tiposociedadId = dto.tiposociedadId;
+            empresaExistente.actividadId = dto.actividadId;
+            empresaExistente.regimenId = dto.regimenId;
+            empresaExistente.razonSocial = dto.razonSocial;
+            empresaExistente.nombreComercial = dto.nombreComercial;
+            empresaExistente.nit = dto.nit;
+            empresaExistente.dv = dto.dv;
+            empresaExistente.telefono = dto.telefono;
+            empresaExistente.email = dto.email;
+            empresaExistente.representanteLegal = dto.representanteLegal;
+            empresaExistente.activo = dto.activo;
             empresaExistente.actualizadoEn = DateTime.Now;
+
             try
             {
                 _context.Empresa.Update(empresaExistente);
                 await _context.SaveChangesAsync();
+                return Ok();
             }
             catch (DbUpdateException)
             {
-
-                return StatusCode(500, "Error al actualizar el rol en la base de datos.");
+                return StatusCode(500, "Error al actualizar la empresa en la base de datos.");
             }
-            return Ok();
         }
-        [HttpDelete]
-        [Route("eliminar")]
-        public async Task<IActionResult> eliminar(int Id)
+
+        [HttpGet]
+        [Route("leer")]
+        public async Task<List<Empresa>> leer()
         {
-            var empresaBorrado = await _context.Empresa.FindAsync(Id);
-
-            _context.Empresa.Remove(empresaBorrado);
-
-            await _context.SaveChangesAsync();
-            return Ok();
+            var empresas = await _context.Empresa.ToListAsync();
+            return empresas;
         }
     }
 }

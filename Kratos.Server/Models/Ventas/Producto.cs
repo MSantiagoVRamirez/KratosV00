@@ -11,9 +11,6 @@ namespace Kratos.Server.Models.Ventas
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
         public string codigo { get; set; }
 
-        [ForeignKey("Impuesto")]
-        public int? impuestoId { get; set; }
-        public Impuesto? impuestoFk { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
@@ -27,6 +24,11 @@ namespace Kratos.Server.Models.Ventas
         [ForeignKey("Categorias")]
         public int categoriaId { get; set; }
         public Categoria? categoriaFk { get; set; }
+
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        [ForeignKey("Categorias")]
+        public int subCategoriaId { get; set; }
+        public Categoria? subCategoriaFk { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [Column(TypeName = "decimal(18,2)")]
@@ -49,5 +51,9 @@ namespace Kratos.Server.Models.Ventas
 
         [DataType(DataType.DateTime)]
         public DateTime actualizadoEn { get; set; } = DateTime.Now;
+        public string? ImagenUrl { get; set; } // Ruta relativa de la imagen
+
+        [NotMapped] // evita que EF la mapee a la BD
+        public IFormFile? ImagenArchivo { get; set; }
     }
 }

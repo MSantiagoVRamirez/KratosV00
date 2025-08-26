@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Kratos.Server.Models.Ventas;
 using Kratos.Server.Models.Contexto;
+using Kratos.Server.Models.Seguridad;
+using Kratos.Server.Services.Storage;
 
 namespace Kratos.Server.Controllers.Ventas
 {
@@ -19,40 +21,14 @@ namespace Kratos.Server.Controllers.Ventas
         private readonly KratosContext _context;
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger<ProductosController> _logger;
+        private readonly IFilesHelper _filesHelper;
 
-        public ProductosController(
-            KratosContext context,
-            IWebHostEnvironment environment,
-            ILogger<ProductosController> logger)
+        public ProductosController(KratosContext context, IWebHostEnvironment environment, ILogger<ProductosController> logger, IFilesHelper filesHelper)
         {
             _context = context;
             _environment = environment;
             _logger = logger;
-        }
-
-        [HttpGet("leer")]
-        public async Task<ActionResult<IEnumerable<Producto>>> Leer()
-        {
-            return await _context.Producto
-                .Include(p => p.categoriaFk)
-                .Include(p => p.impuestoFk)
-                .ToListAsync();
-        }
-
-        [HttpGet("consultar")]
-        public async Task<ActionResult<Producto>> Consultar(int id)
-        {
-            var producto = await _context.Producto
-                .Include(p => p.categoriaFk)
-                .Include(p => p.impuestoFk)
-                .FirstOrDefaultAsync(p => p.id == id);
-
-            if (producto == null)
-            {
-                return NotFound();
-            }
-
-            return producto;
+            _filesHelper = filesHelper;
         }
 
         [HttpPost("insertar")]
@@ -64,14 +40,15 @@ namespace Kratos.Server.Controllers.Ventas
                 return Conflict("Ya existe un producto con este código");
             }
 
-            // Manejo de imagen
-            if (imagenArchivo != null && imagenArchivo.Length > 0)
-            {
-                producto.imagenUrl = await GuardarImagen(imagenArchivo);
-            }
-
             producto.creadoEn = DateTime.Now;
             producto.actualizadoEn = DateTime.Now;
+
+            if (producto.ImagenArchivo is { Length: > 0 })
+            {
+                await using Stream image = producto.ImagenArchivo.OpenReadStream();
+                string urlimagen = await _filesHelper.SubirArchivo(image, producto .ImagenArchivo.FileName);
+                producto.ImagenUrl = urlimagen;
+            }
 
             _context.Producto.Add(producto);
             await _context.SaveChangesAsync();
@@ -79,30 +56,44 @@ namespace Kratos.Server.Controllers.Ventas
             return CreatedAtAction("Consultar", new { producto.id }, producto);
         }
 
+        [HttpGet("leer")]
+        public async Task<ActionResult<IEnumerable<Producto>>> Leer()
+        {
+            return await _context.Producto
+                .Include(p => p.categoriaFk)
+                .ToListAsync();
+        }
+
+        [HttpGet("consultar")]
+        public async Task<ActionResult<Producto>> Consultar(int id)
+        {
+            var producto = await _context.Producto
+                .Include(p => p.categoriaFk)
+                .FirstOrDefaultAsync(p => p.id == id);
+
+            if (producto == null)
+            {
+                return NotFound();
+            }
+
+            return producto;
+        }
+
+       
+
         [HttpPut("editar")]
-        public async Task<IActionResult> Editar([FromForm] Producto producto, IFormFile imagenArchivo)
+        public async Task<IActionResult> Editar([FromForm] Producto producto)
         {
             var productoExistente = await _context.Producto.FindAsync(producto.id);
             if (productoExistente == null)
             {
                 return NotFound();
             }
-
-            // Validar código único
-            if (await _context.Producto.AnyAsync(p => p.codigo == producto.codigo && p.id != producto.id))
+            if (producto.ImagenArchivo is { Length: > 0 })
             {
-                return Conflict("Ya existe un producto con este código");
-            }
-
-            // Manejo de imagen
-            if (imagenArchivo != null && imagenArchivo.Length > 0)
-            {
-                // Eliminar imagen anterior si existe
-                if (!string.IsNullOrEmpty(productoExistente.imagenUrl))
-                {
-                    EliminarImagen(productoExistente.imagenUrl);
-                }
-                productoExistente.imagenUrl = await GuardarImagen(imagenArchivo);
+                await using Stream image = producto.ImagenArchivo.OpenReadStream();
+                string urlimagen = await _filesHelper.SubirArchivo(image, producto.ImagenArchivo.FileName);
+                producto.ImagenUrl = urlimagen;
             }
 
             // Actualizar otros campos
@@ -110,16 +101,24 @@ namespace Kratos.Server.Controllers.Ventas
             productoExistente.nombre = producto.nombre;
             productoExistente.descripcion = producto.descripcion;
             productoExistente.categoriaId = producto.categoriaId;
-            productoExistente.impuestoId = producto.impuestoId;
+            productoExistente.subCategoriaId = producto.subCategoriaId;
             productoExistente.precio = producto.precio;
             productoExistente.costo = producto.costo;
             productoExistente.stockMinimo = producto.stockMinimo;
             productoExistente.activo = producto.activo;
             productoExistente.actualizadoEn = DateTime.Now;
+            productoExistente.imagenUrl = producto.imagenUrl;
+            try
+            {
+                _context.Producto.Update(productoExistente);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
 
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+                return StatusCode(500, "Error al actualizar el Producto en la base de datos.");
+            }
+            return Ok();
         }
 
         [HttpDelete("eliminar")]
@@ -131,51 +130,10 @@ namespace Kratos.Server.Controllers.Ventas
                 return NotFound();
             }
 
-            // Eliminar imagen asociada si existe
-            if (!string.IsNullOrEmpty(producto.imagenUrl))
-            {
-                EliminarImagen(producto.imagenUrl);
-            }
-
             _context.Producto.Remove(producto);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private async Task<string> GuardarImagen(IFormFile imagenArchivo)
-        {
-            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "productos");
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(imagenArchivo.FileName)}";
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await imagenArchivo.CopyToAsync(fileStream);
-            }
-
-            return Path.Combine("uploads", "productos", uniqueFileName).Replace("\\", "/");
-        }
-
-        private void EliminarImagen(string imagenUrl)
-        {
-            var imagePath = Path.Combine(_environment.WebRootPath, imagenUrl);
-            if (System.IO.File.Exists(imagePath))
-            {
-                try
-                {
-                    System.IO.File.Delete(imagePath);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error al eliminar la imagen del producto");
-                }
-            }
         }
     }
 }

@@ -1,0 +1,20 @@
+export interface Empresa {
+    id: number,
+    contraseña: string,
+    confirmarContraseña: string,
+    tiposociedadId: number,
+    actividadId: number,
+    regimenId: number,
+    token: string,
+    razonSocial: string,
+    nombreComercial: string,
+    nit: string,
+    dv: string,
+    telefono: string,
+    email: string,
+    representanteLegal: string,
+    activo: boolean,
+    creadoEn: string,
+    actualizadoEn: string,
+    imagenUrl?: string | null
+}

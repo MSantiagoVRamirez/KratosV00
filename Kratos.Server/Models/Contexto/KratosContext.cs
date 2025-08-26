@@ -65,18 +65,18 @@ namespace Kratos.Server.Models.Contexto
                 .HasForeignKey(r => r.empresaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Productos -> Impuesto
-            modelBuilder.Entity<Producto>()
-                .HasOne(p => p.impuestoFk)
-                .WithMany()
-                .HasForeignKey(p => p.impuestoId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // Productos -> Categorias
             modelBuilder.Entity<Producto>()
                 .HasOne(p => p.categoriaFk)
                 .WithMany()
                 .HasForeignKey(p => p.categoriaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Productos -> subCategorias
+            modelBuilder.Entity<Producto>()
+                .HasOne(p => p.subCategoriaFk)
+                .WithMany()
+                .HasForeignKey(p => p.subCategoriaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Inventarios -> Productos

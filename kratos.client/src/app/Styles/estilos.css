@@ -1,15 +1,20 @@
 /*body {
     background: linear-gradient(45deg,
-        rgba(10, 70, 120),
-        rgba(21, 154, 230),
-        rgba(15, 100, 180),
-        rgba(100, 200, 250),
-        rgba(5, 50, 100));
+        rgba(7, 7, 7, 0.897),
+        rgba(7, 7, 7, 0.397),
+        rgb(58, 56, 53),
+        rgba(64, 66, 59, 0.349),
+        rgba(121, 124, 115, 0.849));
     background-size: cover;
     background-position: center;
 }*/
+
 body{
-     background-image: url('fondo1.png');
+     background-image: url('fondo-3.jpg');
+
+    background-size: cover;
+    background-position: center;
+
 }
 
 .content-2 {

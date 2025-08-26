@@ -174,10 +174,10 @@ export function PermisoWidget() {
       renderCell: (params: GridRenderCellParams) => (
         <Box>
           <IconButton onClick={() => fetchPermiso(params.row.id)}>
-            <Edit className="icon-editar" />
+            <Edit style={{color: 'rgba(241, 218, 6, 1)'}} className="icon-editar" />
           </IconButton>
           <IconButton onClick={() => openDeleteModal(params.row.id)}>
-            <Delete className="icon-eliminar" />
+            <Delete style={{color: 'rgba(228, 69, 6, 1)'}} className="icon-eliminar" />
           </IconButton>
         </Box>
       ),

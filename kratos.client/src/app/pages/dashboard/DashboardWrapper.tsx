@@ -28,10 +28,12 @@ const DashboardPage: FC = () => (
                 {/* begin::Col */}
                 <div className='col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10'>
                     <CardsWidget20
-                        className='h-md-50 mb-5 mb-xl-10'
+                        className='h-md-50 mb-9 mb-xl-10'
                         description='Active Projects'
-                        color='#3708e0ff'
+                        color='rgba(34, 31, 31, 0.38)'
                         img={toAbsoluteUrl('media/patterns/pattern-1.jpg')}
+                        
+                        
                     />
                     <CardsWidget7
                         className='h-md-50 mb-5 mb-xl-10'
@@ -39,7 +41,7 @@ const DashboardPage: FC = () => (
                         icon={false}
                         stats={357}
                         labelColor='dark'
-                        textColor='gray-300'
+                        textColor='rgba(230, 25, 219, 1)'
                     />
                 </div>
                 {/* end::Col */}

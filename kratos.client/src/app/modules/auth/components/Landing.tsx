@@ -142,7 +142,7 @@ const handleLoginEmpresa = async () => {
     return (
         <div className="content-2">
             <div className="header-21">
-                <h1 style={{ color: 'rgb(255, 255, 255)', scale: '2', padding: '0px 50px' }}>KRATOS</h1>
+                <img style={{ maxWidth: "5%", height: "5%", objectFit: "contain", scale: "140%", marginLeft:  "3%" }} src="../../../../../public/media/logos/logo-1.png" alt="logo" />
                 <div className="header-botones">
                     <button
                         style={{ marginTop: '0px' }}

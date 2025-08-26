@@ -11,6 +11,8 @@ using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpContextAccessor();
+
 // 1. Configuración de la base de datos y rutas
 builder.Services.AddDbContext<KratosContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

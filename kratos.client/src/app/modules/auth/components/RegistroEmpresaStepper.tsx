@@ -22,7 +22,7 @@ type Props = {
   initialData?: Empresa | null
   actividades: ActividadEconomica[]
   rigimenes: RegimenTributario[]
-  tiposSociedad: TipoSociedad[]
+  tiposSociedad: TipoSociedad[] 
 }
 const modalsRoot = document.getElementById('root-modals') || document.body
 

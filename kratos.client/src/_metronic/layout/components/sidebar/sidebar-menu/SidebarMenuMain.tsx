@@ -8,7 +8,7 @@ const SidebarMenuMain = () => {
       <SidebarMenuItem to='/dashboard' title='Home' icon='element-11' fontIcon='bi-app-indicator' />
       {/*Configuracion*/}
         <SidebarMenuItemWithSub to='/seguridad' title='Configuración' icon='shield' fontIcon='bi-shield'>
-          <SidebarMenuItem to="seguridad/empresas-widget" title="Perfil" /> 
+          <SidebarMenuItem to="seguridad/empresa-widget" title="Perfil" /> 
           <SidebarMenuItem to="seguridad/roles-widget" title="Roles " />
           <SidebarMenuItem to="seguridad/permisos-widget" title="Permisos " />
           <SidebarMenuItem to="seguridad/usuarios-widget" title="Usuarios " />
@@ -16,7 +16,7 @@ const SidebarMenuMain = () => {
         </SidebarMenuItemWithSub>
         {/*Inventario*/}
         <SidebarMenuItemWithSub to='/inventario' title='Inventario' icon='shield' fontIcon='bi-shield'>
-          <SidebarMenuItem to="inventario/registro-producto-widget" title="Regitro Productos " />
+          <SidebarMenuItem to="ventas/registro-producto-widget" title="Regitro Productos " />
           <SidebarMenuItem to="inventario/registro-Servicios-widget" title="Registro Servicios " />
           <SidebarMenuItem to="inventario/Stock-Productos-widget" title="Stock Productos" />
           <SidebarMenuItem to="inventario/Agenda-Servicios-widget" title="Stock Servicios" />        

@@ -14,7 +14,7 @@ $coal-400:  #0F1014 !default;
 $coal-500:  #0D0E12 !default;
 $coal-600:  #0B0C10 !default;
 $coal-black: #000000 !default;
-$coal-clarity:  rgba(#2b2022, 50) !default;
+$coal-clarity:  rgba(#2aeb107a, 50) !default;
 
 
 // Bootstrap color system
@@ -25,10 +25,10 @@ $black:#ffffff !default;
 $gray-100: rgba(10, 70, 120) !default;
 $gray-200: rgba(10, 70, 120) !default;
 $gray-300: #ffffff !default;
-$gray-400: #4be90d !default;
+$gray-400: #e7d80d !default;
 $gray-500: #dadada !default;
 $gray-600: rgb(16, 212, 247) !default;
-$gray-700:  rgb(18, 211, 137)!default;
+$gray-700:  rgb(255, 255, 255)!default;
 $gray-800: #fafafa !default;
 $gray-900: #ffffff !default;
  
@@ -63,7 +63,7 @@ $primary-inverse: 				 $gray-200 !default;
 
 // Secondary colors
 $secondary: 					#ebe70c !default;
-$secondary-active: 			#d30c0c !default;
+$secondary-active: 			#d36c0c !default;
 $secondary-light: 				 rgba(#016FD7, 0.1) !default; 
 $secondary-clarity:				 rgba(#016FD7, 0.2) !default; 
 // $secondary: 					 $gray-200 !default;
@@ -75,15 +75,15 @@ $secondary-inverse:				 $gray-800 !default;
 // Light colors
 $light: 						 $white  !default;
 $light-active: 					 $gray-600 !default;
-$light-light: 					#eb0a0a !default;
+$light-light: 					#0a0eeb !default;
 $light-clarity: 				 rgba($white, 0.2) !default;
 $light-inverse:					 $gray-800 !default;
 
 // Success colors
-$success: 						#d50000 !default; 
+$success: 						#54df14 !default; 
 $success-active: 				#59D500 !default;
-$success-light: 				 rgba(#59D500, 0.1) !default;
-$success-clarity: 				 rgba(#59D500, 0.2) !default;
+$success-light: 				 rgba(#60e706, 0.1) !default;
+$success-clarity: 				 rgba(#58ee12, 0.2) !default;
 // $success: 					#17C653 !default; 
 // $success-active: 			#04B440 !default;
 // $success-light: 			#DFFFEA !default;
@@ -104,7 +104,7 @@ $info-inverse: 					 $white !default;
 // Warning colors
 $warning: 						#F6C000 !default; 
 $warning-active: 				#DEAD00 !default;
-$warning-light: 				#e20808 !default;
+$warning-light: 				#3be208 !default;
 $warning-clarity: 				 rgba(#F6C000, 0.2) !default;
 $warning-inverse: 				 $white !default;
 
@@ -120,10 +120,10 @@ $danger-clarity: 				 rgba(#FF5955, 0.2) !default;
 $danger-inverse: 				 $white !default;
 
 // Dark colors
-$dark: 						#f10707 !default;
-$dark-active: 					#d11242 !default;
+$dark: 						#c70d73 !default;
+$dark-active: 					#e008aa !default;
 $dark-light: 					#000000 !default; 
-$dark-clarity: 					 rgb(196, 20, 231) !default;
+$dark-clarity: 					 rgb(255, 255, 255) !default;
 $dark-inverse: 					 $white !default;
 
 // Contextual colors
@@ -842,7 +842,7 @@ $tooltip-color:      				    var(--#{$prefix}gray-800) !default;
 $tooltip-bg:      				        var(--#{$prefix}body-bg) !default;
 $tooltip-border-radius:    				$btn-border-radius !default;
 $tooltip-opacity:       				1 !default;
-$tooltip-box-shadow:    				0px 0px 50px 0px rgba(82,63,105, 0.075) !default;
+$tooltip-box-shadow:    				0px 0px 50px 0px rgba(108, 226, 12, 0.9) !default;
 $tooltip-padding-y:     				.75rem !default;
 $tooltip-padding-x:     				1rem !default;
 $tooltip-margin:     				    0 !default;
@@ -1171,7 +1171,7 @@ $sticky-toolbar-z-index: 95 !default;
 
 // Keenthemes drawer component
 $drawer-z-index: 110 !default;
-$drawer-box-shadow: 0px 1px 9px -3px rgba(0,0,0, 0.05) !default;
+$drawer-box-shadow: 0px 1px 9px -3px rgba(0,0,0, 0.9) !default;
 $drawer-bg-color: $body-bg !default;
 $drawer-transition-speed: 0.3s !default;
 $drawer-overlay-bg-color: rgba($black, 0.2) !default;

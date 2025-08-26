@@ -269,7 +269,6 @@ export function UsuarioWidget() {
                         label={u.estado ? 'Activo' : 'Inactivo'}
                         color={u.estado ? 'success' : 'default'}
                         size="medium"
-                        style={{ backgroundColor: u.estado ? 'rgba(8, 230, 15, 0.3)' : 'rgba(244, 67, 54, 0.7)' }}
                         
                         sx={{ color: '#fff'                   
                          }}

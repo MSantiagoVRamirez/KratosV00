@@ -66,7 +66,7 @@ export function RolWidget() {
         console.error("Error al obtener la lista de Roles", error);
       });
   };
-
+//corregir este metodo
   const fetchEmpresas = () => {
     EmpresaService.getAll()
       .then((response) => {
@@ -171,10 +171,10 @@ export function RolWidget() {
       renderCell: (params: GridRenderCellParams) => (
         <Box>
           <IconButton onClick={() => fetchRol(params.row.id)}>
-            <Edit className="icon-editar" />
+            <Edit style={{color: 'rgba(241, 218, 6, 1)'}} className="icon-editar" />     
           </IconButton>
           <IconButton onClick={() => openDeleteModal(params.row.id)}>
-            <Delete className="icon-eliminar" />
+            <Delete style={{color: 'rgba(228, 69, 6, 1)'}} className="icon-eliminar" />
           </IconButton>
         </Box>
       ),
@@ -280,11 +280,12 @@ export function RolWidget() {
                     className="form-control"
                     value={editedRol.empresaId || 0}
                     onChange={(e) => setEditedRol(prev => ({ ...prev, empresaId: Number(e.target.value) }))}
+                     style={{backgroundColor: 'rgb(10, 70, 120)', color:'white'}}
                     required
                   >
                     <option value={0} disabled>Seleccione una empresa</option>
                     {empresas.map(emp => (
-                      <option key={emp.id} value={emp.id}>{emp.nombreComercial}</option>
+                      <option  style={{backgroundColor: 'rgb(10, 70, 120)', color:'white'}} key={emp.id} value={emp.id}>{emp.nombreComercial}</option>
                     ))}
                   </select>
                 </div>

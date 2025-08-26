@@ -51,7 +51,7 @@ namespace Kratos.Server.Controllers.Seguridad
         [HttpPost("iniciarSesion")]
         public async Task<IActionResult> iniciarSesion([FromBody] IniciarSesionRequest request, int tipoLogin)
         {
-            if (tipoLogin == 1 )
+            if (tipoLogin == 1)
             {
                 if (string.IsNullOrEmpty(request.email) || string.IsNullOrEmpty(request.contraseña))
                 {
@@ -71,7 +71,8 @@ namespace Kratos.Server.Controllers.Seguridad
                 {
                    new Claim(ClaimTypes.Name, empresa.email),
                    new Claim(ClaimTypes.NameIdentifier, empresa.id.ToString()),
-                   new Claim("RoleId", rolId.ToString())
+                   new Claim("RoleId", rolId.ToString()),
+                   new Claim("tipoLogin", tipoLogin.ToString())
                 };
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -96,21 +97,20 @@ namespace Kratos.Server.Controllers.Seguridad
                 var rolId = usuario.rolesId;
 
                 var claims = new List<Claim>
-            {
-               new Claim(ClaimTypes.Name, usuario.email),
-               new Claim(ClaimTypes.NameIdentifier, usuario.id.ToString()),
-               new Claim("RoleId", rolId.ToString())
-            };
+                {
+                    new Claim(ClaimTypes.Name, usuario.email),
+                    new Claim(ClaimTypes.NameIdentifier, usuario.id.ToString()),
+                    new Claim("RoleId", rolId.ToString()),
+                    new Claim("tipoLogin", tipoLogin.ToString()) // Fix: Convert 'tipoLogin' to string
+                };
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
                 return Ok(new { Message = "Inicio de sesión exitoso", usuario });
-
             }
             return BadRequest("Acceso Denegado.");
-
         }
 
 
