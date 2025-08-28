@@ -325,6 +325,102 @@ button:hover {
 }
 .pos-item-row.total { border-bottom: 0; font-weight: 700; }
 .pos-empty { color: #fff; opacity: .85; padding: 12px; }
+
+/* POS details modal adjustments */
+.pos-details-modal .pos-items-grid {
+  grid-template-columns: 1fr !important;
+}
+
+/* ===== Landing Page polish ===== */
+.landing-page .header-21 {
+  margin-bottom: 1.5rem;
+}
+.landing-page .formulario-1 {
+  margin: 1.25rem auto;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.landing-page .bloque-formulario {
+  padding: 1.25rem 1.25rem 1.5rem 1.25rem;
+  backdrop-filter: saturate(105%) blur(1px);
+}
+.landing-hero {
+  padding: 0.75rem !important;
+}
+.landing-page h2 {
+  margin-bottom: .75rem;
+}
+.landing-page .row {
+  gap: 1rem;
+}
+.landing-page .col .bloque-formulario {
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.landing-page .col .bloque-formulario:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+}
+.landing-page .boton-formulario {
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.pos-details-modal .pos-item-card {
+  margin-bottom: 8px;
+}
+
+/* ===== Simple Carousel (Landing) ===== */
+.kc-carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+}
+.kc-carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform .6s ease;
+}
+.kc-carousel-slide {
+  min-width: 100%;
+  height: 100%;
+}
+.kc-carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.kc-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  border: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.kc-carousel-arrow.left { left: 10px; }
+.kc-carousel-arrow.right { right: 10px; }
+.kc-carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.kc-carousel-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255,255,255,.5);
+  cursor: pointer;
+}
+.kc-carousel-dots .dot.active { background: #fff; }
 .pos-grid-side { min-width: 280px; }
 .pos-side-card {
   background: linear-gradient(45deg,

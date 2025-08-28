@@ -15,6 +15,37 @@ import { PuntoVenta } from '../../interfaces/Ventas/PuntoVenta'
 import usuarioService from '../../services/seguridad/usuarioService'
 import { Usuario } from '../../interfaces/seguridad/Usuario'
 
+// Helpers para mostrar nombres de enumerables (mismo criterio que Ventas)
+const getEstadoVentaText = (estado: number) => {
+  switch (estado) {
+    case 0: return 'Pendiente'
+    case 1: return 'Finalizada'
+    case 2: return 'Pagada'
+    case 3: return 'Cancelada'
+    case 4: return 'Reembolsada'
+    case 5: return 'Por Cobrar'
+    default: return 'Desconocido'
+  }
+}
+const getTipoVentaText = (t: number) => {
+  switch (t) {
+    case 0: return 'Contado'
+    case 1: return 'Crédito'
+    case 2: return 'Mixto'
+    default: return 'Desconocido'
+  }
+}
+const getTipoPagoText = (t: number) => {
+  switch (t) {
+    case 0: return 'Efectivo'
+    case 1: return 'Tarjeta Crédito'
+    case 2: return 'Tarjeta Débito'
+    case 3: return 'Transferencia'
+    case 4: return 'Otro'
+    default: return 'Desconocido'
+  }
+}
+
 const POSWidget: React.FC = () => {
   // Venta actual
   const [venta, setVenta] = useState<Venta | null>(null)
@@ -40,8 +71,12 @@ const POSWidget: React.FC = () => {
   }
   const [editItem, setEditItem] = useState<POSItem>(defaultItem)
   const [modalType, setModalType] = useState<'add' | 'edit' | 'finalizar' | 'cancelar' | null>(null)
+  const [continuarModal, setContinuarModal] = useState(false)
+  const [continuables, setContinuables] = useState<Venta[]>([])
+  const [continuarVentaId, setContinuarVentaId] = useState<number>(0)
 
   const closeModal = () => setModalType(null)
+  const closeContinuar = () => setContinuarModal(false)
 
   const cargarCatalogos = async () => {
     const results = await Promise.allSettled([
@@ -71,6 +106,45 @@ const POSWidget: React.FC = () => {
     } catch (e: any) {
       setError(e?.response?.data || 'Error iniciando venta')
     } finally { setLoading(false) }
+  }
+
+  const abrirContinuar = async () => {
+    setContinuarVentaId(0)
+    try {
+      const { data } = await VentaService.leerContinuables(pvId || undefined)
+      setContinuables(Array.isArray(data) ? data : [])
+      setContinuarModal(true)
+    } catch (e) {
+      setContinuables([])
+      setContinuarModal(true)
+    }
+  }
+
+  const confirmarContinuar = async () => {
+    if (!continuarVentaId) { alert('Seleccione una venta'); return }
+    try {
+      // Si es cancelada, reabrir
+      const target = continuables.find(v => v.id === continuarVentaId)
+      if (target && target.estado === 3 /* Cancelada */) {
+        await VentaService.reabrir(target.id)
+        target.estado = 0 // Pendiente
+        target.activo = true
+        target.estaCancelada = false
+      }
+      if (target) {
+        setVenta(target)
+        setPvId(target.puntoVentaId)
+        setNumeroFactura(target.numeroFactura || '')
+        setTipoVenta(target.tipoVenta)
+        setTipoPago(target.tipoPago)
+        setClienteId(target.clienteId || 0)
+        setVendedorId(target.vendedorId || 0)
+        await cargarLineas(target.id)
+      }
+      closeContinuar()
+    } catch (e: any) {
+      alert(e?.response?.data || 'No fue posible continuar la venta seleccionada')
+    }
   }
 
   const agregarLinea = async () => {
@@ -191,6 +265,9 @@ const POSWidget: React.FC = () => {
             <div className='pos-actions'>
               <button className='boton-formulario btn-xl' onClick={iniciarVenta} disabled={loading || !pvId}>
                 <AddShoppingCart style={{marginRight: 6}} /> Iniciar Venta
+              </button>
+              <button className='boton-formulario btn-xl' onClick={abrirContinuar}>
+                <AddShoppingCart style={{marginRight: 6}} /> Continuar Venta
               </button>
             </div>
           </div>
@@ -368,6 +445,30 @@ const POSWidget: React.FC = () => {
             content={<div style={{ color: 'white' }}>Esta acción eliminará todas las líneas POS asociadas. ¿Desea continuar?</div>}
             onConfirm={cancelarVenta}
             closeModal={closeModal}
+          />
+        )}
+
+        {continuarModal && (
+          <ModalDialog
+            title='Continuar Venta'
+            textBtn='Confirmar'
+            content={
+              <div style={grid2ColStyle}>
+                <div className='form-group' style={{ gridColumn: 'span 2' }}>
+                  <label style={{ color: 'white' }} className='form-label'>Seleccione una venta (Pendiente o Cancelada)</label>
+                  <select className='form-control' value={continuarVentaId} onChange={(e) => setContinuarVentaId(Number(e.target.value))}>
+                    <option value={0}>Seleccione...</option>
+                    {continuables.map(v => (
+                      <option key={v.id} value={v.id}>
+                        #{v.id} • {new Date(v.fecha || '').toLocaleString()} • {v.numeroFactura || 's/f'} • Estado: {getEstadoVentaText(Number(v.estado))} • Venta: {getTipoVentaText(Number(v.tipoVenta))} • Pago: {getTipoPagoText(Number(v.tipoPago))}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            }
+            onConfirm={confirmarContinuar}
+            closeModal={closeContinuar}
           />
         )}
       </div>

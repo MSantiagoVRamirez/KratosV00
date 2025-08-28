@@ -69,6 +69,75 @@ namespace Kratos.Server.Controllers.Ventas
             return Ok(list);
         }
 
+        // Ventas continuables: Pendientes o Canceladas
+        [HttpGet("leerContinuables")]
+        public async Task<ActionResult<IEnumerable<object>>> LeerContinuables(int? puntoVentaId = null)
+        {
+            var query = _context.Venta
+                .Include(v => v.puntoVentaVentaFk)
+                .Include(v => v.ClienteVentaFk)
+                .Include(v => v.vendedorVentaFk)
+                .Where(v => v.estado == Venta.EstadoVenta.Pendiente || v.estado == Venta.EstadoVenta.Cancelada)
+                .AsQueryable();
+
+            if (puntoVentaId.HasValue)
+                query = query.Where(v => v.puntoVentaId == puntoVentaId.Value);
+
+            var ventas = await query
+                .OrderByDescending(v => v.fecha)
+                .Select(v => new
+                {
+                    v.id,
+                    v.fecha,
+                    v.numeroFactura,
+                    v.total,
+                    v.tipoVenta,
+                    v.tipoPago,
+                    v.estado,
+                    v.activo,
+                    v.puntoVentaId,
+                    puntoVentaNombre = v.puntoVentaVentaFk != null ? v.puntoVentaVentaFk.nombre : null,
+                    v.clienteId,
+                    clienteNombre = v.ClienteVentaFk != null ? (v.ClienteVentaFk.nombres + " " + v.ClienteVentaFk.apellidos) : null,
+                    v.vendedorId,
+                    vendedorNombre = v.vendedorVentaFk != null ? (v.vendedorVentaFk.nombres + " " + v.vendedorVentaFk.apellidos) : null,
+                })
+                .ToListAsync();
+
+            return Ok(ventas);
+        }
+
+        // Lista general de ventas (todas), con datos relacionados básicos
+        [HttpGet("leer")]
+        public async Task<ActionResult<IEnumerable<object>>> Leer()
+        {
+            var ventas = await _context.Venta
+                .Include(v => v.puntoVentaVentaFk)
+                .Include(v => v.ClienteVentaFk)
+                .Include(v => v.vendedorVentaFk)
+                .OrderByDescending(v => v.fecha)
+                .Select(v => new
+                {
+                    v.id,
+                    v.fecha,
+                    v.numeroFactura,
+                    v.total,
+                    v.tipoVenta,
+                    v.tipoPago,
+                    v.estado,
+                    v.activo,
+                    v.puntoVentaId,
+                    puntoVentaNombre = v.puntoVentaVentaFk != null ? v.puntoVentaVentaFk.nombre : null,
+                    v.clienteId,
+                    clienteNombre = v.ClienteVentaFk != null ? (v.ClienteVentaFk.nombres + " " + v.ClienteVentaFk.apellidos) : null,
+                    v.vendedorId,
+                    vendedorNombre = v.vendedorVentaFk != null ? (v.vendedorVentaFk.nombres + " " + v.vendedorVentaFk.apellidos) : null,
+                })
+                .ToListAsync();
+
+            return Ok(ventas);
+        }
+
         public class FinalizarDto
         {
             [Required]
@@ -187,6 +256,38 @@ namespace Kratos.Server.Controllers.Ventas
             venta.activo = false;
             venta.estaCancelada = true;
 
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        public class ReabrirDto
+        {
+            [Required]
+            public int ventaId { get; set; }
+        }
+
+        // Reabrir una venta (Cancelada -> Pendiente) para continuar en POS
+        [HttpPost("reabrir")]
+        public async Task<IActionResult> Reabrir([FromBody] ReabrirDto dto)
+        {
+            var venta = await _context.Venta.FindAsync(dto.ventaId);
+            if (venta == null) return NotFound();
+
+            if (venta.estado == Venta.EstadoVenta.Pendiente)
+            {
+                venta.activo = true;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+
+            if (venta.estado != Venta.EstadoVenta.Cancelada)
+            {
+                return BadRequest("Solo se puede reabrir una venta Cancelada o mantener una Pendiente.");
+            }
+
+            venta.estado = Venta.EstadoVenta.Pendiente;
+            venta.activo = true;
+            venta.estaCancelada = false;
             await _context.SaveChangesAsync();
             return Ok();
         }

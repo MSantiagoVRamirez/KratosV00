@@ -1,6 +1,7 @@
 ﻿import React, { useState } from 'react';
 import '../../../Styles/estilos.css';
 import img1 from '../../../../../public/media/misc/portfolio.png';
+import { Carousel } from '../../../pages/components/Carousel'
 import { ActividadEconomica } from '../../../interfaces/Configuracion/ActividadEconomica';
 import { RegimenTributario } from '../../../interfaces/Configuracion/RegimenTributario';
 import { TipoSociedad } from '../../../interfaces/Configuracion/TipoSociedad';
@@ -139,8 +140,8 @@ const handleLoginEmpresa = async () => {
         getTiposSociedad();
     }, []);
 
-    return (
-        <div className="content-2">
+return (
+        <div className="landing-page content-2">
             <div className="header-21">
                 <img style={{ maxWidth: "5%", height: "5%", objectFit: "contain", scale: "140%", marginLeft:  "3%" }} src="../../../../../public/media/logos/logo-1.png" alt="logo" />
                 <div className="header-botones">
@@ -212,8 +213,20 @@ const handleLoginEmpresa = async () => {
 
             <div id="demo" className="formulario-1">
                 <h2>Vista Previa</h2>
-                <div className="bloque-formulario text-center ">
-                    <img src={img1} alt="Demo" style={{ maxWidth: "100%", borderRadius: "10px", border: "2px solid white" }} />
+                <div className="bloque-formulario text-center landing-hero">
+                    <Carousel
+                      images={[
+                        '/media/carusel/img-1.png',
+                        '/media/carusel/img-2.png',
+                        '/media/carusel/img-3.png',
+                        '/media/carusel/img-4.png',
+                        '/media/carusel/img-5.png',
+                      ]}
+                      height={520}
+                      intervalMs={12500}
+                      showIndicators
+                      showArrows
+                    />
                     <div className="bloque-botnones mt-3">
                         <a href="#" className="boton-formulario">Tour Interactivo</a>
                     </div>

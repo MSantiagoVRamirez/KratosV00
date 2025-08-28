@@ -102,14 +102,14 @@ $info-clarity: 					 rgba(#010043, 0.2) !default;
 $info-inverse: 					 $white !default;
 
 // Warning colors
-$warning: 						#F6C000 !default; 
+$warning: 						#f8f8f8 !default; 
 $warning-active: 				#DEAD00 !default;
-$warning-light: 				#3be208 !default;
-$warning-clarity: 				 rgba(#F6C000, 0.2) !default;
+$warning-light: 				rgba(13, 10, 233, 0.534) !default;
+$warning-clarity: 				 rgba(#0004f6, 0.2) !default;
 $warning-inverse: 				 $white !default;
 
 // Danger colors
-$danger: 						#c4a51e !default; 
+$danger: 						#0de00d !default; 
 $danger-active: 				#FF5955 !default;
 $danger-light: 					 rgba(#FF5955, 0.1) !default;
 $danger-clarity: 				 rgba(#FF5955, 0.2) !default;
