@@ -10,7 +10,7 @@ export interface Producto {
 
   precio: number;   // decimal(18,2)
   costo: number;    // decimal(18,2)
-
+  
   stockMinimo: number;
 
   // En tu modelo existen ambas:
@@ -24,5 +24,5 @@ export interface Producto {
 
   // Para subir archivo (IFormFile en back):
   ImagenArchivo?: File | null;
-    
+  productoServicio: boolean;
 }

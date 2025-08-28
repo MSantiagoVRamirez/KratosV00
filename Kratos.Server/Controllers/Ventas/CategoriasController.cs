@@ -13,6 +13,7 @@ using Kratos.Server.Models.Contexto;
 using static System.Net.Mime.MediaTypeNames;
 using Kratos.Server.Services.Storage;
 using Kratos.Server.Models.Seguridad;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 namespace Kratos.Server.Controllers.Ventas
@@ -31,18 +32,40 @@ namespace Kratos.Server.Controllers.Ventas
         }
 
         [HttpGet]
-        [Route("leerCategoria")]
-        public async Task<List<Categoria>> leerCategoria()
+        [Route("leerCategoriaProducto")]
+        public async Task<List<Categoria>> leerCategoriaProducto()
         {
-            var listaCategorias = await _context.Categoria.ToListAsync();
+            var listaCategorias = await _context.Categoria
+                .Where(c => c.categoriapadreId == null && c.ProductoServicio == false)
+                .ToListAsync();
+
             return listaCategorias;
         }
         [HttpGet]
-        [Route("leerSubCategoria")]
-        public async Task<List<Categoria>> leerSubCategoria(int categoria)
+        [Route("leerSubCategoriaProducto")]
+        public async Task<List<Categoria>> leerSubCategoriaProducto(int categoria)
         {
             var listaSubCategorias = await _context.Categoria
-                .Where(c => c.categoriapadreId == categoria)
+                .Where(c => c.categoriapadreId == categoria && c.ProductoServicio == false)
+                .ToListAsync();
+            return listaSubCategorias;
+        }
+        [HttpGet]
+        [Route("leerCategoriaServicio")]
+        public async Task<List<Categoria>> leerCategoriaServicio()
+        {
+            var listaCategorias = await _context.Categoria
+                .Where(c => c.categoriapadreId == null && c.ProductoServicio == true)
+                .ToListAsync();
+
+            return listaCategorias;
+        }
+        [HttpGet]
+        [Route("leerSubCategoriaServicio")]
+        public async Task<List<Categoria>> leerSubCategoriaServicio(int categoria)
+        {
+            var listaSubCategorias = await _context.Categoria
+                .Where(c => c.categoriapadreId == categoria && c.ProductoServicio == true)
                 .ToListAsync();
             return listaSubCategorias;
         }

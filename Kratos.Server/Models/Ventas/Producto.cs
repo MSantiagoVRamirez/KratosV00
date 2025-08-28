@@ -40,8 +40,7 @@ namespace Kratos.Server.Models.Ventas
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         public int stockMinimo { get; set; }
-
-        public string? imagenUrl { get; set; } // Nueva propiedad para imágenes
+ 
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         public bool activo { get; set; }
@@ -55,5 +54,7 @@ namespace Kratos.Server.Models.Ventas
 
         [NotMapped] // evita que EF la mapee a la BD
         public IFormFile? ImagenArchivo { get; set; }
+
+        public bool productoServicio { get; set; }
     }
 }

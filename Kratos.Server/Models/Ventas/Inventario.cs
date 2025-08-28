@@ -23,6 +23,9 @@ namespace Kratos.Server.Models.Ventas
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         public int cantidad { get; set; }
 
+        // Indica si el item corresponde a un servicio (true) o producto (false)
+        public bool productoServicio { get; set; }
+
 
         [DataType(DataType.DateTime)]
         public DateTime creadoEn { get; set; }

@@ -25,7 +25,7 @@ namespace Kratos.Server.Controllers.Ventas
             var inventarioExistente = await _context.Inventario.AnyAsync(i => i.productoId == inventario.productoId);
             if (inventarioExistente)
             {
-                BadRequest($"Error: Ya existe un Registro con ese Producto asociado.");
+                return BadRequest($"Error: Ya existe un Registro con ese Producto asociado.");
             }
             await _context.Inventario.AddAsync(inventario);
             await _context.SaveChangesAsync();
@@ -35,9 +35,25 @@ namespace Kratos.Server.Controllers.Ventas
 
         [HttpGet]
         [Route("leer")]
-        public async Task<ActionResult<IEnumerable<Inventario>>> leer()
+        public async Task<ActionResult<IEnumerable<object>>> leer()
         {
-            var inventario = await _context.Inventario.ToListAsync();
+            var inventario = await _context.Inventario
+                .Include(i => i.productoFk)
+                .Include(i => i.puntoventaFk)
+                .Select(i => new
+                {
+                    i.id,
+                    i.productoId,
+                    productoNombre = i.productoFk != null ? i.productoFk.nombre : null,
+                    productoCodigo = i.productoFk != null ? i.productoFk.codigo : null,
+                    i.puntoventaId,
+                    puntoventaNombre = i.puntoventaFk != null ? i.puntoventaFk.nombre : null,
+                    i.cantidad,
+                    i.productoServicio,
+                    i.creadoEn,
+                    i.actualizadoEn
+                })
+                .ToListAsync();
 
             return Ok(inventario);
         }
@@ -66,6 +82,7 @@ namespace Kratos.Server.Controllers.Ventas
             inventarioExistente.productoId = inventario.productoId;
             inventarioExistente.puntoventaId = inventario.puntoventaId;
             inventarioExistente.cantidad = inventario.cantidad;
+            inventarioExistente.productoServicio = inventario.productoServicio;
             inventarioExistente.creadoEn = inventario.creadoEn;
             inventarioExistente.actualizadoEn = DateTime.Now;
 
@@ -86,6 +103,10 @@ namespace Kratos.Server.Controllers.Ventas
         public async Task<IActionResult> eliminar(int Id)
         {
             var inventarioBorrado = await _context.Inventario.FindAsync(Id);
+            if (inventarioBorrado == null)
+            {
+                return NotFound();
+            }
 
             _context.Inventario.Remove(inventarioBorrado);
 

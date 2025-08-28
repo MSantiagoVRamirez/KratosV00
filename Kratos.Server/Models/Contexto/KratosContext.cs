@@ -121,6 +121,13 @@ namespace Kratos.Server.Models.Contexto
                 .HasForeignKey(pv => pv.responsableId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //PuntoVentas -> empresa
+            modelBuilder.Entity<PuntoVenta>()
+                .HasOne(pv => pv.empresaSucursalFk)
+                .WithMany()
+                .HasForeignKey(pv => pv.empresaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Usuarios -> Roles
             modelBuilder.Entity<Usuario>()
                 .HasOne(u => u.usuariosrolesFk)

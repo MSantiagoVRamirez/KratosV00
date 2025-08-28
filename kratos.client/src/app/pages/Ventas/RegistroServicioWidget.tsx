@@ -36,7 +36,7 @@ function formatApiError(err: any): string {
   try { return JSON.stringify(data); } catch { return resp.statusText || 'Error de servidor'; }
 }
 
-export function ProductoCreateWidget() {
+export function ServicioCreateWidget() {
   const defaultProducto: Producto = {
     id: 0,
     codigo: '',
@@ -51,7 +51,7 @@ export function ProductoCreateWidget() {
     imagenUrl: null,
     ImagenUrl: null,
     ImagenArchivo: null,
-    productoServicio: false,
+    productoServicio: true,
   };
 
   const [producto, setProducto] = useState<Producto>(defaultProducto);
@@ -76,6 +76,7 @@ export function ProductoCreateWidget() {
     stockMinimo:   { value: producto.stockMinimo, required: true, type: 'number' },
     activo:        { value: producto.activo, required: true, type: 'boolean' },
   });
+
   // 👇 mantén un estado auxiliar de strings
     const [precioText, setPrecioText] = useState('');
     const [costoText, setCostoText] = useState('');
@@ -100,7 +101,7 @@ export function ProductoCreateWidget() {
     const loadCategorias = async () => {
       setCatLoading(true);
       try {
-        const resp = await CategoriasService.getCategoriasProductos();
+        const resp = await CategoriasService.getCategoriasServicios();
         const data = Array.isArray(resp.data) ? resp.data : [];
         const parsed: UICategoria[] = data.map((c: any) => ({
           id: Number(c.id),
@@ -127,7 +128,7 @@ export function ProductoCreateWidget() {
 
     setSubCatLoading(true);
     try {
-      const resp = await CategoriasService.getSubCategoriasProductos(id);
+      const resp = await CategoriasService.getSubCategoriasServicios(id);
 
       // Log de depuración (puedes comentarlo luego)
       // console.log('GET subcategorias', { url: resp.config?.url, params: (resp.config as any)?.params, data: resp.data });
@@ -232,7 +233,7 @@ export function ProductoCreateWidget() {
   return (
     <div className="contenido">
       <div id="productos" className="bloque-formulario">
-        <div><h2>Registrar Producto</h2></div>
+        <div><h2>Registrar Servicio</h2></div>
 
         <Card
           sx={{
@@ -244,7 +245,7 @@ export function ProductoCreateWidget() {
           }}
         >
           <CardHeader
-            title={<Typography variant="h6" sx={{ fontWeight: 800, color: '#fff' }}>Registro de Producto</Typography>}
+            title={<Typography variant="h6" sx={{ fontWeight: 800, color: '#fff' }}>Registro de Servicio</Typography>}
             sx={{ borderBottom: '1px solid rgba(255,255,255,0.2)', pb: 1.5 }}
           />
 
@@ -368,71 +369,74 @@ export function ProductoCreateWidget() {
             ))}
 
             <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.2)' }} />
-
+       
             {/* Sección: Precios */}
-            {seccion('Precios', (
-              <div style={grid2ColStyle}>
-                <div className="form-group">
-                 <label style={{ color: 'white' }} className="form-label required">Precio</label>
-                    <input
-                      type="text"
-                      value={precioText}
-                      onChange={(e) => {
-                        // permitir hasta 14 dígitos y opcionalmente 2 decimales
-                        const raw = e.target.value.replace(/[^0-9.,]/g, '').replace(',', '.');
-                        if (raw.length <= 18) { // 14 enteros + 2 decimales + punto
-                          setPrecioText(raw);
-                        }
-                      }}
-                      onBlur={(e) => {
-                        const num = parseFloat(precioText);
-                        if (!isNaN(num)) {
-                          setProducto(p => ({ ...p, precio: num }));
-                          setPrecioText(formatCurrency(num)); // mostrar formateado
-                        } else {
-                          setProducto(p => ({ ...p, precio: 0 }));
-                          setPrecioText('');
-                        }
-                      }}
-                      onFocus={(e) => {
-                        // mostrar valor crudo al enfocar
-                        setPrecioText(producto.precio ? producto.precio.toString() : '');
-                      }}
-                      className="form-control"
-                      required
-                    />
+              {seccion('Precios', (
+                <div style={grid2ColStyle}>
+                  <div className="form-group">
+                   <label style={{ color: 'white' }} className="form-label required">Precio</label>
+                      <input
+                        type="text"
+                        value={precioText}
+                        onChange={(e) => {
+                          // permitir hasta 14 dígitos y opcionalmente 2 decimales
+                          const raw = e.target.value.replace(/[^0-9.,]/g, '').replace(',', '.');
+                          if (raw.length <= 18) { // 14 enteros + 2 decimales + punto
+                            setPrecioText(raw);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          const num = parseFloat(precioText);
+                          if (!isNaN(num)) {
+                            setProducto(p => ({ ...p, precio: num }));
+                            setPrecioText(formatCurrency(num)); // mostrar formateado
+                          } else {
+                            setProducto(p => ({ ...p, precio: 0 }));
+                            setPrecioText('');
+                          }
+                        }}
+                        onFocus={(e) => {
+                          // mostrar valor crudo al enfocar
+                          setPrecioText(producto.precio ? producto.precio.toString() : '');
+                        }}
+                        className="form-control"
+                        required
+                      />
+                  </div>
+  
+                  <div className="form-group">
+                     <label style={{ color: 'white' }} className="form-label required">Costo</label>
+                      <input
+                        type="text"
+                        value={costoText}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/[^0-9.,]/g, '').replace(',', '.');
+                          if (raw.length <= 18) {
+                            setCostoText(raw);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          const num = parseFloat(costoText);
+                          if (!isNaN(num)) {
+                            setProducto(p => ({ ...p, costo: num }));
+                            setCostoText(formatCurrency(num));
+                          } else {
+                            setProducto(p => ({ ...p, costo: 0 }));
+                            setCostoText('');
+                          }
+                        }}
+                        onFocus={(e) => {
+                          setCostoText(producto.costo ? producto.costo.toString() : '');
+                        }}
+                        className="form-control"
+                        required
+                      />
+                  </div>
                 </div>
+              ))}
+           
 
-                <div className="form-group">
-                   <label style={{ color: 'white' }} className="form-label required">Costo</label>
-                    <input
-                      type="text"
-                      value={costoText}
-                      onChange={(e) => {
-                        const raw = e.target.value.replace(/[^0-9.,]/g, '').replace(',', '.');
-                        if (raw.length <= 18) {
-                          setCostoText(raw);
-                        }
-                      }}
-                      onBlur={(e) => {
-                        const num = parseFloat(costoText);
-                        if (!isNaN(num)) {
-                          setProducto(p => ({ ...p, costo: num }));
-                          setCostoText(formatCurrency(num));
-                        } else {
-                          setProducto(p => ({ ...p, costo: 0 }));
-                          setCostoText('');
-                        }
-                      }}
-                      onFocus={(e) => {
-                        setCostoText(producto.costo ? producto.costo.toString() : '');
-                      }}
-                      className="form-control"
-                      required
-                    />
-                </div>
-              </div>
-            ))}
+           
 
             <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.2)' }} />
 
@@ -492,4 +496,4 @@ export function ProductoCreateWidget() {
   );
 }
 
-export default ProductoCreateWidget;
+export default ServicioCreateWidget;

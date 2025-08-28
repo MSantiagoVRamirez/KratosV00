@@ -2,7 +2,7 @@ import axios from "axios";
 import { Usuario } from "../../interfaces/seguridad/Usuario";
 import APIurls from "../APIurls";
 
-const API_URL = APIurls.Currennt_API_URL + "/api/Usuario";
+const API_URL = APIurls.Currennt_API_URL + "/api/Usuarios";
 
 // Preservar estado de la sesión iniciada
 axios.defaults.withCredentials = true;

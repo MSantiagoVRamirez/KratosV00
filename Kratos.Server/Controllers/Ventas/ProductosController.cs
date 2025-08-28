@@ -60,6 +60,7 @@ namespace Kratos.Server.Controllers.Ventas
         public async Task<ActionResult<IEnumerable<Producto>>> Leer()
         {
             return await _context.Producto
+                .Where(p => p.productoServicio == false)
                 .Include(p => p.categoriaFk)
                 .ToListAsync();
         }
@@ -107,7 +108,7 @@ namespace Kratos.Server.Controllers.Ventas
             productoExistente.stockMinimo = producto.stockMinimo;
             productoExistente.activo = producto.activo;
             productoExistente.actualizadoEn = DateTime.Now;
-            productoExistente.imagenUrl = producto.imagenUrl;
+            productoExistente.ImagenUrl = producto.ImagenUrl;
             try
             {
                 _context.Producto.Update(productoExistente);

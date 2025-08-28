@@ -4,6 +4,7 @@ using Kratos.Server.Models.Contexto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kratos.Server.Migrations
 {
     [DbContext(typeof(KratosContext))]
-    partial class KratosContextModelSnapshot : ModelSnapshot
+    [Migration("20250827165054_cambios007")]
+    partial class cambios007
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -516,9 +519,6 @@ namespace Kratos.Server.Migrations
                     b.Property<int>("productoId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("productoServicio")
-                        .HasColumnType("bit");
-
                     b.Property<int>("puntoventaId")
                         .HasColumnType("int");
 
@@ -723,7 +723,7 @@ namespace Kratos.Server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("empresaId")
+                    b.Property<int?>("empressaId")
                         .HasColumnType("int");
 
                     b.Property<string>("nombre")
@@ -741,7 +741,7 @@ namespace Kratos.Server.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("empresaId");
+                    b.HasIndex("empressaId");
 
                     b.HasIndex("responsableId");
 
@@ -1052,7 +1052,7 @@ namespace Kratos.Server.Migrations
                 {
                     b.HasOne("Empresa", "empresaSucursalFk")
                         .WithMany()
-                        .HasForeignKey("empresaId")
+                        .HasForeignKey("empressaId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Kratos.Server.Models.Seguridad.Usuario", "usuarioFk")

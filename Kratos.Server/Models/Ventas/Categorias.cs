@@ -19,4 +19,6 @@ public class Categoria
     public bool Activo { get; set; } = true;
     public DateTime CreadoEn { get; set; } = DateTime.Now;
     public DateTime ActualizadoEn { get; set; } = DateTime.Now;
+    
+    public bool ProductoServicio { get; set; }
 }

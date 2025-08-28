@@ -16,7 +16,12 @@ import { RolWidget } from '../pages/Configuracion/RolWidget'
 
 //Ventas
 import { ProductoCreateWidget } from '../pages/Ventas/RegistroProductoWidget'
-// Contratos y ODs
+import { ServicioCreateWidget } from '../pages/Ventas/RegistroServicioWidget'
+import { PuntoVentaWidget } from '../pages/Ventas/PuntoVentaWidget'
+import { POSWidget } from '../pages/Ventas/POSWidget'
+import { StockProductosWidget } from '../pages/Inventario/StockProductosWidget'
+import { StockServiciosWidget } from '../pages/Inventario/StockServiciosWidget'
+// Contratos y ODs 
 import { TroncalesWidget } from '../pages/contratos-ods/TroncalesWidget'
 import { ProyectosWidget } from '../pages/contratos-ods/ProyectosWidget'
 import { ContratosWidget } from '../pages/contratos-ods/ContratosWidget'
@@ -65,6 +70,15 @@ const PrivateRoutes = () => {
 
         {/* Ventas */}
         <Route path="ventas/registro-producto-widget" element={<ProductoCreateWidget />} />
+        <Route path="ventas/registro-servicio-widget" element={<ServicioCreateWidget />} />
+        <Route path="ventas/punto-venta-widget" element={<PuntoVentaWidget />} />
+        <Route path="ventas/POS" element={<POSWidget />} />
+
+        {/* Inventario */}
+        <Route path="inventario/Stock-Productos-widget" element={<StockProductosWidget />} />
+        <Route path="inventario/Agenda-Servicios-widget" element={<StockServiciosWidget />} />
+
+        
 
 
         {/* Contratos y ODS */}

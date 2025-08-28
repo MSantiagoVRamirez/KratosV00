@@ -31,7 +31,10 @@ namespace Kratos.Server.Models.Ventas
         public int responsableId { get; set; }
         public Usuario? usuarioFk { get; set; }
 
-
+        
+        [ForeignKey("Empresa")]
+        public int? empresaId { get; set; }
+        public Empresa? empresaSucursalFk { get; set; }
 
         public bool activo { get; set; }
 
