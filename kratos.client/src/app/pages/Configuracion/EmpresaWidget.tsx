@@ -191,13 +191,13 @@ export function EmpresaWidget() {
 
   const seccion = (title: string, content: React.ReactNode) => (
     <Box sx={{ mb: 2 }}>
-      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#fff', mb: 0.5 }}>{title}</Typography>
+      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'rgb(18, 30, 130)', mb: 0.5 }}>{title}</Typography>
       <Box
         sx={{
           p: 1.5,
           borderRadius: '8px',
-          backgroundColor: 'rgba(255,255,255,0.10)',
-          color: '#fff',
+          backgroundColor: 'rgba(255, 255,255, 0.5)',
+          color: 'rgb(18, 30, 130)',
           lineHeight: 1.6
         }}
       >
@@ -219,7 +219,7 @@ export function EmpresaWidget() {
       <div className="contenido">
         <div className="bloque-formulario">
           <h2>Detalles de Empresa</h2>
-          <p style={{ color: '#fff' }}>Cargando...</p>
+          <p style={{ color: '#d80d0dff' }}>Cargando...</p>
         </div>
       </div>
     );
@@ -230,7 +230,7 @@ export function EmpresaWidget() {
       <div className="contenido">
         <div className="bloque-formulario">
           <h2>Detalles de Empresa</h2>
-          <p style={{ color: '#ffb3b3' }}>{error}</p>
+          <p style={{ color: '#dd1b1bff' }}>{error}</p>
         </div>
       </div>
     );
@@ -244,8 +244,8 @@ export function EmpresaWidget() {
         <Card
           sx={{
             mt: 1,
-            background: 'linear-gradient(45deg, rgba(10, 70, 120, 0.7), rgba(21, 154, 230, 0.7))',
-            color: '#fff',
+            background: 'rgb(227, 227, 236)',
+            color: 'rgb(18, 30, 130)',
             borderRadius: '12px',
             margin: "3%"
           }}
@@ -253,16 +253,16 @@ export function EmpresaWidget() {
           <CardHeader
             title={
               <Box>
-                <Typography variant="h6" sx={{ fontSize: "100%", fontWeight: 800, color: '#fff' }}>
+                <Typography variant="h6" sx={{ fontSize: "100%", fontWeight: 800, color: 'rgba(255, 255, 255, 1)' }}>
                   {empresa.nombreComercial || 'Empresa'}
                 </Typography>
-                <Typography variant="caption" sx={{  fontSize: "70%", color: 'rgba(255,255,255,0.85)' }}>
+                <Typography variant="caption" sx={{  fontSize: "70%", color: 'rgba(255, 255, 255, 1)' }}>
                   ID: {empresa.id} • NIT: {empresa.nit}-{empresa.dv}
                 </Typography>
               </Box>
             }
             action={headerActions}
-            sx={{ borderBottom: '1px solid rgba(255, 255, 255, 1)', pb: 1.5 }}
+            sx={{ backgroundColor: "rgb(18, 30, 130)",  borderBottom: '1px solid rgb(18, 30, 130)', pb: 1.5 }}
           />
 
           {/* Imagen destacada */}
@@ -279,7 +279,7 @@ export function EmpresaWidget() {
                   width: '100%',
                   height: 160,
                   borderRadius: '10px',
-                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  backgroundColor: 'rgb(18, 30, 130)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -328,7 +328,7 @@ export function EmpresaWidget() {
                     label={empresa.activo ? 'Activo' : 'Inactivo'}
                     color={empresa.activo ? 'success' : 'default'}
                     size="small"
-                    sx={{ color: '#fff' }}
+                    sx={{ color: 'rgb(18, 30, 130)' }}
                   />
                 </div>
                 <div><strong>Creado en:</strong> {empresa.creadoEn ? new Date(empresa.creadoEn).toLocaleString() : '-'}</div>
@@ -336,7 +336,7 @@ export function EmpresaWidget() {
               </Box>
             ))}
 
-            <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.2)' }} />
+            <Divider sx={{ my: 2, borderColor: 'rgb(18, 30, 130)' }} />
 
             
           </CardContent>

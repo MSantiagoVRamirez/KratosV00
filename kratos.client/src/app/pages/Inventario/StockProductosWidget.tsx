@@ -154,17 +154,8 @@ const StockProductosWidget: React.FC = () => {
             onPaginationModelChange={setPaginationModel}
             pageSizeOptions={[5, 10, 25, 50]}
             loading={loading}
-            sx={{
-              background: 'linear-gradient(45deg, rgba(10, 70, 120, 0.7), rgba(21, 154, 230, 0.7))',
-              borderRadius: '10px',
-              color: '#fff',
-              '& .MuiDataGrid-columnHeaders': { borderBottom: '1px solid rgba(255, 255, 255, 0.2)' },
-              '& .MuiDataGrid-columnHeader': { backgroundColor: 'rgb(20, 111, 165)', color: '#fff', fontWeight: 'bold' },
-              '& .MuiDataGrid-cell': { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', fontSize: '0.95rem', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' },
-              '& .MuiDataGrid-row:hover': { backgroundColor: 'rgba(255, 255, 255, 0.2)' },
-              '& .MuiDataGrid-footerContainer': { backgroundColor: 'rgba(0, 0, 0, 0.2)', color: '#fff', borderTop: '1px solid rgba(255, 255, 255, 0.2)' },
-              '& .MuiSvgIcon-root': { color: '#fff' },
-              '& .MuiTablePagination-root': { color: '#fff' },
+             sx={{
+              
             }}
           />
         </div>

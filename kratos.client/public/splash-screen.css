@@ -60,7 +60,7 @@ html[data-bs-theme='dark'] .splash-screen .dark-logo {
 .loader {
   width: 2rem;
   height: 2rem;
-  border: 0.185rem solid #C8DE26;
+  border: 0.185rem solid #e1e0e4;
   border-bottom-color: transparent;
   border-radius: 50%;
   display: inline-block;

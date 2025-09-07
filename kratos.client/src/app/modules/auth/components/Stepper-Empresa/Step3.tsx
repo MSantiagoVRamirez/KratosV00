@@ -42,12 +42,12 @@ export const Step3: FC<Props> = ({
   return (
     <div className="w-100" data-kt-stepper-element="content">
       <div style={{ marginLeft: '7%', marginTop: '2%' }}>
-        <div className="w-100">
+        <div className="w-100 user-card" style={{ padding: '1rem' }}>
           <div className="row">
             {/* Tipo de Sociedad */}
             <div className="col-md-12">
               <div className="fv-row mb-7">
-                <label className="form-label required fs-6 fw-semibold">Tipo Sociedad</label>
+                <label style={{color: 'rgb(18, 30, 130)'}} className=" required fs-6 fw-semibold">Tipo Sociedad</label>
                 <select
                   className={`form-select form-select-solid ${hasError && !data.step3.tiposociedadId ? 'is-invalid' : ''}`}
                   value={data.step3.tiposociedadId ?? 0}
@@ -68,7 +68,7 @@ export const Step3: FC<Props> = ({
             {/* Actividad Económica */}
             <div className="col-md-12">
               <div className="fv-row mb-7">
-                <label className="form-label required fs-6 fw-semibold">Actividad Económica</label>
+                <label style={{color: 'rgb(18, 30, 130)'}}  className=" required fs-6 fw-semibold">Actividad Económica</label>
                 <select
                   className={`form-select form-select-solid ${hasError && !data.step3.actividadId ? 'is-invalid' : ''}`}
                   value={data.step3.actividadId ?? 0}
@@ -91,7 +91,7 @@ export const Step3: FC<Props> = ({
           <div className="row">
             <div className="col-md-12">
               <div className="fv-row mb-7">
-                <label className="form-label required fs-6 fw-semibold">Régimen Tributario</label>
+                <label style={{color: 'rgb(18, 30, 130)'}} className="required fs-6 fw-semibold">Régimen Tributario</label>
                 <select
                   className={`form-select form-select-solid ${hasError && !data.step3.regimenId ? 'is-invalid' : ''}`}
                   value={data.step3.regimenId ?? 0}
@@ -114,7 +114,7 @@ export const Step3: FC<Props> = ({
           <div className="row">
             <div className="col-md-12">
               <div className="fv-row mb-7">
-                <label className="form-label required fs-6 fw-semibold">Razón Social</label>
+                <label style={{color: 'rgb(18, 30, 130)'}} className=" required fs-6 fw-semibold">Razón Social</label>
                 <input
                   type="text"
                   className={`form-control form-control-solid ${hasError && !data.step3.razonSocial ? 'is-invalid' : ''}`}
@@ -131,7 +131,7 @@ export const Step3: FC<Props> = ({
 
             <div className="col-md-12">
               <div className="fv-row mb-7">
-                <label className="form-label required fs-6 fw-semibold">Nombre Comercial</label>
+                <label style={{color: 'rgb(18, 30, 130)'}} className=" required fs-6 fw-semibold">Nombre Comercial</label>
                 <input
                   type="text"
                   className={`form-control form-control-solid ${hasError && !data.step3.nombreComercial ? 'is-invalid' : ''}`}
@@ -151,7 +151,7 @@ export const Step3: FC<Props> = ({
           <div className="row">
             <div className="col-md-12">
               <div className="fv-row mb-7">
-                <label className="form-label required fs-6 fw-semibold">NIT</label>
+                <label style={{color: 'rgb(18, 30, 130)'}} className=" required fs-6 fw-semibold">NIT</label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -169,7 +169,7 @@ export const Step3: FC<Props> = ({
 
             <div className="col-md-12">
               <div className="fv-row mb-7">
-                <label className="form-label required fs-6 fw-semibold">DV</label>
+                <label style={{color: 'rgb(18, 30, 130)'}} className=" required fs-6 fw-semibold">DV</label>
                 <input
                   type="text"
                   inputMode="numeric"

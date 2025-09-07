@@ -24,12 +24,12 @@ const Step2: FC<Props> = ({
 
   return (
     <div className='w-100' data-kt-stepper-element='content'>
-      <div  style={{ marginLeft: '7%', marginTop: '2%'  }}>
-        <div className='w-100'>
+      <div style={{ marginLeft: '7%', marginTop: '2%' }}>
+        <div className='w-100 user-card' style={{ padding: '1rem' }}>
           <div className='row'>
             <div className='col-md-12'>
               <div className='fv-row mb-7'>
-                <label className='form-label required fs-6 fw-semibold'>Teléfono</label>
+                <label style={{color: 'rgb(18, 30, 130)'}} className='required fs-6 fw-semibold'>Teléfono</label>
                 <input
                   type="text"
                   className={`form-control form-control-solid ${hasError && !data.step2.telefono ? 'is-invalid' : ''}`}
@@ -44,7 +44,7 @@ const Step2: FC<Props> = ({
             </div>
             <div className='col-md-12'>
               <div className='fv-row mb-7'>
-                <label className='form-label required fs-6 fw-semibold'>Representante Legal</label>
+                <label style={{color: 'rgb(18, 30, 130)'}} className=' required fs-6 fw-semibold'>Representante Legal</label>
                 <input
                   type="text"
                   className={`form-control form-control-solid ${hasError && !data.step2.representanteLegal ? 'is-invalid' : ''}`}

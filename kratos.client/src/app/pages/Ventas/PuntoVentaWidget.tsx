@@ -185,11 +185,9 @@ export function PuntoVentaWidget() {
   const CardPV = (pv: PuntoVenta) => (
     <Card
       key={pv.id}
+      className="user-card"
       sx={{
         height: '100%',
-        background: 'linear-gradient(45deg, rgba(10, 70, 120, 0.7), rgba(21, 154, 230, 0.7))',
-        color: '#fff',
-        borderRadius: '12px',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -197,10 +195,10 @@ export function PuntoVentaWidget() {
       <CardHeader
         title={
           <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#fff' }}>
+            <Typography variant="subtitle1" className="user-title">
               {pv.nombre}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)' }}>
+            <Typography variant="caption" className="user-subtitle">
               ID: {pv.id}
             </Typography>
           </Box>
@@ -209,12 +207,12 @@ export function PuntoVentaWidget() {
           <Box>
             <Tooltip title="Editar">
               <IconButton onClick={() => openEdit(pv.id)}>
-                <Edit style={{color: 'rgba(241, 218, 6, 1)'}} className="icon-editar" />
+                <Edit className="icon-editar" />
               </IconButton>
             </Tooltip>
             <Tooltip title="Eliminar">
               <IconButton onClick={() => openDelete(pv.id)}>
-                <Delete style={{color: 'rgba(228, 69, 6, 1)'}} className="icon-eliminar" />
+                <Delete className="icon-eliminar" />
               </IconButton>
             </Tooltip>
           </Box>
@@ -241,7 +239,7 @@ export function PuntoVentaWidget() {
             label={pv.activo ? 'Activo' : 'Inactivo'}
             color={pv.activo ? 'success' : 'default'}
             size="small"
-            sx={{ color: '#fff' }}
+            className="user-chip"
           />
         </Box>
         <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.2)' }} />
@@ -285,14 +283,7 @@ export function PuntoVentaWidget() {
 
               {pageItems.length === 0 && (
                 <Grid size={12}>
-                  <Card
-                    sx={{
-                      background: 'linear-gradient(45deg, rgba(10, 70, 120, 0.7), rgba(21, 154, 230, 0.7))',
-                      color: '#fff',
-                      borderRadius: '12px',
-                      p: 2,
-                    }}
-                  >
+                  <Card className="user-card" sx={{ p: 2 }}>
                     <Typography>No hay puntos de venta registrados.</Typography>
                   </Card>
                 </Grid>
@@ -334,7 +325,7 @@ export function PuntoVentaWidget() {
             content={
               <div style={grid2ColStyle}>
                 <div className="form-group">
-                  <label style={{ color: 'white' }} className="form-label required">Nombre</label>
+                  <label className="form-label required label-light">Nombre</label>
                   <input
                     type="text"
                     value={edited.nombre}
@@ -346,7 +337,7 @@ export function PuntoVentaWidget() {
                 </div>
 
                 <div className="form-group">
-                  <label style={{ color: 'white' }} className="form-label required">Teléfono</label>
+                  <label className="form-label required label-light">Teléfono</label>
                   <input
                     type="text"
                     value={edited.telefono}
@@ -358,7 +349,7 @@ export function PuntoVentaWidget() {
                 </div>
 
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                  <label style={{ color: 'white' }} className="form-label required">Dirección</label>
+                  <label className="form-label required label-light">Dirección</label>
                   <input
                     type="text"
                     value={edited.direccion}
@@ -370,7 +361,7 @@ export function PuntoVentaWidget() {
                 </div>
                 {/* empresa */}
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                  <label style={{ color: 'white' }} className="form-label">Empresa</label>
+                  <label className="form-label label-light">Empresa</label>
                   <select
                     className="form-control"
                     value={edited.responsableId || 0}
@@ -389,7 +380,7 @@ export function PuntoVentaWidget() {
 
                 {/* Responsable */}
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                  <label style={{ color: 'white' }} className="form-label required">Responsable</label>
+                  <label className="form-label required label-light">Responsable</label>
                   <select
                     className="form-control"
                     value={edited.responsableId || 0}
@@ -407,7 +398,7 @@ export function PuntoVentaWidget() {
 
                 {/* Estado */}
                 <div className="form-group">
-                  <label style={{ color: 'white' }} className="form-label">Estado</label>
+                  <label className="form-label label-light">Estado</label>
                   <select
                     className="form-control"
                     value={edited.activo ? '1' : '0'}

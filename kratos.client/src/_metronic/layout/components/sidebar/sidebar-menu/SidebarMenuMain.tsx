@@ -33,8 +33,8 @@ const SidebarMenuMain = () => {
       {/* Compras */}
       <SidebarMenuItemWithSub to='/compras' title='Compras' icon='element-11' fontIcon='bi-bag'>
         <SidebarMenuItem to='compras/compras-widget' title='Compras ' icon='element-11' fontIcon='bi-bag-check' />
-        <SidebarMenuItem to='compras/ordenes-compra' title='Ordenes de Compra ' icon='clipboard' fontIcon='bi-clipboard-check' />
-        <SidebarMenuItem to='compras/Proveedores-Widget' title='Proveedores' icon='truck' fontIcon='bi-truck' />
+        <SidebarMenuItem to='ventas/orden-compra-Widget' title='Ordenes de Compra ' icon='clipboard' fontIcon='bi-clipboard-check' />
+        <SidebarMenuItem to='ventas/proveedores-widget' title='Proveedores' icon='truck' fontIcon='bi-truck' />
         <SidebarMenuItem to='compras/entrada-productos-Widget' title='Resepcion de Productos' icon='element-11' fontIcon='bi-box-arrow-in-down' />
       </SidebarMenuItemWithSub>
 

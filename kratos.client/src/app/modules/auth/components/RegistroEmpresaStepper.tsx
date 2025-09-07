@@ -291,8 +291,7 @@ const RegistroEmpresaStepper = ({
                     <span className='stepper-number'>4</span>
                   </div>
                   <div className='stepper-label'>
-                    <h3 className='stepper-title'>Valores</h3>
-                    <div className='stepper-desc'>Costos y gastos</div>
+                    <h3 className='stepper-title'>Resumen</h3>
                   </div>
                 </div>
               </div>
@@ -337,7 +336,7 @@ const RegistroEmpresaStepper = ({
                 <div className='me-2'>
                   <button
                     type='button'
-                    className='btn btn-lg btn-light-primary me-3'
+                    className='btn boton-formulario btn-lg me-3'
                     data-kt-stepper-action='previous'
                     onClick={prevStep}
                   >
@@ -347,7 +346,7 @@ const RegistroEmpresaStepper = ({
                 <div>
                   <button
                     type='button'
-                    className='btn btn-lg btn-light-primary boton' 
+                    className='btn boton-formulario btn-lg' 
                     data-kt-stepper-action='submit'
                     onClick={submit}
                   >
@@ -357,7 +356,7 @@ const RegistroEmpresaStepper = ({
 
                   <button
                     type='button'
-                    className='btn btn-lg btn-light-primary '
+                    className='btn boton-formulario btn-lg'
                     data-kt-stepper-action='next'
                     onClick={nextStep}
                   >

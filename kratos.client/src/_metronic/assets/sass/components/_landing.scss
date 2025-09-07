@@ -2,8 +2,12 @@
 // Landing elements
 //
 
-// Variables
-$landing-dark-color: #13263C;
+// Variables (Blue palette)
+// Deep navy for dark sections (good contrast on light text)
+$landing-dark-color: #0F1D2D;
+// Accents (derived from blue primary for borders/separators)
+$landing-accent-300: #6FB1FF; // light blue for subtle borders
+$landing-accent-200: #9FD2FF; // lighter separator
 $landing-header-height: 100px;
 $landing-header-height-tablet-and-mobile: 70px;
 $landing-header-sticky-height: 70px;
@@ -19,11 +23,11 @@ $landing-header-sticky-height-tablet-and-mobile: 70px;
 }
 
 .landing-dark-border {
-    border:1px dashed #25ec0a;
+    border: 1px dashed $landing-accent-300;
 }
 
 .landing-dark-separator {
-    border-top:1px dashed #07e9cb;
+    border-top: 1px dashed $landing-accent-200;
 }
 
 .landing-curve  {
@@ -66,7 +70,8 @@ $landing-header-sticky-height-tablet-and-mobile: 70px;
             .menu-link {
                 &.active {
                     color: $primary;
-                    background-color: rgba(#0804e9, 0.4);
+                    // Soft highlight using the primary hue
+                    background-color: rgba($primary, 0.12);
                 }
             }
         }
@@ -81,7 +86,8 @@ $landing-header-sticky-height-tablet-and-mobile: 70px;
         left: 0;
         z-index: 100;
         background-color: $white;
-        box-shadow: 0px 10px 30px 0px rgba(241, 7, 97, 0.05);
+        // Subtle shadow tinted with blue primary
+        box-shadow: 0px 10px 30px 0px rgba(31, 111, 235, 0.12);
         height: $landing-header-sticky-height;
         
         // Logos
@@ -123,7 +129,7 @@ body[data-kt-sticky-landing-header="on"] {
             .menu-link {
                 &.active {
                     color: $primary;
-                    background-color: rgba(#0b1ae9, 0.4);
+                    background-color: rgba($primary, 0.12);
                 }
             }
         }

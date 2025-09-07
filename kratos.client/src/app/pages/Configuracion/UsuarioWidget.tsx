@@ -207,7 +207,7 @@ export function UsuarioWidget() {
 
   return (
     <div className="contenido">
-      <div id="usuario" className="bloque-formulario">
+      <div id="proveedor" className="bloque-formulario">
         <div><h2>Listado de Usuarios</h2></div>
 
         <div className="bloque-botones">
@@ -227,41 +227,34 @@ export function UsuarioWidget() {
           <Grid container spacing={2}>
             {pagedUsuarios.map((u) => (
               <Grid >
-                <Card
-                  sx={{
-                    height: '100%',
-                    background: 'linear-gradient(45deg, rgba(10, 70, 120, 0.7), rgba(21, 154, 230, 0.7))',
-                    color: '#fff',
-                    borderRadius: '10px',
-                  }}
-                >
+                <Card className="user-card" sx={{ height: '100%' }}>
                   <CardHeader
                     avatar={
                       <Avatar
                         src={u.imagenUrl ?? undefined}
                         alt={`${u.nombres} ${u.apellidos}`}
-                        sx={{ bgcolor: 'rgba(255,255,255,0.2)' }}
+                        className="user-avatar"
                       >
                         {(!u.imagenUrl && u.nombres) ? u.nombres[0]?.toUpperCase() : ''}
                       </Avatar>
                     }
                     title={
-                      <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 700 }}>
+                      <Typography variant="subtitle1" className="user-title">
                         {u.nombres} {u.apellidos}
                       </Typography>
                     }
                     subheader={
-                       <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                       <Typography variant="caption" className="user-subtitle">
                         ID: {u.id} • Rol: {rol.find(r => r.id === u.rolesId)?.nombre ?? `#${u.rolesId}`}
                        </Typography>
                     }
                     sx={{ pb: 0 }}
                   />
                   <CardContent sx={{ pt: 1 }}>
-                    <Typography variant="body2" sx={{ color: '#fff'   }}>
+                    <Typography variant="body2" className="user-field">
                       <strong>Email:</strong> {u.email}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#fff' }}>
+                    <Typography variant="body2" className="user-field">
                       <strong>Teléfono:</strong> {u.telefono}
                     </Typography>
                     <Box sx={{ mt: 1 }}>
@@ -269,21 +262,19 @@ export function UsuarioWidget() {
                         label={u.estado ? 'Activo' : 'Inactivo'}
                         color={u.estado ? 'success' : 'default'}
                         size="medium"
-                        
-                        sx={{ color: '#fff'                   
-                         }}
+                        className="user-chip"
                       />
                     </Box>
                   </CardContent>
                   <CardActions sx={{ justifyContent: 'flex-end' }}>
                     <Tooltip title="Editar">
                       <IconButton  onClick={() => fetchUsuario(u.id)}>
-                        <Edit style={{color: 'rgba(241, 218, 6, 1)'}} className="icon-editar" />
+                        <Edit className="icon-editar" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Eliminar">
                       <IconButton onClick={() => openDeleteModal(u.id)}>
-                        <Delete style={{color: 'rgba(228, 69, 6, 1)'}} className="icon-eliminar" />
+                        <Delete className="icon-eliminar" />
                       </IconButton>
                     </Tooltip>
                   </CardActions>
@@ -301,7 +292,7 @@ export function UsuarioWidget() {
                 label="Tamaño página"
                 value={paginationModel.pageSize}
                 onChange={(e) => setPaginationModel(p => ({ ...p, pageSize: Number(e.target.value), page: 0 }))}
-                sx={{ color: '#fff' }}
+                className="mui-select-light"
               >
                 {pageSizeOptions.map(ps => (
                   <MenuItem key={ps} value={ps}>{ps}</MenuItem>

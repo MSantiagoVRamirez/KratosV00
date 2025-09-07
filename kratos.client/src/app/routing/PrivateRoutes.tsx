@@ -22,6 +22,9 @@ import { POSWidget } from '../pages/Ventas/POSWidget'
 import { VentasWidget } from '../pages/Ventas/VentasWidget'
 import { StockProductosWidget } from '../pages/Inventario/StockProductosWidget'
 import { StockServiciosWidget } from '../pages/Inventario/StockServiciosWidget'
+import { ProveedoresWidget } from '../pages/Ventas/ProveedoresWidget'
+import { OrdenCompraWidget } from '../pages/Ventas/OrdenCompraWidget'
+import { ComprasWidget } from '../pages/Ventas/ComprasWidget'
 // Contratos y ODs 
 import { TroncalesWidget } from '../pages/contratos-ods/TroncalesWidget'
 import { ProyectosWidget } from '../pages/contratos-ods/ProyectosWidget'
@@ -73,6 +76,10 @@ const PrivateRoutes = () => {
         <Route path="ventas/registro-producto-widget" element={<ProductoCreateWidget />} />
         <Route path="ventas/registro-servicio-widget" element={<ServicioCreateWidget />} />
         <Route path="ventas/punto-venta-widget" element={<PuntoVentaWidget />} />
+        <Route path="ventas/proveedores-widget" element={<ProveedoresWidget />} />
+        <Route path="ventas/orden-compra-Widget" element={<OrdenCompraWidget />} />
+        <Route path="ventas/compras-widget" element={<ComprasWidget />} />
+        <Route path="compras/compras-widget" element={<ComprasWidget />} />
         <Route path="ventas/ventas-widget" element={<VentasWidget />} />
         <Route path="ventas/POS" element={<POSWidget />} />
 

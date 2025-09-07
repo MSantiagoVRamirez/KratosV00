@@ -9,13 +9,15 @@
     background-position: center;
 }*/
 
-body{
+/*body{
      background-image: url('fondo-3.jpg');
 
     background-size: cover;
     background-position: center;
 
-}
+}*/
+
+
 
 .content-2 {
   width: 95%;
@@ -24,12 +26,7 @@ body{
   margin: 2rem;
 }
 .header-21 {
-    background: linear-gradient(45deg,
-        rgba(10, 70, 120, 0.7),
-        rgba(21, 154, 230, 0.7),
-        rgba(15, 100, 180, 0.7),
-        rgba(100, 200, 250, 0.7),
-        rgba(5, 50, 100, 0.7));
+    background-color: rgb(18, 30, 130);
     border-radius: 1em;
     color: white;
     padding: 10px 20px;
@@ -42,7 +39,7 @@ body{
     width: 100%;
     box-sizing: border-box;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(8, 156, 254, 0.98);
+    box-shadow: 0 8px 24px rgba(86, 87, 88, 0.9);
 }
 .header-botones {
     display: flex;
@@ -50,7 +47,7 @@ body{
     flex-wrap: wrap;
 }
 .boton-formulario {
-    background-color: rgba(12, 150, 235, 0.5);
+    background-color: #1F6FEB;
     display: inline-block;
     color: white;
     padding: 10px 20px; /* Tamaño estándar */
@@ -64,88 +61,76 @@ body{
     text-align: center;
     transition: all 0.3s ease-in-out;
     font-family: Arial, Helvetica, sans-serif; /* Fuente estándar para botones */
+    box-shadow: 0 8px 18px rgba(86, 87, 88, 0.9);
 }
 .boton-formulario:hover {
-    background: linear-gradient(45deg,
-        rgba(80, 80, 80, 0.4),
-        rgba(120, 120, 120, 0.4),
-        rgba(160, 160, 160, 0.4),
-        rgba(110, 110, 110, 0.4),
-        rgba(200, 200, 200, 0.4));
-    color: rgb(255, 255, 255);
-    transform: scale(1.05);
+    background-color: #4DA0FF;
+    color: #fff;
+    transform: translateY(-1px) scale(1.02);
 }
 .bloque-2 {
-    background: linear-gradient(45deg,
-        rgba(20, 20, 20, 0.6),
-        rgba(140, 140, 140, 0.6),
-        rgba(40, 40, 40, 0.6),
-        rgba(180, 180, 180, 0.6),
-        rgba(15, 15, 15, 0.6));
+    background-color: rgb(185, 185, 197);
     padding: 20px;
     border-radius: 20px;
     height: 400px;
     justify-content: center;
     align-items: center;
     display: flex;
+    box-shadow: 0 6px 16px rgba(38, 39, 39, 0.9);
 }
 .h2-index {
-    color: rgb(255, 255, 255);
+    color: rgb(18, 30, 130);
     text-shadow: 2px 2px 4px rgba(0, 0, 0);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 75px;
 }
   .p-index {
-        color: rgb(255, 255, 255);
+        color: rgb(18, 30, 130);
         text-align: center;
         font-size: 25px;
     }
 .bloque-formulario {
-    background: linear-gradient(45deg,
-        rgba(20, 20, 20, 0.6),
-        rgba(140, 140, 140, 0.6),
-        rgba(40, 40, 40, 0.6),
-        rgba(180, 180, 180, 0.6),
-        rgba(15, 15, 15, 0.6));
+    background-color: rgb(185, 185, 197);
     width: 100%;
     border-radius: 20px;
     font-family: Arial, Helvetica, sans-serif;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 16px rgba(31, 111, 235, 0.9);
     height: 100%;
     margin-top: 0%;
 }
 h2 {
     text-align: center;
-    color: rgb(255, 255, 255);
+    color: rgb(18, 30, 130);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0);
+
 }
 .formulario-1 {
     max-width: 90%;
     width: 100%;
     margin: auto;
     padding: 20px;
-    background: linear-gradient(45deg,
-        rgba(20, 20, 20, 0.6),
-        rgba(140, 140, 140, 0.6),
-        rgba(40, 40, 40, 0.6),
-        rgba(180, 180, 180, 0.6),
-        rgba(15, 15, 15, 0.6));
+    background-color: rgb(185, 185, 197);
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 22px rgba(86, 87, 88, 0.9);
 }
 .row {
     display: flex;
     flex-wrap: wrap;
     margin-right: -15px;
     margin-left: -15px;
-    color: rgb(255, 255, 255);
+    color: rgb(18, 30, 130);
 }
+
+h3{
+  color: rgb(18, 30, 130)
+}
+
+ 
 
 .col {
     flex: 1;
     padding: 15px;
-    color: rgb(255, 255, 255);
+    color: rgb(18, 30, 130);
 }
 .modal-logueo {
     position: fixed;
@@ -197,17 +182,12 @@ h2 {
   margin: 2rem;
 }
     .bloque-formulario {
-        background: linear-gradient(45deg,
-            rgba(20, 20, 20, 0.6),
-            rgba(140, 140, 140, 0.6),
-            rgba(40, 40, 40, 0.6),
-            rgba(180, 180, 180, 0.6),
-            rgba(15, 15, 15, 0.6));
+        background-color: rgb(227, 227, 236);
         width: 100%;
         margin: 0rem;
         border-radius: 20px;
         font-family: Arial, Helvetica, sans-serif;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3)
+        box-shadow: 0 10px 22px rgba(86, 87, 88, 0.9);
     }
 button:hover {
   color: rgba(10, 70, 120, 1);
@@ -221,15 +201,13 @@ button:hover {
   padding: 1rem 1rem 2rem 1rem;
 }
 .pos-header {
-  background: linear-gradient(45deg,
-        rgba(10, 70, 120, 0.85),
-        rgba(21, 154, 230, 0.85));
+  background-color: rgb(18, 30, 130);
   border-radius: 12px;
   padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4px 12px rgba(8, 156, 254, 0.25);
+  box-shadow: 0 4px 12px rgba(86, 87, 88, 0.9);
 }
 .pos-title {
   color: #fff;
@@ -242,15 +220,15 @@ button:hover {
   align-items: center;
 }
 .pos-pill {
-  background: rgba(255,255,255,0.12);
-  color: #fff;
+  background: rgba(19, 218, 12, 0.5);
+  color: rgb(255, 255, 255);
   padding: 6px 10px;
   border-radius: 999px;
   font-size: .85rem;
 }
 .pos-total {
-  background: rgba(0,0,0,0.35);
-  color: #fff;
+  background: rgba(19, 218, 12, 0.5);
+  color: rgb(18, 30, 130);
   padding: 8px 14px;
   border-radius: 999px;
   font-weight: 700;
@@ -299,12 +277,10 @@ button:hover {
   .pos-items-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
 }
 .pos-item-card {
-  background: linear-gradient(45deg,
-        rgba(10, 70, 120, 0.65),
-        rgba(21, 154, 230, 0.65));
+  background-color: rgb(145, 145, 151);
   border-radius: 12px;
   padding: 12px;
-  color: #fff;
+  color: rgb(18, 30, 130);
   box-shadow: 0 4px 10px rgba(0,0,0,.25);
 }
 .pos-item-header {
@@ -321,7 +297,7 @@ button:hover {
   align-items: center;
   justify-content: space-between;
   padding: 6px 0;
-  border-bottom: 1px dashed rgba(255,255,255,0.25);
+  border-bottom: 1px dashed rgba(160,200,255,0.35);
 }
 .pos-item-row.total { border-bottom: 0; font-weight: 700; }
 .pos-empty { color: #fff; opacity: .85; padding: 12px; }
@@ -337,11 +313,11 @@ button:hover {
 }
 .landing-page .formulario-1 {
   margin: 1.25rem auto;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(111, 177, 255, 0.25);
 }
 .landing-page .bloque-formulario {
   padding: 1.25rem 1.25rem 1.5rem 1.25rem;
-  backdrop-filter: saturate(105%) blur(1px);
+  backdrop-filter: saturate(110%) blur(1px);
 }
 .landing-hero {
   padding: 0.75rem !important;
@@ -360,7 +336,7 @@ button:hover {
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
 }
 .landing-page .boton-formulario {
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(111, 177, 255, 0.35);
 }
 .pos-details-modal .pos-item-card {
   margin-bottom: 8px;
@@ -372,7 +348,7 @@ button:hover {
   width: 100%;
   overflow: hidden;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+  box-shadow: 0 6px 16px rgba(31,111,235,.20);
 }
 .kc-carousel-track {
   display: flex;
@@ -393,7 +369,7 @@ button:hover {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0,0,0,0.35);
+  background: rgba(15,35,60,0.45);
   color: #fff;
   border: 0;
   width: 36px;
@@ -423,12 +399,10 @@ button:hover {
 .kc-carousel-dots .dot.active { background: #fff; }
 .pos-grid-side { min-width: 280px; }
 .pos-side-card {
-  background: linear-gradient(45deg,
-        rgba(10, 70, 120, 0.7),
-        rgba(21, 154, 230, 0.7));
+  background-color: rgb(235, 235, 243);
   border-radius: 12px;
   padding: 16px;
-  color: #fff;
+  color: rgb(18, 30, 130);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 .pos-side-row {
@@ -442,4 +416,346 @@ button:hover {
   border-bottom: 0;
   font-size: 1.05rem;
   font-weight: 700;
+}
+
+/* ===== MUI DataGrid: Column Menu overrides ===== */
+/* The column menu is rendered in a portal; use global selectors */
+.MuiDataGrid-menu .MuiPaper-root,
+.MuiDataGrid-menu {
+  
+  color: rgb(18, 30, 130) !important;              /* text/icon color */
+  border-radius: 10px !important;
+  box-shadow: 0 10px 22px rgba(86, 87, 88, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.MuiDataGrid-menu .MuiMenuItem-root {
+  color: rgb(18, 30, 130) !important;
+}
+
+.MuiDataGrid-menu .MuiSvgIcon-root {
+  color: rgb(18, 30, 130) !important;
+}
+
+.MuiDataGrid-menu .MuiMenuItem-root:hover {
+  background-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* ===== MUI DataGrid: Manage Columns panel (ColumnsPanel) ===== */
+/* Popper panel container */
+.MuiDataGrid-panel {
+  background-color: rgb(185, 185, 197) !important;
+  color: rgb(18, 30, 130) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 22px rgba(86, 87, 88, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Header of the panel (title/search area top) */
+.MuiDataGrid-panelHeader {
+  background-color: rgb(18, 30, 130) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+}
+
+/* Content area padding */
+.MuiDataGrid-panelContent {
+  padding: 8px 12px !important;
+}
+
+/* Ensure inner lists and groups inherit background */
+.MuiDataGrid-columnsPanel .MuiList-root,
+.MuiDataGrid-columnsPanel .MuiFormGroup-root,
+.MuiDataGrid-panelFooter {
+  background-color: rgb(185, 185, 197) !important;
+}
+
+/* Column items hover */
+.MuiDataGrid-columnsPanel .MuiListItem-root:hover {
+  background-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Divider color inside panels/menus */
+.MuiDataGrid-panel .MuiDivider-root,
+.MuiDataGrid-menu .MuiDivider-root {
+  border-color: rgba(18, 30, 130, 0.15) !important;
+}
+
+/* ===== MUI DataGrid: Global styling for all tables ===== */
+.MuiDataGrid-root {
+  background-color: rgb(185, 185, 197) !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+}
+
+.MuiDataGrid-columnHeaders {
+  border-bottom: 1px solid rgb(185, 185, 197) !important;
+}
+
+.MuiDataGrid-columnHeader, .MuiDataGrid-columnHeader--moving {
+  background-color: rgb(18, 30, 130) !important;
+  color: #fff !important;
+  font-weight: bold !important;
+}
+
+.MuiDataGrid-cell {
+  background-color: rgb(185, 185, 197) !important;
+  color: rgb(18, 30, 130) !important;
+  font-size: 0.95rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.MuiDataGrid-row:hover {
+  background-color: rgb(185, 185, 197) !important;
+}
+
+.MuiDataGrid-footerContainer {
+  background-color: rgb(185, 185, 197) !important;
+  color: rgb(18, 30, 130) !important;
+  border-top: 1px solid rgb(185, 185, 197) !important;
+}
+
+.MuiDataGrid-root .MuiSvgIcon-root {
+  color: rgb(18, 30, 130) !important;
+}
+
+.MuiDataGrid-root .MuiTablePagination-root {
+  color: rgb(18, 30, 130) !important;
+}
+
+/* Inside ColumnsPanel: labels and controls */
+.MuiDataGrid-columnsPanel .MuiFormControlLabel-label {
+  color: rgb(18, 30, 130) !important;
+}
+.MuiDataGrid-columnsPanel .MuiCheckbox-root {
+  color: rgb(18, 30, 130) !important;
+}
+.MuiDataGrid-columnsPanel .MuiCheckbox-root.Mui-checked {
+  color: rgb(18, 30, 130) !important;
+}
+
+/* Search input */
+.MuiDataGrid-columnsPanel .MuiInputBase-root {
+  background-color: rgba(255, 255, 255, 0.35) !important;
+  color: rgb(18, 30, 130) !important;
+  border-radius: 8px !important;
+}
+.MuiDataGrid-columnsPanel .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(18, 30, 130, 0.55) !important;
+}
+.MuiDataGrid-columnsPanel .MuiInputBase-input::placeholder {
+  color: rgba(18, 30, 130, 0.75) !important;
+}
+
+/* Footer buttons like RESET */
+.MuiDataGrid-panel .MuiButton-root {
+  background-color: rgba(255, 255, 255, 0.35) ;
+  color: rgb(18, 30, 130) !important;
+}
+
+/* ===== Usuarios Widget (shared styles) ===== */
+.user-card {
+  background-color: rgb(235, 235, 243);
+  color: rgb(18, 30, 130);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.user-title {
+  color: rgb(18, 30, 130);
+  font-weight: 700;
+}
+
+.user-subtitle {
+  color: rgb(18, 30, 130);
+  font-size: 12px;
+}
+
+.user-field {
+  color: rgb(18, 30, 130);
+}
+
+.user-avatar {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #fff;
+}
+
+.user-chip .MuiChip-label {
+  color: #fff;
+  font-weight: 600;
+}
+
+.icon-editar {
+  color: rgba(241, 218, 6, 1);
+}
+
+.icon-eliminar {
+  color: rgba(228, 69, 6, 1);
+}
+
+/* Light labels/inputs for dark modal headers */
+.label-light {
+  color: #fff !important;
+}
+.mui-input-label-light {
+  color: #fff !important;
+}
+.mui-select-light .MuiSelect-select {
+  color: #fff !important;
+}
+.mui-select-light .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.6) !important;
+}
+.mui-select-light.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #fff !important;
+}
+/* Default form label color across views */
+.form-label {
+  color: rgb(18, 30, 130) !important;
+}
+/* Keep labels readable on dark modal backgrounds */
+.modal-content .form-label {
+  color: #fff !important;
+}
+
+/* ===== Shared content sections inside cards ===== */
+.section-box {
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: rgb(18, 30, 130);
+  line-height: 1.6;
+}
+
+/* ===== Form controls (inputs/selects) unified to brand blue ===== */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+textarea,
+select,
+.form-control,
+.form-select {
+  color: rgb(18, 30, 130);
+  border-color: rgba(18, 30, 130, 0.35);
+}
+
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: rgb(18, 30, 130);
+}
+
+.form-control:focus,
+.form-select:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  color: rgb(18, 30, 130);
+  border-color: rgb(18, 30, 130);
+  box-shadow: 0 0 0 2px rgba(18, 30, 130, 0.15);
+  outline: none;
+}
+
+/* Metronic solid controls inherit brand color */
+.form-control.form-control-solid,
+.form-select.form-select-solid {
+  color: rgb(18, 30, 130);
+}
+
+/* ===== MUI inputs (TextField/Select) aligned to brand blue ===== */
+.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(18, 30, 130, 0.35) !important;
+}
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: rgb(18, 30, 130) !important;
+}
+.MuiInputBase-input,
+.MuiSelect-select {
+  color: rgb(18, 30, 130) !important;
+}
+.MuiFormLabel-root {
+  color: rgb(18, 30, 130) !important;
+}
+.MuiSvgIcon-root {
+  color: rgb(18, 30, 130);
+}
+
+/* ===== Buttons (Bootstrap/Metronic) aligned to boton-formulario ===== */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0.5rem;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 8px 18px rgba(86, 87, 88, 0.9);
+}
+
+/* Shared hover/active motion for all buttons */
+.btn:not(:disabled):not(.disabled):hover,
+.btn:not(:disabled):not(.disabled):focus {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.btn-primary {
+  background-color: #1F6FEB !important;
+  border-color: #1F6FEB !important;
+  color: #fff !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #4DA0FF !important;
+  border-color: #4DA0FF !important;
+  color: #fff !important;
+  transform: translateY(-1px) scale(1.02);
+}
+.btn-primary:disabled,
+.btn-primary.disabled {
+  opacity: .7;
+}
+
+.btn-outline,
+.btn-outline.btn-active-light,
+.btn.btn-outline,
+.btn.btn-outline.btn-active-light {
+  background-color: transparent !important;
+  color: rgb(18, 30, 130) !important;
+  border: 1px solid rgba(111, 177, 255, 0.45) !important;
+}
+.btn-outline:hover,
+.btn-outline.btn-active-light:hover,
+.btn.btn-outline:hover,
+.btn.btn-outline.btn-active-light:hover,
+.btn-outline:focus,
+.btn-outline.btn-active-light:focus {
+  background-color: rgba(111, 177, 255, 0.15) !important;
+  color: rgb(18, 30, 130) !important;
+  border-color: rgba(111, 177, 255, 0.65) !important;
+}
+
+.btn-danger {
+  background-color: rgba(228, 69, 6, 1) !important;
+  border-color: rgba(228, 69, 6, 1) !important;
+  color: #fff !important;
+}
+.btn-danger:hover,
+.btn-danger:focus {
+  background-color: rgba(228, 69, 6, .9) !important;
+  border-color: rgba(228, 69, 6, .9) !important;
+}
+
+/* ===== Bootstrap Modal background override ===== */
+.modal-content {
+  background-color: rgb(185, 185, 197) !important;
 }

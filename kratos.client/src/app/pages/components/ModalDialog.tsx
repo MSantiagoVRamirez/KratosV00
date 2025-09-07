@@ -18,22 +18,22 @@ export function ModalDialog({
   textBtn, 
   onConfirm, 
   closeModal, 
-  confirmButtonClass = "btn-primary",
+  confirmButtonClass = "boton-formulario",
   isFormValid = true 
 }: ModalDialogProps) {
   return (
     <div  className="modal fade show d-block" tabIndex={-1} role="dialog">
       <div  className="modal-dialog modal-dialog-centered">
-        <div style={{backgroundColor: '#0d5d97'}}  className="modal-content">
+        <div  className="modal-content">
         <div className="modal-header">
           <h5 className="modal-title">{ title }</h5>
-          <button type="button" className="btn-close" onClick={ closeModal }></button>
+          <button  type="button" className="btn-close" onClick={ closeModal }></button>
         </div>
         <div className="modal-body">{ content }</div>
         <div className="modal-footer">
-          <button className="btn btn-outline btn-active-light" onClick={ closeModal }>Cancelar</button>
+          <button className="boton-formulario" onClick={ closeModal }>Cancelar</button>
           <button 
-            className={`btn ${confirmButtonClass} ${!isFormValid ? 'disabled' : ''}`} 
+            className="boton-formulario"
             onClick={ onConfirm }
             disabled={!isFormValid}
             title={!isFormValid ? 'Complete todos los campos requeridos' : ''}

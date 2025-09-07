@@ -213,18 +213,10 @@ export function ServicioCreateWidget() {
   // Sección helper
   const seccion = (title: string, content: React.ReactNode) => (
     <Box sx={{ mb: 2 }}>
-      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#fff', mb: 0.5 }}>
+      <Typography variant="subtitle1" className="user-title" sx={{ mb: 0.5 }}>
         {title}
       </Typography>
-      <Box
-        sx={{
-          p: 1.5,
-          borderRadius: '8px',
-          backgroundColor: 'rgba(255,255,255,0.10)',
-          color: '#fff',
-          lineHeight: 1.6
-        }}
-      >
+      <Box className="section-box">
         {content}
       </Box>
     </Box>
@@ -235,18 +227,10 @@ export function ServicioCreateWidget() {
       <div id="productos" className="bloque-formulario">
         <div><h2>Registrar Servicio</h2></div>
 
-        <Card
-          sx={{
-            mt: 1,
-            background: 'linear-gradient(45deg, rgba(10, 70, 120, 0.7), rgba(21, 154, 230, 0.7))',
-            color: '#fff',
-            borderRadius: '12px',
-            margin: "3%"
-          }}
-        >
+        <Card className="user-card" sx={{ mt: 1, margin: '3%' }}>
           <CardHeader
-            title={<Typography variant="h6" sx={{ fontWeight: 800, color: '#fff' }}>Registro de Servicio</Typography>}
-            sx={{ borderBottom: '1px solid rgba(255,255,255,0.2)', pb: 1.5 }}
+            title={<Typography variant="h6" className="user-title">Registro de Servicio</Typography>}
+            sx={{ borderBottom: '1px solid rgba(18,30,130,0.15)', pb: 1.5 }}
           />
 
           <CardContent>
@@ -254,7 +238,7 @@ export function ServicioCreateWidget() {
             {seccion('Imagen del Producto', (
               <div style={grid2ColStyle}>
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                  <label style={{ color: 'white' }} className="form-label">URL de Imagen</label>
+                  <label className="form-label">URL de Imagen</label>
                   <input
                     type="text"
                     placeholder="https://tusitio.com/imagen.png (opcional si cargas archivo)"
@@ -262,7 +246,7 @@ export function ServicioCreateWidget() {
                     onChange={(e) => handleUrlChange(e.target.value)}
                     className="form-control"
                   />
-                  <label style={{ color: 'white', marginTop: '8px' }} className="form-label">Cargar imagen desde tu equipo</label>
+                  <label style={{ marginTop: '8px' }} className="form-label">Cargar imagen desde tu equipo</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -284,7 +268,7 @@ export function ServicioCreateWidget() {
             {seccion('Información Básica', (
               <div style={grid2ColStyle}>
                 <div className="form-group">
-                  <label style={{ color: 'white' }} className="form-label required">Código</label>
+                  <label className="form-label required">Código</label>
                   <input
                     type="text"
                     maxLength={100}
@@ -296,7 +280,7 @@ export function ServicioCreateWidget() {
                 </div>
 
                 <div className="form-group">
-                  <label style={{ color: 'white' }} className="form-label required">Nombre</label>
+                  <label className="form-label required">Nombre</label>
                   <input
                     type="text"
                     maxLength={100}
@@ -308,7 +292,7 @@ export function ServicioCreateWidget() {
                 </div>
 
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                  <label style={{ color: 'white' }} className="form-label required">Descripción</label>
+                  <label className="form-label required">Descripción</label>
                   <textarea
                     maxLength={500}
                     value={producto.descripcion}
@@ -328,31 +312,31 @@ export function ServicioCreateWidget() {
               <div style={grid2ColStyle}>
                 {/* Categoría */}
                 <div className="form-group">
-                  <label style={{ color: 'white' }} className="form-label required">Categoría</label>
+                  <label className="form-label required">Categoría</label>
                   <select
                     className="form-control"
                     value={producto.categoriaId || 0}
                     onChange={(e) => handleCategoriaChange(e.target.value)}
                     disabled={catLoading}
-                    style={{backgroundColor: 'rgb(10, 70, 120)', color:'white'}}
+                    
                     required
                   >
                     <option value={0} disabled>{catLoading ? 'Cargando...' : '-- Seleccione --'}</option>
                     {categorias.map(c => (
-                      <option style={{backgroundColor: 'rgb(10, 70, 120)', color:'white'}}  key={c.id} value={c.id}>{c.nombre}</option>
+                      <option   key={c.id} value={c.id}>{c.nombre}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Subcategoría */}
                 <div className="form-group">
-                  <label style={{ color: 'white' }} className="form-label required">Subcategoría</label>
+                  <label className="form-label required">Subcategoría</label>
                   <select
                     className="form-control"
                     value={producto.subCategoriaId || 0}
                     onChange={(e) => handleSubCategoriaChange(e.target.value)}
                     disabled={subCatLoading || !producto.categoriaId}
-                    style={{backgroundColor: 'rgb(10, 70, 120)', color:'white'}}
+                    
                     required
                   >
                     <option value={0} disabled>
@@ -361,7 +345,7 @@ export function ServicioCreateWidget() {
                         : (!producto.categoriaId ? 'Seleccione una categoría' : '-- Seleccione --')}
                     </option>
                     {subcategorias.map(sc => (
-                      <option style={{backgroundColor: 'rgb(10, 70, 120)', color:'white'}} key={sc.id} value={sc.id}>{sc.nombre}</option>
+                      <option  key={sc.id} value={sc.id}>{sc.nombre}</option>
                     ))}
                   </select>
                 </div>
@@ -374,7 +358,7 @@ export function ServicioCreateWidget() {
               {seccion('Precios', (
                 <div style={grid2ColStyle}>
                   <div className="form-group">
-                   <label style={{ color: 'white' }} className="form-label required">Precio</label>
+                   <label className="form-label required">Precio</label>
                       <input
                         type="text"
                         value={precioText}
@@ -405,7 +389,7 @@ export function ServicioCreateWidget() {
                   </div>
   
                   <div className="form-group">
-                     <label style={{ color: 'white' }} className="form-label required">Costo</label>
+                     <label className="form-label required">Costo</label>
                       <input
                         type="text"
                         value={costoText}
@@ -444,7 +428,7 @@ export function ServicioCreateWidget() {
             {seccion('Inventario y Estado', (
               <div style={grid2ColStyle}>
                 <div className="form-group">
-                  <label style={{ color: 'white' }} className="form-label required">Stock mínimo</label>
+                  <label className="form-label required">Stock mínimo</label>
                   <input
                     type="number"
                     min={0}
@@ -456,7 +440,7 @@ export function ServicioCreateWidget() {
                 </div>
 
                 <div className="form-group">
-                  <label style={{ color: 'white' }} className="form-label">Estado</label>
+                  <label className="form-label">Estado</label>
                   <select
                     className="form-control"
                     value={producto.activo ? '1' : '0'}

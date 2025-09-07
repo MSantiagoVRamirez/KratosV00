@@ -2,8 +2,8 @@
 // Variables
 //
 
-// Reboot
-$app-bg-color: #fcfcfc;
+// Reboot  
+$app-bg-color: #f1f1f1;
 $app-bg-color-dark: $coal-400;
 $app-blank-bg-color: $app-bg-color;
 $app-blank-bg-color-dark: $app-bg-color-dark;
@@ -13,6 +13,14 @@ $app-general-root-font-size-desktop: 13px;
 $app-general-root-font-size-tablet: 12px;
 $app-general-root-font-size-mobile: 12px;
 
+// Theme primary (global)
+// Cohesive blue palette for project
+$primary: #1F6FEB; // base primary blue
+$primary-active: #1559D6;
+$primary-light: #E9F3FF; // light surfaces
+$primary-clarity: rgba($primary, 0.20);
+$primary-inverse: #ffffff;
+
 // Container
 $app-container-padding-x: 30px;
 $app-container-padding-x-mobile: 20px;
@@ -20,7 +28,7 @@ $app-container-padding-x-mobile: 20px;
 // Header base
 $app-header-base-height: 74px;
 $app-header-base-height-mobile: 60px;
-$app-header-base-bg-color: rgb(13, 93, 151, 0.7);
+$app-header-base-bg-color: rgb(18, 30, 130); // deep navy header
 $app-header-base-bg-color-dark: rgb(255 255 255);
 $app-header-base-bg-color-mobile: $app-header-base-bg-color;
 $app-header-base-bg-color-mobile-dark: $app-header-base-bg-color-dark;
@@ -30,7 +38,7 @@ $app-header-base-box-shadow-dark: none;
 // Header minimize
 $app-header-minimize-height: 74px;
 $app-header-minimize-height-mobile: 60px;
-$app-header-minimize-bg-color: $body-bg;
+$app-header-minimize-bg-color: rgb(18, 30, 130);
 $app-header-minimize-bg-color-dark: $app-header-base-bg-color-dark;
 $app-header-minimize-box-shadow: 0px 10px 30px 0px rgba(82,63,105,0.05);
 $app-header-minimize-box-shadow-dark: $box-shadow-sm-dark;
@@ -50,23 +58,23 @@ $app-header-dark-menu-active-link-bg-color: #242424;
 $app-sidebar-base-width: 265px;
 $app-sidebar-base-width-mobile: 250px; 
 
-$app-sidebar-base-toggle-btn-box-shadow: 0px 8px 14px rgba(182, 13, 216);
+$app-sidebar-base-toggle-btn-box-shadow: 0px 8px 14px rgba(31, 111, 235, 0.25);
 $app-sidebar-base-toggle-btn-box-shadow-dark: none;
 $app-sidebar-base-toggle-btn-bg-color: $body-bg;
 $app-sidebar-base-toggle-btn-bg-color-dark: $gray-200-dark;
-$app-sidebar-base-toggle-btn-border-color: #2ed418;
+$app-sidebar-base-toggle-btn-border-color: #1F6FEB;
 $app-sidebar-base-toggle-btn-border-color-dark: none;
-$app-sidebar-base-border-color: #000000;
+$app-sidebar-base-border-color: rgba(31,111,235,0.25);
 $app-sidebar-base-border-color-dark: none;
 
 // Sidebar minimize
 $app-sidebar-minimize-width: 75px;
 
 // Sidebar light
-$app-sidebar-light-bg-color: rgb(13, 93, 151, 0.5);
+$app-sidebar-light-bg-color: rgb(18, 30, 130);
 $app-sidebar-light-bg-color-dark:$coal-500;
 
-$app-sidebar-light-box-shadow: 0 0 28px 0 rgb(255, 255, 255);
+$app-sidebar-light-box-shadow: 0 0 28px 0 rgba(224, 226, 228, 0.9);
 $app-sidebar-light-box-shadow-dark: none;
 
 $app-sidebar-light-separator-color: $app-header-light-separator-color;
@@ -74,16 +82,16 @@ $app-sidebar-light-separator-color-dark: $app-header-light-separator-color-dark;
 
 $app-sidebar-light-scrollbar-color-hover: $gray-200;
 $app-sidebar-light-scrollbar-color-hover-dark: $gray-200-dark;
-$app-sidebar-light-menu-heading-color: #73f10b;
-$app-sidebar-light-menu-heading-color-dark: $gray-500-dark;
-$app-sidebar-light-menu-link-bg-color-active:rgb(13, 93, 151);
-$app-sidebar-light-menu-link-bg-color-active-dark:#ffffff;
-$app-sidebar-light-menu-link-color: #f7f7f7;
-$app-sidebar-light-menu-link-color-dark: $gray-300;
-$app-sidebar-light-menu-link-icon-color: #99A1B7;
-$app-sidebar-light-menu-link-icon-color-dark: #7F8194;
-$app-sidebar-light-header-menu-link-bg-color-active: #F7F8FB;
-$app-sidebar-light-header-menu-link-bg-color-active-dark: $gray-100-dark;
+$app-sidebar-light-menu-heading-color: #ffffff;
+$app-sidebar-light-menu-heading-color-dark: #000000;
+$app-sidebar-light-menu-link-bg-color-active: rgba(233, 233, 233, 0.404);
+$app-sidebar-light-menu-link-bg-color-active-dark:#000000;
+$app-sidebar-light-menu-link-color: #ffffff;
+$app-sidebar-light-menu-link-color-dark: #000000;
+$app-sidebar-light-menu-link-icon-color: #ffffff;
+$app-sidebar-light-menu-link-icon-color-dark: #000000;
+$app-sidebar-light-header-menu-link-bg-color-active: #000000;
+$app-sidebar-light-header-menu-link-bg-color-active-dark: #000000;
     
 // Sidebar dark
 $app-sidebar-dark-bg-color: $coal-500;
@@ -96,7 +104,7 @@ $app-sidebar-dark-menu-link-bg-color-active: #1C1C21;
 // Aside base
 $app-aside-base-width: 320px;
 $app-aside-base-width-mobile: 300px; 
-$app-aside-base-bg-color: $body-bg;
+$app-aside-base-bg-color: rgb(0,0,0);
 $app-aside-base-bg-color-dark: #131313; 
 $app-aside-base-gap-end: $app-container-padding-x;
 $app-aside-base-gap-top: $app-container-padding-x;
@@ -106,7 +114,7 @@ $app-aside-base-gap-bottom: $app-container-padding-x;
 $app-toolbar-base-height: 55px;
 $app-toolbar-base-bg-color: $body-bg;
 $app-toolbar-base-bg-color-dark: #131313;
-$app-toolbar-base-box-shadow: 0px 10px 30px 0px rgba(82,63,105,0.05);
+$app-toolbar-base-box-shadow: 0px 10px 30px 0px rgba(31,111,235,0.12);
 $app-toolbar-base-box-shadow-dark: none;
 $app-toolbar-base-border-top: 1px dashed $border-dashed-color;
 $app-toolbar-base-border-top-dark: 1px dashed $border-dashed-color-dark;

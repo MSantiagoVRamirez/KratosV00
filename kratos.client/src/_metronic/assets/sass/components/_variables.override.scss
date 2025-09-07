@@ -13,3 +13,10 @@ $card-box-shadow-dark:  			none;
 $card-border-enabled: 				true;
 $card-border-color:					$gray-200;
 $card-border-color-dark:			$dark-light-dark;
+
+// Menu active state colors (used by `.menu-active-bg` and active links)
+$menu-link-color-active: $primary;
+$menu-link-bg-color-active: $primary-light;
+// Optional: harmonize here/show states to primary tone
+$menu-link-color-here: $primary;
+$menu-link-color-show: $primary;

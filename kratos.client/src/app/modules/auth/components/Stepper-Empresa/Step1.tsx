@@ -29,12 +29,12 @@ const Step1: FC<Props> = ({
 
   return (
     <div className='w-100' data-kt-stepper-element='content'>
-      <div  style={{ marginLeft: '7%', marginTop: '2%'  }}>
-      <div className='w-100'>
+      <div style={{ marginLeft: '7%', marginTop: '2%' }}>
+      <div className='w-100 user-card' style={{ padding: '1rem' }}>
         <div className='row'>
           <div className='col-md-12'>
             <div className='fv-row mb-7'>
-              <label className='form-label required fs-6 fw-semibold' style={{color: 'rgba(255, 255, 255, 1)'}}>Email</label>
+              <label style={{color: 'rgb(18, 30, 130)'}} className='required fs-6 fw-semibold'>Email</label>
               <input
                 type='text'
                 className={`form-control form-control-solid ${hasError && !data.step1.email ? 'is-invalid' : ''}`}
@@ -52,7 +52,7 @@ const Step1: FC<Props> = ({
         <div className='row'>
           <div className='col-md-12'>
             <div className='fv-row mb-7 position-relative'>
-              <label className='form-label required fs-6 fw-semibold'>Contraseña</label>
+              <label style={{color: 'rgb(18, 30, 130)'}} className='required fs-6 fw-semibold'>Contraseña</label>
               <input
                 type={showPassword ? 'text' : 'password'}
                 className={`form-control form-control-solid ${hasError && !data.step1.contraseña ? 'is-invalid' : ''}`}
@@ -81,7 +81,7 @@ const Step1: FC<Props> = ({
 
           <div className='col-md-12'>
             <div className='fv-row mb-7 position-relative'>
-              <label className='form-label required fs-6 fw-semibold'>Confirmar Contraseña</label>
+              <label style={{color: 'rgb(18, 30, 130)'}} className=' required fs-6 fw-semibold'>Confirmar Contraseña</label>
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 className={`form-control form-control-solid ${hasError && !data.step1.confirmarContraseña ? 'is-invalid' : ''}`}
@@ -112,7 +112,7 @@ const Step1: FC<Props> = ({
         <div className='row'>
           <div className='col-md-12'>
             <div className='fv-row mb-7'>
-              <label className='form-label required fs-6 fw-semibold'>Token</label>
+              <label style={{color: 'rgb(18, 30, 130)'}} className='required fs-6 fw-semibold'>Token</label>
               <input
                 type='text'
                 className={`form-control form-control-solid ${hasError && !data.step1.token ? 'is-invalid' : ''}`}
