@@ -1,0 +1,444 @@
+import React, { useState } from 'react';
+import '../../../Styles/estilos.css';
+import img1 from '../../../../../public/media/misc/portfolio.png';
+import { Carousel } from '../../../pages/components/Carousel'
+import { ActividadEconomica } from '../../../interfaces/Configuracion/ActividadEconomica';
+import { RegimenTributario } from '../../../interfaces/Configuracion/RegimenTributario';
+import { TipoSociedad } from '../../../interfaces/Configuracion/TipoSociedad';
+import {RegistroEmpresaStepper } from './RegistroEmpresaStepper';
+import { Empresa } from '../../../interfaces/seguridad/Empresa';
+import loginService from '../../../services/seguridad/loginService'
+import axiosInstance from '../../../api/axiosInstance'
+import consultasRegistroService from '../../../services/seguridad/consultasRegistroService';
+import { ModalDialog } from "../../../pages/components/ModalDialog"
+import { useFormValidation } from '../../../hooks/useFormValidation'
+import { grid2ColStyle } from "../../../utils"
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+
+
+function Landing() {
+    const [actividad, setActividad] = useState<ActividadEconomica[]>([])
+    const [rigimenes, setRigimenes] = useState<RegimenTributario[]>([])
+    const [tiposSociedad, setTiposSociedad] = useState<TipoSociedad[]>([])
+    const [modalType, setModalType] = useState<'registroEmpresa' | 'registroUsuario' | 'loginSeleccion' | 'loginEmpresa' | 'loginUsuario' | null>(null);
+    const defaultEmpresa: Empresa = {
+        id: 0,
+        contraseña: '',
+        confirmarContraseña: '',
+        tiposociedadId: 0,
+        actividadId: 0,
+        regimenId: 0,
+        token: '',
+        razonSocial: '',
+        nombreComercial: '',
+        nit: '',
+        dv: '',
+        telefono: '',
+        email: '',
+        representanteLegal: '',
+        activo: true,
+        creadoEn:  new Date().toISOString(),
+        actualizadoEn:  new Date().toISOString(),
+      } 
+    const [login, setLogin] = useState({ email: '', contraseña: '' })
+    const closeModal = () => setModalType(null)
+    const navigate = useNavigate();
+    
+    const isFormValid = useFormValidation({
+        email: { value: login.email, required: true, type: 'string' },
+        contraseña: { value: login.contraseña, required: true, type: 'string' }
+    });
+    const { invertAuth, saveUser, saveRole, setSession } = useAuth();
+
+    // Registrar Empresa (con imagen opcional)
+    const RegistrarEmpresa = (data: Empresa, imagenFile?: File | null) => {
+        const fd = new FormData();
+        // Campos básicos
+        fd.append('email', data.email);
+        fd.append('token', data.token);
+        fd.append('razonSocial', data.razonSocial);
+        fd.append('nombreComercial', data.nombreComercial);
+        fd.append('nit', data.nit);
+        fd.append('dv', data.dv);
+        fd.append('telefono', data.telefono);
+        fd.append('representanteLegal', data.representanteLegal);
+        fd.append('tiposociedadId', String(data.tiposociedadId));
+        fd.append('actividadId', String(data.actividadId));
+        fd.append('regimenId', String(data.regimenId));
+        fd.append('activo', String(data.activo));
+        // Contraseñas (con clave unicode correcta)
+        fd.append('contraseña', (data as any)['contrase\u00f1a'] ?? '');
+        fd.append('confirmarContraseña', (data as any)['confirmarContrase\u00f1a'] ?? '');
+        // Imagen
+        if (imagenFile) {
+          fd.append('ImagenArchivo', imagenFile);
+        }
+
+        loginService.registroEmpresaForm(fd)
+          .then(() => {
+            alert('Empresa registrada exitosamente');
+          })
+          .catch((error) => {
+            console.error('Hubo un error al registrar la empresa', error);
+            alert(`Error al Registrar la Empresa: ${error.response?.data || error.response?.data?.message || error.message}`);
+          });
+    }
+//llamar servicio para loguear se como empresa
+const handleLoginEmpresa = async () => {
+  try {
+    const { data } = await loginService.loginEmpresa(login.email, login.contraseña);
+    console.log('login ok', data);
+
+    // 1) Actualiza el contexto de auth como hacías antes
+    const emailResp =
+      data?.empresa?.email ?? data?.usuario?.email ?? login.email;
+    const roleResp =
+      data?.empresa ? 'Empresa' : (data?.usuario?.rol ?? 'Usuario');
+
+    // Resolver avatar si viene en la entidad
+    let avatarUrl: string | null = null;
+    try {
+      const entidad: any = (data as any)?.empresa ?? (data as any)?.usuario ?? null;
+      const imagenCampo: string | undefined = entidad?.imagenUrl ?? entidad?.ImagenUrl;
+      if (imagenCampo) {
+        const apiBase = (axiosInstance as any)?.defaults?.baseURL?.replace(/\/api$/, '') || '';
+        avatarUrl = String(imagenCampo).startsWith('http')
+          ? String(imagenCampo)
+          : `${apiBase}/${String(imagenCampo).replace(/^\//, '')}`;
+      }
+    } catch {}
+
+    // Guardar sesión extendida
+    setSession({
+      isAuth: true,
+      user: emailResp,
+      role: roleResp,
+      tipoLogin: 'empresa',
+      id: (data as any)?.empresa?.id ?? null,
+      empresaId: (data as any)?.empresa?.id ?? null,
+      empresaNombre: (data as any)?.empresa?.razonSocial ?? (data as any)?.empresa?.nombreComercial ?? null,
+      roleId: null,
+      avatarUrl: avatarUrl,
+    });
+
+    saveUser(emailResp);
+    saveRole(roleResp);
+
+    // 2) Cierra el modal (si aplica) y navega
+    closeModal?.();
+    navigate('/dashboard', { replace: true });
+  } catch (error: any) {
+    console.error('Hubo un error al iniciar sesión como Empresa', error);
+    alert(
+      `Error al iniciar sesión como Empresa: ${
+        error.response?.data || error.response?.data?.message || error.message
+      }`
+    );
+  }
+};
+    //llamar el servicio para loguearse como usuario
+    const handleLoginUsuario = () =>{
+        loginService.loginUsuario(login.email, login.contraseña)
+        .then(() => {
+            navigate('/dashboard', { replace: true });
+        })
+        .catch((error) => {
+            console.error("Hubo un error al iniciar sesión como Usuario", error);
+            alert(`Error al iniciar sesión como Usuario: ${error.response?.data || error.response?.data?.message || error.message}`);
+        });
+    }
+
+    // Version unificada: inicia sesion como usuario y redirige a dashboard
+    const handleLoginUsuarioV2 = async () => {
+      try {
+        const { data } = await loginService.loginUsuario(login.email, (login as any)['contrase\u00f1a']);
+        const emailResp = data?.usuario?.email ?? (data as any)?.usuario?.correo ?? login.email;
+        const roleResp = data?.usuario?.rol ?? 'Usuario';
+        // Resolver avatar si viene en la entidad
+        let avatarUrl: string | null = null;
+        try {
+          const entidad: any = (data as any)?.usuario ?? (data as any)?.empresa ?? null;
+          const imagenCampo: string | undefined = entidad?.imagenUrl ?? entidad?.ImagenUrl;
+          if (imagenCampo) {
+            const apiBase = (axiosInstance as any)?.defaults?.baseURL?.replace(/\/api$/, '') || '';
+            avatarUrl = String(imagenCampo).startsWith('http')
+              ? String(imagenCampo)
+              : `${apiBase}/${String(imagenCampo).replace(/^\//, '')}`;
+          }
+        } catch {}
+
+        // Guardar sesión extendida
+        setSession({
+          isAuth: true,
+          user: emailResp,
+          role: roleResp,
+          tipoLogin: 'usuario',
+          id: (data as any)?.usuario?.id ?? null,
+          empresaId: (data as any)?.usuario?.empresaId ?? null,
+          empresaNombre: null,
+          roleId: (data as any)?.usuario?.rolesId ?? (data as any)?.usuario?.rolId ?? null,
+          avatarUrl: avatarUrl,
+        });
+        saveUser(emailResp);
+        saveRole(roleResp);
+        closeModal?.();
+        navigate('/dashboard', { replace: true });
+      } catch (error: any) {
+        console.error('Hubo un error al iniciar sesion como Usuario', error);
+        alert(`Error al iniciar sesion como Usuario: ${error.response?.data || error.response?.data?.message || error.message}`);
+      }
+    }
+
+    // traer actividades economicas
+    const getActividadesEconomicas = () => {
+        consultasRegistroService.getActividadesEconomicas()
+            .then(response => {
+                setActividad(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener actividades económicas", error);
+            });
+    }
+    // traer regimenes tributarios
+    const getRegimenesTributarios = () => {
+        consultasRegistroService.getRegimenesTributarios()
+            .then(response => {
+                setRigimenes(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener regimenes tributarios", error);
+            });
+    }
+    // traer tipos de sociedad
+    const getTiposSociedad = () => {
+        consultasRegistroService.getTiposSociedad()
+            .then(response => {
+                setTiposSociedad(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener tipos de sociedad", error);
+            });
+    }
+    // Cargar datos al iniciar el componente
+    React.useEffect(() => {
+        getActividadesEconomicas();
+        getRegimenesTributarios();
+        getTiposSociedad();
+    }, []);
+
+return (
+        <div className="landing-page content-2">
+            <div className="header-21">
+                <img style={{ maxWidth: "5%", height: "5%", objectFit: "contain", scale: "140%", marginLeft:  "3%" }} src="../../../../../public/media/logos/logo-1.png" alt="logo" />
+                <div className="header-botones">
+                    <button
+                        style={{ marginTop: '0px' }}
+                        className="boton-formulario"
+                        onClick={() => setModalType('loginSeleccion')}
+                    >
+                        Iniciar Sesión
+                    </button>
+                    <button
+                        style={{ marginTop: '0px' }}
+                        className="boton-formulario"
+                        onClick={() => setModalType('registroSeleccion')}
+                    >
+                        Registro
+                    </button>
+                </div>
+            </div>
+
+            <br /><br /><br /><br />
+
+            <div className="bloque-2">
+                <div>
+                    <h2 className="h2-index">Transforma tu Negocio</h2>
+                    <p className="p-index">La solución todo en uno para gestión de inventario, ventas y clientes</p>
+                    <div className="bloque-botnones">
+                        <a href="/registro" className="boton-formulario">Prueba Gratis</a>
+                        <a href="#demo" className="boton-formulario">Ver Demo</a>
+                    </div>
+                </div>
+            </div>
+
+            <br /><br />
+
+            <div id="features" className="formulario-1">
+                <h2>Características Principales</h2>
+                <div className="row">
+                    <div className="col">
+                        <div className="bloque-formulario">
+                            <h3>?? Gestión de Inventario</h3>
+                            <p>Control total de tu stock con alertas inteligentes</p>
+                        </div>
+                    </div>
+                    <div className="col">
+                        <div className="bloque-formulario">
+                            <h3>?? Reportes en Tiempo Real</h3>
+                            <p>Métricas clave para tomar mejores decisiones</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <div className="bloque-formulario">
+                            <h3>?? CRM Integrado</h3>
+                            <p>Gestiona tus clientes y fidelízalos</p>
+                        </div>
+                    </div>
+                    <div className="col">
+                        <div className="bloque-formulario">
+                            <h3>?? Punto de Venta</h3>
+                            <p>Sistema rápido y seguro para tus transacciones</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <br /><br />
+
+            <div id="demo" className="formulario-1">
+                <h2>Vista Previa</h2>
+                <div className="bloque-formulario text-center landing-hero">
+                    <Carousel
+                      images={[
+                        '/media/carusel/img-1.png',
+                        '/media/carusel/img-2.png',
+                        '/media/carusel/img-3.png',
+                        '/media/carusel/img-4.png',
+                        '/media/carusel/img-5.png',
+                      ]}
+                      height={520}
+                      intervalMs={12500}
+                      showIndicators
+                      showArrows
+                    />
+                    <div className="bloque-botnones mt-3">
+                        <a href="#" className="boton-formulario">Tour Interactivo</a>
+                    </div>
+                </div>
+            </div>
+
+            <br /><br />
+
+            <div className="formulario-1">
+                <h2>Lo que dicen nuestros usuarios</h2>
+                <div className="row">
+                    <div className="col">
+                        <div className="bloque-formulario">
+                            <p>"ShopConnect revolucionó mi negocio. Ahora tengo todo bajo control en un solo lugar."</p>
+                            <p><strong>- María Gómez, Tienda de Ropa</strong></p>
+                        </div>
+                    </div>
+                    <div className="col">
+                        <div className="bloque-formulario">
+                            <p>"La implementación fue sencilla y el soporte excelente. ¡Altamente recomendado!"</p>
+                            <p><strong>- Carlos Ruiz, Ferretería</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <br /><br />
+
+            <div className="formulario-1">
+                <div>
+                    <h2 className="h2-index-1">¿Listo para comenzar?</h2>
+                    <p className="p-index">Regístrate hoy y obtén 14 días gratis</p>
+                </div>
+                <div className="bloque-botnones mt-3">
+                    <a href="/registro" className="boton-formulario">¡Empezar Ahora!</a>
+                </div>
+            </div>
+        {/* Modal Stepper de Creación/Registro de Empresa */}
+        <RegistroEmpresaStepper
+          show={modalType === 'registroEmpresa' || modalType === 'registroUsuario'}
+          handleClose={closeModal}
+          onSubmit={(Empresa, imagenFile) => {
+            if (modalType === 'registroEmpresa') {
+              RegistrarEmpresa(Empresa, imagenFile ?? null);
+            }
+          }}
+          modalType={modalType === 'registroEmpresa' ? 'create' : 'edit'}
+          actividades={actividad}        
+          rigimenes={rigimenes}             
+          tiposSociedad={tiposSociedad} 
+        />
+        {/* Selección de tipo de Login */}
+        {modalType === 'loginSeleccion' && (
+          <ModalDialog
+            title={'Elige cómo iniciar sesión'}
+            isFormValid={false}
+            content={
+              <div style={{ display: 'grid', gap: 12 }}>
+                <button className="boton-formulario" onClick={() => setModalType('loginEmpresa')}>
+                  Ingresar como Empresa
+                </button>
+                <button className="boton-formulario" onClick={() => setModalType('loginUsuario')}>
+                  Ingresar como Usuario
+                </button>
+              </div>
+            }
+            textBtn={'Continuar'}
+            onConfirm={() => {}}
+            closeModal={closeModal}
+          />
+        )}
+
+        {/* Formulario de Login */}
+            {(modalType === 'loginEmpresa' || modalType == 'loginUsuario') && (
+              <ModalDialog
+            title={modalType === 'loginEmpresa' ? "Iniciar Session como Empresa" : "Iniciar Sesion Como Usuario"}
+            isFormValid={isFormValid}
+            content={
+              <div style={grid2ColStyle}>
+                <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                  <label style={{color:'white'}} className="form-label required">Email</label>
+                  <input
+                    type="text"
+                    placeholder="Email"
+                    onChange={(e) =>
+                      setLogin(prev => ({
+                        ...prev,
+                        email: e.target.value  
+                      }))
+                    }
+                    className="form-control"
+                    required
+                  />
+                </div>
+
+                <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                  <label style={{color:'white'}} className="form-label required">Contraseña</label>
+                  <input
+                    type="password"
+                    placeholder="Contraseña"
+                    onChange={(e) =>
+                      setLogin(prev => ({
+                        ...prev,
+                        contraseña: e.target.value    
+                      }))
+                    }
+                    className="form-control"
+                    required
+                  />
+                </div>
+              </div>
+            }
+            textBtn="Iniciar Sesión"
+            onConfirm={() => { // Llamar a la función correcta con el estado unificado
+              if (modalType === 'loginEmpresa') {
+                handleLoginEmpresa();
+              } else if (modalType === 'loginUsuario') {
+                handleLoginUsuarioV2();
+              }
+            }}
+            closeModal={closeModal}
+          />
+            )}
+          </div>
+    );
+}
+
+export default Landing;

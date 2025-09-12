@@ -17,7 +17,7 @@ import '../../../Styles/estilos.css';
 type Props = {
   show: boolean
   handleClose: () => void
-  onSubmit: (empresa: Empresa ) => void
+  onSubmit: (empresa: Empresa, imagenFile?: File | null) => void
   modalType: 'create' | 'edit'
   initialData?: Empresa | null
   actividades: ActividadEconomica[]
@@ -200,7 +200,7 @@ const RegistroEmpresaStepper = ({
         actualizadoEn: new Date().toISOString(),
     }
 
-    onSubmit(empresaData)
+    onSubmit(empresaData, data.step2.imagenFile ?? null)
     handleClose()
   }
 

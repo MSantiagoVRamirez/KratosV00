@@ -405,6 +405,103 @@ namespace Kratos.Server.Migrations
                     b.ToTable("Usuario");
                 });
 
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.CatalogoItemCarrusel", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<bool>("activo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("actualizadoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("creadoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("descripcion")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("empresaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("imagenUrl")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("intervaloMs")
+                        .HasColumnType("int");
+
+                    b.Property<int>("orden")
+                        .HasColumnType("int");
+
+                    b.Property<string>("seccion")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("titulo")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("tituloColor")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("empresaId");
+
+                    b.ToTable("CatalogoItemCarrusel");
+                });
+
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.CatalogoProductoConfig", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<DateTime?>("actualizadoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("creadoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("descripcionPersonalizada")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("empresaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("palabrasClave")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("productoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("tituloPersonalizado")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<bool>("visible")
+                        .HasColumnType("bit");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("empresaId");
+
+                    b.HasIndex("productoId");
+
+                    b.ToTable("CatalogoProductoConfig");
+                });
+
             modelBuilder.Entity("Kratos.Server.Models.Ventas.Compra", b =>
                 {
                     b.Property<int>("id")
@@ -434,6 +531,9 @@ namespace Kratos.Server.Migrations
 
                     b.Property<int>("puntoVentaId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("recibido")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("solicitanteId")
                         .HasColumnType("int");
@@ -529,6 +629,47 @@ namespace Kratos.Server.Migrations
                     b.HasIndex("puntoventaId");
 
                     b.ToTable("Inventario");
+                });
+
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.Oferta", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<bool>("activo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("actualizadoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("creadoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("empresaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("fechaFin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("fechaInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("porcentajeDescuento")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("productoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("empresaId");
+
+                    b.HasIndex("productoId");
+
+                    b.ToTable("Oferta");
                 });
 
             modelBuilder.Entity("Kratos.Server.Models.Ventas.POS", b =>
@@ -748,6 +889,65 @@ namespace Kratos.Server.Migrations
                     b.ToTable("PuntoVenta");
                 });
 
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.Recepcion", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<int>("compraId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("creadoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("entregadoPor")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("fechaHora")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("usuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("compraId");
+
+                    b.HasIndex("usuarioId");
+
+                    b.ToTable("Recepcion");
+                });
+
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.RecepcionDetalle", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<bool>("completo")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("pedidoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("recepcionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("pedidoId");
+
+                    b.HasIndex("recepcionId");
+
+                    b.ToTable("RecepcionDetalle");
+                });
+
             modelBuilder.Entity("Kratos.Server.Models.Ventas.TratamientoEmpresa", b =>
                 {
                     b.Property<int>("id")
@@ -925,6 +1125,36 @@ namespace Kratos.Server.Migrations
                     b.Navigation("usuariosrolesFk");
                 });
 
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.CatalogoItemCarrusel", b =>
+                {
+                    b.HasOne("Empresa", "empresaFk")
+                        .WithMany()
+                        .HasForeignKey("empresaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("empresaFk");
+                });
+
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.CatalogoProductoConfig", b =>
+                {
+                    b.HasOne("Empresa", "empresaFk")
+                        .WithMany()
+                        .HasForeignKey("empresaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Kratos.Server.Models.Ventas.Producto", "productoFk")
+                        .WithMany()
+                        .HasForeignKey("productoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("empresaFk");
+
+                    b.Navigation("productoFk");
+                });
+
             modelBuilder.Entity("Kratos.Server.Models.Ventas.Compra", b =>
                 {
                     b.HasOne("Kratos.Server.Models.Ventas.Proveedor", "proveedorCompraFk")
@@ -978,6 +1208,25 @@ namespace Kratos.Server.Migrations
                     b.Navigation("productoFk");
 
                     b.Navigation("puntoventaFk");
+                });
+
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.Oferta", b =>
+                {
+                    b.HasOne("Empresa", "ofertaEmpresaFk")
+                        .WithMany()
+                        .HasForeignKey("empresaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Kratos.Server.Models.Ventas.Producto", "productoFk")
+                        .WithMany()
+                        .HasForeignKey("productoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ofertaEmpresaFk");
+
+                    b.Navigation("productoFk");
                 });
 
             modelBuilder.Entity("Kratos.Server.Models.Ventas.POS", b =>
@@ -1064,6 +1313,43 @@ namespace Kratos.Server.Migrations
                     b.Navigation("empresaSucursalFk");
 
                     b.Navigation("usuarioFk");
+                });
+
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.Recepcion", b =>
+                {
+                    b.HasOne("Kratos.Server.Models.Ventas.Compra", "compraFk")
+                        .WithMany()
+                        .HasForeignKey("compraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Kratos.Server.Models.Seguridad.Usuario", "usuarioFk")
+                        .WithMany()
+                        .HasForeignKey("usuarioId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("compraFk");
+
+                    b.Navigation("usuarioFk");
+                });
+
+            modelBuilder.Entity("Kratos.Server.Models.Ventas.RecepcionDetalle", b =>
+                {
+                    b.HasOne("Kratos.Server.Models.Ventas.Pedido", "pedidoFk")
+                        .WithMany()
+                        .HasForeignKey("pedidoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Kratos.Server.Models.Ventas.Recepcion", "recepcionFk")
+                        .WithMany()
+                        .HasForeignKey("recepcionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("pedidoFk");
+
+                    b.Navigation("recepcionFk");
                 });
 
             modelBuilder.Entity("Kratos.Server.Models.Ventas.TratamientoEmpresa", b =>

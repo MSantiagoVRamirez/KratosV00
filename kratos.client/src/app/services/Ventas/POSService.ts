@@ -9,6 +9,6 @@ const leerPorVenta = (ventaId: number) => axios.get(`${API_URL}/leerPorVenta`, {
 const insertar = (data: POSItem) => axios.post(`${API_URL}/insertar`, data)
 const editar = (data: POSItem) => axios.put(`${API_URL}/editar`, data)
 const eliminar = (id: number) => axios.delete(`${API_URL}/eliminar`, { params: { id } })
+const topProductos = (limit?: number) => axios.get(`${API_URL}/topProductos`, { params: { limit } })
 
-export default { leerPorVenta, insertar, editar, eliminar }
-
+export default { leerPorVenta, insertar, editar, eliminar, topProductos }

@@ -58,7 +58,7 @@ const MenuInnerWithSub: FC<Props & WithChildren> = ({
 
         {fontIcon && (
           <span className='menu-icon'>
-            <i className={clsx('bi fs-3', fontIcon)}></i>
+            <i className={clsx('bi fs-3', fontIcon)} style={{color: 'white'}}></i>
           </span>
         )}
 

@@ -37,7 +37,7 @@ namespace Kratos.Server.Models.Ventas
         }
         public TipoCompra tipoCompra { get; set; } = TipoCompra.Contado;
 
-        public enum TipoPago
+        public enum TipoPagoCompra
         {
             Efectivo,
             TarjetaCredito,
@@ -45,7 +45,7 @@ namespace Kratos.Server.Models.Ventas
             TransferenciaBancaria,
             Otro
         }
-        public TipoPago tipoPago { get; set; } = TipoPago.Efectivo;
+        public TipoPagoCompra tipoPago { get; set; } = TipoPagoCompra.Efectivo;
 
         public enum EstadoCompra
         {
@@ -60,5 +60,8 @@ namespace Kratos.Server.Models.Ventas
 
         public bool activo { get; set; } = false;
         public bool estaCancelada { get; set; } = false;
+
+        // Indica si la compra ya fue recepcionada (puente Compras -> Inventario)
+        public bool recibido { get; set; } = false;
     }
 }

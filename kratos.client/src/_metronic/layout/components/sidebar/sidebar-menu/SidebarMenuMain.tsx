@@ -1,20 +1,32 @@
-import {SidebarMenuItemWithSub} from './SidebarMenuItemWithSub'
-import {SidebarMenuItem} from './SidebarMenuItem'
+import { SidebarMenuItemWithSub } from './SidebarMenuItemWithSub'
+import { SidebarMenuItem } from './SidebarMenuItem'
+import { useAuth } from '../../../../../app/modules/auth/AuthContext'
 
 const SidebarMenuMain = () => {
+  const { isAuth, tipoLogin, roleId } = useAuth()
+  const isEmpresa = isAuth && tipoLogin === 'empresa'
+  const isUsuarioHome = roleId === 1
+  const tipeEmpresa =  tipoLogin === 'empresa'
 
   return (
     <>
-      <SidebarMenuItem to='/dashboard' title='Home' icon='element-11' fontIcon='bi-app-indicator' />
+        {tipeEmpresa &&(
+         <SidebarMenuItem to='/dashboard' title='Home' icon='element-11' fontIcon='bi-app-indicator' />
+    )} 
+      {isUsuarioHome && (
+        <SidebarMenuItem to='/usuarios/home' title='Inicio Usuarios' icon='people' fontIcon='bi-people' />
+      )}
 
-      {/* Configuración */}
-      <SidebarMenuItemWithSub to='/seguridad' title='Configuración' icon='setting-2' fontIcon='bi-gear'>
-        <SidebarMenuItem to='seguridad/empresa-widget' title='Perfil' icon='profile-circle' fontIcon='bi-building' />
-        <SidebarMenuItem to='seguridad/roles-widget' title='Roles ' icon='badge' fontIcon='bi-person-badge' />
-        <SidebarMenuItem to='seguridad/permisos-widget' title='Permisos ' icon='key' fontIcon='bi-key' />
-        <SidebarMenuItem to='seguridad/usuarios-widget' title='Usuarios ' icon='people' fontIcon='bi-people' />
-        <SidebarMenuItem to='ventas/punto-venta-widget' title='Sucursales ' icon='shop' fontIcon='bi-shop' />
-      </SidebarMenuItemWithSub>
+      {/* Configuración (solo empresa) */}
+      {isEmpresa && (
+        <SidebarMenuItemWithSub to='/seguridad' title='Configuración' icon='setting-2' fontIcon='bi-gear'>
+          <SidebarMenuItem to='seguridad/empresa-widget' title='Perfil' icon='profile-circle' fontIcon='bi-building' />
+          <SidebarMenuItem to='seguridad/roles-widget' title='Roles ' icon='badge' fontIcon='bi-person-badge' />
+          <SidebarMenuItem to='seguridad/permisos-widget' title='Permisos ' icon='key' fontIcon='bi-key' />
+          <SidebarMenuItem to='seguridad/usuarios-widget' title='Usuarios ' icon='people' fontIcon='bi-people' />
+          <SidebarMenuItem to='ventas/punto-venta-widget' title='Sucursales ' icon='shop' fontIcon='bi-shop' />
+        </SidebarMenuItemWithSub>
+      )}
 
       {/* Inventario */}
       <SidebarMenuItemWithSub to='/inventario' title='Inventario' icon='cube-3' fontIcon='bi-box'>
@@ -35,7 +47,7 @@ const SidebarMenuMain = () => {
         <SidebarMenuItem to='compras/compras-widget' title='Compras ' icon='element-11' fontIcon='bi-bag-check' />
         <SidebarMenuItem to='ventas/orden-compra-Widget' title='Ordenes de Compra ' icon='clipboard' fontIcon='bi-clipboard-check' />
         <SidebarMenuItem to='ventas/proveedores-widget' title='Proveedores' icon='truck' fontIcon='bi-truck' />
-        <SidebarMenuItem to='compras/entrada-productos-Widget' title='Resepcion de Productos' icon='element-11' fontIcon='bi-box-arrow-in-down' />
+        <SidebarMenuItem to='ventas/recepcion-productos-widget' title='Resepcion de Productos' icon='element-11' fontIcon='bi-box-arrow-in-down' />
       </SidebarMenuItemWithSub>
 
       {/* Catalogo */}
@@ -48,4 +60,4 @@ const SidebarMenuMain = () => {
   )
 }
 
-export {SidebarMenuMain}
+export { SidebarMenuMain }

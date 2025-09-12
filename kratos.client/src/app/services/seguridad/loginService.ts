@@ -29,8 +29,20 @@ const registroEmpresa = (data: Empresa) => {
   return axios.post(`${API_URL}/registroEmpresa`, data);
 }
 
+const registroEmpresaForm = (form: FormData) => {
+  return axios.post(`${API_URL}/registroEmpresa`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
 const logout = () => {
   return axios.post(`${API_URL}/cerrarSesion`);
 }
 
-export default { loginEmpresa, loginUsuario, registroEmpresa, logout };
+const registroUsuarioForm = (form: FormData) => {
+  return axios.post(`${API_URL}/registroUsuario`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+export default { loginEmpresa, loginUsuario, registroEmpresa, registroEmpresaForm, registroUsuarioForm, logout };

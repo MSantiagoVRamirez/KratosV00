@@ -248,6 +248,160 @@ button:hover {
   gap: .75rem;
   flex-wrap: wrap;
 }
+
+/* ===== Modal borders (theme blue) ===== */
+/* Borde principal del contenido del modal */
+.modal-dialog .modal-content {
+  border: 3px solid rgb(18, 30, 130) !important;
+  border-radius: 12px;
+}
+/* Delimitar header y footer con el mismo tono */
+.modal-header {
+  border-bottom: 2px solid rgb(18, 30, 130) !important;
+}
+.modal-footer {
+  border-top: 2px solid rgb(18, 30, 130) !important;
+}
+
+/* Título del modal en azul del tema */
+.modal-header .modal-title {
+  color: rgb(18, 30, 130) !important;
+}
+
+/* Labels dentro del contenido del modal */
+.modal-content label,
+.modal-content .form-label,
+.modal-content .MuiFormLabel-root,
+.modal-content .MuiInputLabel-root,
+.modal-content .MuiFormLabel-root.Mui-focused,
+.modal-content .MuiInputLabel-root.Mui-focused {
+  color: rgb(18, 30, 130) !important;
+}
+
+/* Botón de cierre del modal con color personalizado */
+.modal-header .btn-close {
+  opacity: 1;
+  background: none !important; /* ocultar ícono por defecto */
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.modal-header .btn-close::before {
+  content: '×';
+  display: block;
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: rgb(18, 30, 130);
+}
+.modal-header .btn-close:hover::before,
+.modal-header .btn-close:focus::before {
+  opacity: 0.85;
+}
+
+/* Forzar variables de MUI dentro del modal (v5/v6 CSS vars) */
+.modal-content {
+  --mui-palette-text-secondary: rgb(18, 30, 130) !important;
+  --mui-palette-primary-main: rgb(18, 30, 130) !important;
+}
+
+/* Aumentar especificidad para MUI labels en distintos estados */
+.modal-content .MuiFormLabel-root,
+.modal-content .MuiInputLabel-root,
+.modal-content .MuiFormLabel-root.MuiFormLabel-colorPrimary,
+.modal-content .MuiInputLabel-root.MuiInputLabel-formControl,
+.modal-content .MuiFormLabel-root.Mui-focused,
+.modal-content .MuiInputLabel-root.Mui-focused,
+.modal-content .MuiFormLabel-root.Mui-error,
+.modal-content .MuiInputLabel-root.Mui-error,
+.modal-content .MuiFormControlLabel-label,
+.modal-content .form-group > label,
+.modal-body label {
+  color: rgb(18, 30, 130) !important;
+}
+
+/* ===== Header menu spacing and hover/open styles ===== */
+/* Separar icono y título en el header */
+#kt_app_header_menu .menu-link .menu-icon { 
+  margin-right: 0.5rem; 
+}
+#kt_app_header_menu .menu-link .menu-title { 
+  margin-left: 0.15rem; 
+}
+
+/* Evitar que el título se vuelva azul al abrir/hover; mantenerlo blanco */
+#kt_app_header_menu .menu-item:hover > .menu-link .menu-title,
+#kt_app_header_menu .menu-item.show > .menu-link .menu-title,
+#kt_app_header_menu .menu-item.here > .menu-link .menu-title {
+  color: #ffffff !important;
+}
+
+/* Mantener iconos en blanco al abrir/hover */
+#kt_app_header_menu .menu-item:hover > .menu-link .menu-icon i,
+#kt_app_header_menu .menu-item.show > .menu-link .menu-icon i,
+#kt_app_header_menu .menu-item.here > .menu-link .menu-icon i {
+  color: #ffffff !important;
+}
+
+/* Resaltar contenedor del item con box-shadow blanco al abrir/hover */
+#kt_app_header_menu .menu-item:hover > .menu-link,
+#kt_app_header_menu .menu-item.show > .menu-link {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6), 0 6px 18px rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+}
+
+/* Submenu items in header: use theme blue */
+#kt_app_header_menu .menu-sub .menu-link .menu-title {
+  color: rgb(18, 30, 130) !important;
+}
+#kt_app_header_menu .menu-sub .menu-link .menu-icon i,
+#kt_app_header_menu .menu-sub .menu-link i.bi {
+  color: rgb(18, 30, 130) !important;
+}
+
+/* User dropdown (navbar) adopts same submenu styles */
+.app-navbar .menu-sub .menu-link .menu-title {
+  color: rgb(18, 30, 130) !important;
+}
+.app-navbar .menu-sub .menu-link .menu-icon i,
+.app-navbar .menu-sub .menu-link i.bi {
+  color: rgb(18, 30, 130) !important;
+}
+.app-navbar .menu-sub .menu-item:hover > .menu-link,
+.app-navbar .menu-sub .menu-item.show > .menu-link {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6), 0 6px 18px rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+}
+#kt_app_header_menu .menu-sub .menu-item:hover > .menu-link .menu-title,
+#kt_app_header_menu .menu-sub .menu-item.show > .menu-link .menu-title,
+#kt_app_header_menu .menu-sub .menu-item.here > .menu-link .menu-title {
+  color: rgb(18, 30, 130) !important;
+}
+
+/* ===== Sidebar spacing and hover/open styles ===== */
+/* Separar icono y título en el sidebar */
+#kt_app_sidebar .menu-link > i.bi { 
+  margin-right: 0.5rem; 
+}
+
+/* Mantener título e iconos en blanco cuando el item está activo/abierto/hover */
+#kt_app_sidebar .menu-item:hover > .menu-link .menu-title,
+#kt_app_sidebar .menu-item.show > .menu-link .menu-title,
+#kt_app_sidebar .menu-item.here > .menu-link .menu-title {
+  color: #ffffff !important;
+}
+#kt_app_sidebar .menu-item:hover > .menu-link i.bi,
+#kt_app_sidebar .menu-item.show > .menu-link i.bi,
+#kt_app_sidebar .menu-item.here > .menu-link i.bi {
+  color: #ffffff !important;
+}
+
+/* Resaltar el contenedor del item con box-shadow blanco */
+#kt_app_sidebar .menu-item:hover > .menu-link,
+#kt_app_sidebar .menu-item.show > .menu-link,
+#kt_app_sidebar .menu-item.here > .menu-link {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6), 0 6px 18px rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+}
 .btn-xl {
   padding: 12px 18px;
   font-size: 1rem;
@@ -758,4 +912,12 @@ select:focus {
 /* ===== Bootstrap Modal background override ===== */
 .modal-content {
   background-color: rgb(185, 185, 197) !important;
+}
+/* Hover effect for cards */
+.card-hover {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.card-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 24px rgba(18, 30, 130, 0.35), 0 6px 10px rgba(18, 30, 130, 0.2);
 }

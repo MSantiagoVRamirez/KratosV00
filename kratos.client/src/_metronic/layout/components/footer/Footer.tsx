@@ -9,9 +9,6 @@ const Footer = () => {
   return (
     <>
       <div className='text-gray-900 order-2 order-md-1'>
-        <span className='text-muted fw-semibold me-1'>
-          {new Date().getFullYear().toString()}&copy;
-        </span>
         {/* <a
           href='https://keenthemes.com/'
           target='_blank'
@@ -19,7 +16,6 @@ const Footer = () => {
         >
           Keenthemes
         </a> */}
-        <span>KRATOS</span>
       </div>
 
       <ul className='menu menu-gray-600 menu-hover-primary fw-semibold order-1'>

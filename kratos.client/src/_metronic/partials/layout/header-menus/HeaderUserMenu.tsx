@@ -1,19 +1,24 @@
 
 import { FC } from 'react'
 // import {Link} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { KTIcon, toAbsoluteUrl } from '../../../helpers'
 import authService from '../../../../app/services/seguridad/authService'
 import { useAuth } from '../../../../app/modules/auth/AuthContext'
 
 const HeaderUserMenu: FC = () => {
-  const { invertAuth, user, role } = useAuth()
+  const { invertAuth, clearSession, user, role, empresaNombre, avatarUrl } = useAuth()
+  const navigate = useNavigate()
+  const avatarSrc = avatarUrl || toAbsoluteUrl('media/avatars/blank.png')
   const username = user || 'Usuario' // Aseguramos que el nombre de usuario esté presente
   const userrole = role || 'Rol' // Aseguramos que el rol esté presente
 
   const logout = () => {
     authService.logout()
       .then(() => {
-        invertAuth()
+        clearSession()
+        // invertAuth()
+        navigate('landing')
       })
       .catch((error) => {
         console.error('Hubo un error al cerrar sesión', error)
@@ -27,7 +32,7 @@ const HeaderUserMenu: FC = () => {
       <div className='menu-item px-3'>
         <div className='menu-content d-flex align-items-center px-3'>
           <div className='symbol symbol-50px me-5'>
-            <img alt='Logo' src={toAbsoluteUrl('media/avatars/blank.png')} />
+            <img alt='Avatar' src={avatarSrc} />
           </div>
 
           <div className='d-flex flex-column'>
@@ -35,9 +40,9 @@ const HeaderUserMenu: FC = () => {
               {username}
               {/* <span className='badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2'>Pro</span> */}
             </div>
-            <a href='#' className='fw-bold text-muted text-hover-primary fs-7'>
-              {userrole}
-            </a>
+            <span className='fw-semibold text-muted fs-7'>
+              {userrole}{empresaNombre ? ` · ${empresaNombre}` : ''}
+            </span>
           </div>
         </div>
       </div>

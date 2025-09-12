@@ -1,11 +1,10 @@
-import axios from 'axios';
+import axios from 'axios'
+import APIurls from '../services/APIurls'
 
 const axiosInstance = axios.create({
-    baseURL: 'https://localhost:7137/api',
-    withCredentials: true, 
-    headers: {
-        'Content-Type': 'application/json'
-    }
-});
+  baseURL: APIurls.Currennt_API_URL + '/api',
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
+})
 
-export default axiosInstance;
+export default axiosInstance

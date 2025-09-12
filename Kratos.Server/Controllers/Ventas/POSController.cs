@@ -107,6 +107,29 @@ namespace Kratos.Server.Controllers.Ventas
             await ActualizarTotalVenta(ventaId);
             return Ok();
         }
+
+        [HttpGet("topProductos")]
+        public async Task<ActionResult<IEnumerable<object>>> TopProductos(int limit = 8)
+        {
+            // Agrupa lneas POS por producto, considerando ventas Finalizadas o Pagadas
+            var query = from p in _context.POS
+                        join v in _context.Venta on p.ventaId equals v.id
+                        join prod in _context.Producto on p.productoId equals prod.id
+                        where v.estado == Venta.EstadoVenta.Finalizada || v.estado == Venta.EstadoVenta.Pagada
+                        group new { p, prod } by new { p.productoId, prod.nombre, prod.codigo, prod.ImagenUrl } into g
+                        orderby g.Sum(x => (int?)x.p.cantidad) ?? 0 descending
+                        select new
+                        {
+                            productoId = g.Key.productoId,
+                            nombre = g.Key.nombre,
+                            codigo = g.Key.codigo,
+                            imagenUrl = g.Key.ImagenUrl,
+                            totalCantidad = g.Sum(x => (int?)x.p.cantidad) ?? 0,
+                            totalVentas = g.Sum(x => (decimal?)x.p.subTotal) ?? 0m
+                        };
+
+            var list = await query.Take(Math.Max(1, limit)).ToListAsync();
+            return Ok(list);
+        }
     }
 }
-

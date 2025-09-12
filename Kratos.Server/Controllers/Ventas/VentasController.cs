@@ -24,7 +24,7 @@ namespace Kratos.Server.Controllers.Ventas
             public int? vendedorId { get; set; }
             public string? numeroFactura { get; set; }
             public Venta.TipoVenta tipoVenta { get; set; } = Venta.TipoVenta.Contado;
-            public Venta.TipoPago tipoPago { get; set; } = Venta.TipoPago.Efectivo;
+            public Venta.TipoPagoVenta tipoPago { get; set; } = Venta.TipoPagoVenta.Efectivo;
         }
 
         [HttpPost("crearPendiente")]
@@ -169,9 +169,16 @@ namespace Kratos.Server.Controllers.Ventas
             return Ok();
         }
 
+        public class VentaFinalizarDto
+        {
+            [Required]
+            public int ventaId { get; set; }
+            public string siguienteEstado { get; set; } = "Pagada"; // Pagada o PorCobrar
+        }
+
         // Variante que afecta inventario al finalizar
         [HttpPost("finalizarConInventario")]
-        public async Task<IActionResult> FinalizarConInventario([FromBody] FinalizarDto dto)
+        public async Task<IActionResult> FinalizarConInventario([FromBody] VentaFinalizarDto dto)
         {
             var venta = await _context.Venta.FindAsync(dto.ventaId);
             if (venta == null) return NotFound();
@@ -235,14 +242,14 @@ namespace Kratos.Server.Controllers.Ventas
             return Ok();
         }
 
-        public class CancelarDto
+        public class VentaCancelarDto
         {
             [Required]
             public int ventaId { get; set; }
         }
 
         [HttpPost("cancelar")]
-        public async Task<IActionResult> Cancelar([FromBody] CancelarDto dto)
+        public async Task<IActionResult> Cancelar([FromBody] VentaCancelarDto dto)
         {
             var venta = await _context.Venta.FindAsync(dto.ventaId);
             if (venta == null) return NotFound();
@@ -260,7 +267,7 @@ namespace Kratos.Server.Controllers.Ventas
             return Ok();
         }
 
-        public class ReabrirDto
+        public class VentaReabrirDto
         {
             [Required]
             public int ventaId { get; set; }
@@ -268,7 +275,7 @@ namespace Kratos.Server.Controllers.Ventas
 
         // Reabrir una venta (Cancelada -> Pendiente) para continuar en POS
         [HttpPost("reabrir")]
-        public async Task<IActionResult> Reabrir([FromBody] ReabrirDto dto)
+        public async Task<IActionResult> Reabrir([FromBody] VentaReabrirDto dto)
         {
             var venta = await _context.Venta.FindAsync(dto.ventaId);
             if (venta == null) return NotFound();

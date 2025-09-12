@@ -31,6 +31,11 @@ namespace Kratos.Server.Models.Contexto
         public DbSet<Proveedor> Proveedor { get; set; }
         public DbSet<Compra> Compra { get; set; }
         public DbSet<Pedido> Pedido { get; set; }
+        public DbSet<Recepcion> Recepcion { get; set; }
+        public DbSet<RecepcionDetalle> RecepcionDetalle { get; set; }
+        public DbSet<Oferta> Oferta { get; set; }
+        public DbSet<CatalogoItemCarrusel> CatalogoItemCarrusel { get; set; }
+        public DbSet<CatalogoProductoConfig> CatalogoProductoConfig { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -240,6 +245,34 @@ namespace Kratos.Server.Models.Contexto
                 .HasForeignKey(p => p.productoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // recepcion -> compra
+            modelBuilder.Entity<Recepcion>()
+                .HasOne(r => r.compraFk)
+                .WithMany()
+                .HasForeignKey(r => r.compraId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // recepcion -> usuario
+            modelBuilder.Entity<Recepcion>()
+                .HasOne(r => r.usuarioFk)
+                .WithMany()
+                .HasForeignKey(r => r.usuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // recepcionDetalle -> recepcion
+            modelBuilder.Entity<RecepcionDetalle>()
+                .HasOne(rd => rd.recepcionFk)
+                .WithMany()
+                .HasForeignKey(rd => rd.recepcionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // recepcionDetalle -> pedido
+            modelBuilder.Entity<RecepcionDetalle>()
+                .HasOne(rd => rd.pedidoFk)
+                .WithMany()
+                .HasForeignKey(rd => rd.pedidoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Categoria>(entity =>
             {
                 entity.ToTable("Categoria");
@@ -248,6 +281,39 @@ namespace Kratos.Server.Models.Contexto
                       .HasForeignKey(c => c.categoriapadreId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+
+            // Ofertas -> Producto, Empresa
+            modelBuilder.Entity<Oferta>()
+                .HasOne(o => o.productoFk)
+                .WithMany()
+                .HasForeignKey(o => o.productoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Oferta>()
+                .HasOne(o => o.ofertaEmpresaFk)
+                .WithMany()
+                .HasForeignKey(o => o.empresaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Catalogo Carrusel -> Empresa
+            modelBuilder.Entity<CatalogoItemCarrusel>()
+                .HasOne(c => c.empresaFk)
+                .WithMany()
+                .HasForeignKey(c => c.empresaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Catalogo Producto Config -> Empresa, Producto
+            modelBuilder.Entity<CatalogoProductoConfig>()
+                .HasOne(c => c.empresaFk)
+                .WithMany()
+                .HasForeignKey(c => c.empresaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CatalogoProductoConfig>()
+                .HasOne(c => c.productoFk)
+                .WithMany()
+                .HasForeignKey(c => c.productoId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

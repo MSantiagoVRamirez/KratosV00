@@ -1,0 +1,119 @@
+import { createContext, useContext, useState, ReactNode } from "react";
+
+type AuthSessionData = {
+  isAuth?: boolean;
+  user?: string | null;
+  role?: string | null;
+  tipoLogin?: 'empresa' | 'usuario' | null;
+  id?: number | null;
+  empresaId?: number | null;
+  empresaNombre?: string | null;
+  roleId?: number | null;
+  avatarUrl?: string | null;
+};
+
+// Definimos la interfaz para nuestro contexto
+interface AuthContextType {
+  isAuth: boolean;
+  user: string | null;
+  role: string | null;
+  // Nuevos campos de sesión
+  tipoLogin: 'empresa' | 'usuario' | null;
+  id: number | null;           // id del principal (empresa o usuario)
+  empresaId: number | null;    // empresa asociada
+  empresaNombre: string | null; // nombre/razón social de la empresa
+  roleId: number | null;       // id del rol si está disponible
+
+  // Acciones existentes
+  invertAuth: () => void;
+  saveUser: (user: string) => void;
+  saveRole: (role: string) => void;
+
+  // Nuevas acciones para gestionar sesión extendida
+  setSession: (data: AuthSessionData) => void;
+  clearSession: () => void;
+}
+
+// Creamos el contexto con valores iniciales
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Provider para envolver la aplicación
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [isAuth, setIsAuth] = useState(false);
+  const [user, setUser] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+  const [tipoLogin, setTipoLogin] = useState<'empresa' | 'usuario' | null>(null);
+  const [id, setId] = useState<number | null>(null);
+  const [empresaId, setEmpresaId] = useState<number | null>(null);
+  const [empresaNombre, setEmpresaNombre] = useState<string | null>(null);
+  const [roleId, setRoleId] = useState<number | null>(null);
+
+  // Función que invierte el estado de autenticación
+  const invertAuth = () => {
+    setIsAuth((prev) => !prev);
+  };
+
+  // Función para guardar el usuario autenticado
+  const saveUser = (user: string) => {
+    setUser(user);
+  };
+
+  // Función para guardar el rol del usuario autenticado
+  const saveRole = (role: string) => {
+    setRole(role);
+  };
+
+  // Establece/actualiza múltiples valores de la sesión de una vez
+  const setSession: AuthContextType['setSession'] = (data) => {
+    if (typeof data.isAuth === 'boolean') setIsAuth(data.isAuth);
+    if (data.user !== undefined) setUser(data.user ?? null);
+    if (data.role !== undefined) setRole(data.role ?? null);
+    if (data.tipoLogin !== undefined) setTipoLogin(data.tipoLogin ?? null);
+    if (data.id !== undefined) setId(data.id ?? null);
+    if (data.empresaId !== undefined) setEmpresaId(data.empresaId ?? null);
+    if (data.empresaNombre !== undefined) setEmpresaNombre(data.empresaNombre ?? null);
+    if (data.roleId !== undefined) setRoleId(data.roleId ?? null);
+  };
+
+  // Limpia toda la sesión
+  const clearSession = () => {
+    setIsAuth(false);
+    setUser(null);
+    setRole(null);
+    setTipoLogin(null);
+    setId(null);
+    setEmpresaId(null);
+    setEmpresaNombre(null);
+    setRoleId(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{
+      isAuth,
+      user,
+      role,
+      tipoLogin,
+      id,
+      empresaId,
+      empresaNombre,
+      roleId,
+      invertAuth,
+      saveUser,
+      saveRole,
+      setSession,
+      clearSession,
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// Hook personalizado para consumir el contexto
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth debe usarse dentro de un AuthProvider");
+  }
+  return context;
+};
+

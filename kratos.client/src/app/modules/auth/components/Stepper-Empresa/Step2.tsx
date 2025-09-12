@@ -57,6 +57,47 @@ const Step2: FC<Props> = ({
                 )}
               </div>
             </div>
+
+            {/* Imagen de perfil (opcional) */}
+            <div className='col-md-12'>
+              <div className='fv-row mb-7'>
+                <label style={{color: 'rgb(18, 30, 130)'}} className='fs-6 fw-semibold'>Imagen de perfil (opcional)</label>
+                <input
+                  type='file'
+                  accept='image/*'
+                  className='form-control form-control-solid'
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] ?? null
+                    const preview = file ? URL.createObjectURL(file) : null
+                    updateData({
+                      step2: {
+                        ...data.step2,
+                        imagenFile: file,
+                        imagenPreview: preview,
+                      },
+                    })
+                  }}
+                />
+                {data.step2.imagenPreview && (
+                  <div style={{marginTop: '10px'}}>
+                    <img
+                      src={data.step2.imagenPreview}
+                      alt='Vista previa'
+                      style={{maxWidth: '180px', borderRadius: 8, boxShadow: '0 4px 10px rgba(0,0,0,.2)'}}
+                    />
+                    <div>
+                      <button
+                        type='button'
+                        className='btn btn-sm btn-light mt-2'
+                        onClick={() => updateData({ step2: { ...data.step2, imagenFile: null, imagenPreview: null } })}
+                      >
+                        Quitar imagen
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>  

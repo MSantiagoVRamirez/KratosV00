@@ -7,6 +7,7 @@ using kratos.Server.Services.Seguridad;
 using Microsoft.EntityFrameworkCore;
 using Kratos.Server.Models.Seguridad;
 using Kratos.Server.Models.Contexto;
+using Kratos.Server.Services.Storage;
 
 
 namespace Kratos.Server.Controllers.Seguridad
@@ -17,15 +18,17 @@ namespace Kratos.Server.Controllers.Seguridad
     {
         private readonly KratosContext _context;
         private readonly IUsuarioService _usuarioService;
+        private readonly IFilesHelper _filesHelper;
 
-        public LoginController(KratosContext context, IUsuarioService usuarioService)
+        public LoginController(KratosContext context, IUsuarioService usuarioService, IFilesHelper filesHelper)
         {
             _context = context;
             _usuarioService = usuarioService;
+            _filesHelper = filesHelper;
         }
         [HttpPost]
         [Route("registroEmpresa")]
-        public async Task<IActionResult> registroEmpresa([FromBody] Empresa empresas)
+        public async Task<IActionResult> registroEmpresa([FromForm] Empresa empresas)
         {
 
             // Valida que la contraseña y la confirmación coincidan
@@ -40,6 +43,14 @@ namespace Kratos.Server.Controllers.Seguridad
             empresas.token = Encriptar.EncriptarClave(empresas.token);
             empresas.creadoEn = DateTime.Now;
 
+
+            // Subir imagen si viene archivo (prioridad) o respetar URL si viene
+            if (empresas.ImagenArchivo is { Length: > 0 })
+            {
+                await using var stream = empresas.ImagenArchivo.OpenReadStream();
+                var url = await _filesHelper.SubirArchivo(stream, empresas.ImagenArchivo.FileName);
+                empresas.ImagenUrl = url;
+            }
 
             // Agrega el usuario a la base de datos
             _context.Empresa.Add(empresas);
@@ -123,7 +134,7 @@ namespace Kratos.Server.Controllers.Seguridad
         }
         [HttpPost]
         [Route("registroUsuario")]
-        public async Task<IActionResult> registroUsuario([FromBody] Usuario usuario)
+        public async Task<IActionResult> registroUsuario([FromForm] Usuario usuario)
         {
 
             // Valida que la contraseña y la confirmación coincidan
@@ -137,6 +148,14 @@ namespace Kratos.Server.Controllers.Seguridad
             usuario.confirmarContraseña = Encriptar.EncriptarClave(usuario.confirmarContraseña);
             usuario.token = Encriptar.EncriptarClave(usuario.token);
             usuario.creadoEn = DateTime.Now;
+
+            // Subir imagen si se envió archivo
+            if (usuario.ImagenArchivo != null && usuario.ImagenArchivo.Length > 0)
+            {
+                await using var imageStream = usuario.ImagenArchivo.OpenReadStream();
+                var uploadedUrl = await _filesHelper.SubirArchivo(imageStream, usuario.ImagenArchivo.FileName);
+                usuario.ImagenUrl = uploadedUrl;
+            }
 
             var empresaAsociada = await _context.Empresa.FirstOrDefaultAsync(e => e.token == usuario.token);
             if (empresaAsociada == null)

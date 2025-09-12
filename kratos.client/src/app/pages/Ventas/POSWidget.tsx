@@ -10,10 +10,12 @@ import VentaService from '../../services/Ventas/VentaService'
 import POSService from '../../services/Ventas/POSService'
 import ProductoService from '../../services/Ventas/ProductoService'
 import PuntoVentaService from '../../services/Ventas/PuntoVentaService'
+import OfertaService from '../../services/Ventas/OfertaService'
 import { Producto } from '../../interfaces/Ventas/Producto'
 import { PuntoVenta } from '../../interfaces/Ventas/PuntoVenta'
 import usuarioService from '../../services/seguridad/usuarioService'
 import { Usuario } from '../../interfaces/seguridad/Usuario'
+import { useAuth } from '../../modules/auth/AuthContext'
 
 // Helpers para mostrar nombres de enumerables (mismo criterio que Ventas)
 const getEstadoVentaText = (estado: number) => {
@@ -47,6 +49,7 @@ const getTipoPagoText = (t: number) => {
 }
 
 const POSWidget: React.FC = () => {
+  const { empresaId } = useAuth()
   // Venta actual
   const [venta, setVenta] = useState<Venta | null>(null)
   const [puntos, setPuntos] = useState<PuntoVenta[]>([])
@@ -77,6 +80,33 @@ const POSWidget: React.FC = () => {
 
   const closeModal = () => setModalType(null)
   const closeContinuar = () => setContinuarModal(false)
+
+  // Ofertas: estado para controlar descuento y visibilidad del input
+  const [tieneOfertaAdd, setTieneOfertaAdd] = useState<boolean>(false)
+  const [descuentoAdd, setDescuentoAdd] = useState<number>(0)
+  const [tieneOfertaEdit, setTieneOfertaEdit] = useState<boolean>(false)
+  const [descuentoEdit, setDescuentoEdit] = useState<number>(0)
+
+  const esOfertaVigente = (inicioIso?: string, finIso?: string, activo?: boolean) => {
+    if (!inicioIso || !finIso || activo === false) return false
+    try {
+      const hoy = new Date()
+      const ini = new Date(inicioIso)
+      const fin = new Date(finIso)
+      return hoy >= ini && hoy <= fin && (activo ?? true)
+    } catch { return false }
+  }
+
+  const consultarOfertaActiva = async (productoId: number): Promise<number | null> => {
+    try {
+      const { data } = await OfertaService.getAll(empresaId ?? undefined)
+      if (!Array.isArray(data)) return null
+      const candidatas = data.filter((o: any) => o.productoId === productoId && esOfertaVigente(o.fechaInicio, o.fechaFin, o.activo))
+      if (candidatas.length === 0) return null
+      candidatas.sort((a: any, b: any) => new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime())
+      return Number(candidatas[0].porcentajeDescuento) || 0
+    } catch { return null }
+  }
 
   const cargarCatalogos = async () => {
     const results = await Promise.allSettled([
@@ -150,7 +180,7 @@ const POSWidget: React.FC = () => {
   const agregarLinea = async () => {
     if (!venta) return
     if (!editItem.productoId || editItem.cantidad <= 0) { alert('Seleccione producto y cantidad válida'); return }
-    const payload = { ...editItem, ventaId: venta.id }
+    const payload = { ...editItem, ventaId: venta.id, porcentajeDescuento: tieneOfertaAdd ? descuentoAdd : 0 }
     await POSService.insertar(payload)
     await cargarLineas(venta.id)
     setEditItem({ ...defaultItem, ventaId: venta.id })
@@ -159,7 +189,8 @@ const POSWidget: React.FC = () => {
 
   const actualizarLinea = async () => {
     if (!venta) return
-    await POSService.editar(editItem)
+    const payload = { ...editItem, porcentajeDescuento: tieneOfertaEdit ? descuentoEdit : 0 }
+    await POSService.editar(payload)
     await cargarLineas(venta.id)
     closeModal()
   }
@@ -195,6 +226,26 @@ const POSWidget: React.FC = () => {
   }
 
   useEffect(() => { cargarCatalogos() }, [])
+
+  // Al abrir modal de edición, consultar oferta de ese producto
+  useEffect(() => {
+    const run = async () => {
+      if (modalType === 'edit' && editItem?.productoId) {
+        const desc = await consultarOfertaActiva(editItem.productoId)
+        if (desc != null) {
+          setTieneOfertaEdit(true)
+          setDescuentoEdit(desc)
+          setEditItem(prev => ({ ...prev, porcentajeDescuento: desc }))
+        } else {
+          setTieneOfertaEdit(false)
+          setDescuentoEdit(0)
+          setEditItem(prev => ({ ...prev, porcentajeDescuento: 0 }))
+        }
+      }
+    }
+    run()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalType, editItem.productoId])
 
   const total = useMemo(() => lineas.reduce((acc, l) => acc + (l.subTotal || 0), 0), [lineas])
 
@@ -277,7 +328,7 @@ const POSWidget: React.FC = () => {
         {venta && (
           <>
             <div className='pos-actions m-4'>
-              <button className='boton-formulario' onClick={() => setModalType('add')}>
+              <button className='boton-formulario' onClick={() => { setModalType('add'); setTieneOfertaAdd(false); setDescuentoAdd(0); setEditItem(defaultItem) }}>
                 <AddShoppingCart style={{marginRight: 6}} /> Agregar Ítem
               </button>
               <button className='boton-formulario' onClick={() => setModalType('finalizar')}>
@@ -356,10 +407,19 @@ const POSWidget: React.FC = () => {
               <div style={grid2ColStyle}>
                 <div className='form-group' style={{ gridColumn: 'span 2' }}>
                   <label style={{ color: 'white' }} className='form-label required'>Producto</label>
-                  <select className='form-control' value={editItem.productoId} onChange={(e) => {
+                  <select className='form-control' value={editItem.productoId} onChange={async (e) => {
                     const id = Number(e.target.value)
                     const prod = productos.find(p => p.id === id)
-                    setEditItem(prev => ({ ...prev, productoId: id, precioUnitario: prod?.precio ?? prev.precioUnitario }))
+                    const desc = await consultarOfertaActiva(id)
+                    if (desc != null) {
+                      setTieneOfertaAdd(true)
+                      setDescuentoAdd(desc)
+                      setEditItem(prev => ({ ...prev, productoId: id, precioUnitario: prod?.precio ?? prev.precioUnitario, porcentajeDescuento: desc }))
+                    } else {
+                      setTieneOfertaAdd(false)
+                      setDescuentoAdd(0)
+                      setEditItem(prev => ({ ...prev, productoId: id, precioUnitario: prod?.precio ?? prev.precioUnitario, porcentajeDescuento: 0 }))
+                    }
                   }}>
                     <option value={0} disabled>Seleccione un producto</option>
                     {productos.filter(p => p.productoServicio === false).map(p => (
@@ -375,10 +435,12 @@ const POSWidget: React.FC = () => {
                   <label style={{ color: 'white' }} className='form-label required'>Precio</label>
                   <input type='number' min={0} className='form-control' value={editItem.precioUnitario} onChange={(e) => setEditItem(prev => ({ ...prev, precioUnitario: Number(e.target.value) }))} />
                 </div>
-                <div className='form-group'>
-                  <label style={{ color: 'white' }} className='form-label'>Descuento %</label>
-                  <input type='number' min={0} className='form-control' value={editItem.porcentajeDescuento} onChange={(e) => setEditItem(prev => ({ ...prev, porcentajeDescuento: Number(e.target.value) }))} />
-                </div>
+                {tieneOfertaAdd && (
+                  <div className='form-group'>
+                    <label style={{ color: 'white' }} className='form-label'>Descuento % (oferta)</label>
+                    <input type='number' min={0} className='form-control' value={descuentoAdd} disabled />
+                  </div>
+                )}
                 <div className='form-group'>
                   <label style={{ color: 'white' }} className='form-label'>IVA %</label>
                   <input type='number' min={0} className='form-control' value={editItem.porcentajeInpuesto} onChange={(e) => setEditItem(prev => ({ ...prev, porcentajeInpuesto: Number(e.target.value) }))} />
@@ -404,10 +466,12 @@ const POSWidget: React.FC = () => {
                   <label style={{ color: 'white' }} className='form-label required'>Precio</label>
                   <input type='number' min={0} className='form-control' value={editItem.precioUnitario} onChange={(e) => setEditItem(prev => ({ ...prev, precioUnitario: Number(e.target.value) }))} />
                 </div>
-                <div className='form-group'>
-                  <label style={{ color: 'white' }} className='form-label'>Descuento %</label>
-                  <input type='number' min={0} className='form-control' value={editItem.porcentajeDescuento} onChange={(e) => setEditItem(prev => ({ ...prev, porcentajeDescuento: Number(e.target.value) }))} />
-                </div>
+                {tieneOfertaEdit && (
+                  <div className='form-group'>
+                    <label style={{ color: 'white' }} className='form-label'>Descuento % (oferta)</label>
+                    <input style={{color: "#ffffffff"}} type='number' min={0} className='form-control' value={descuentoEdit} disabled />
+                  </div>
+                )}
                 <div className='form-group'>
                   <label style={{ color: 'white' }} className='form-label'>IVA %</label>
                   <input type='number' min={0} className='form-control' value={editItem.porcentajeInpuesto} onChange={(e) => setEditItem(prev => ({ ...prev, porcentajeInpuesto: Number(e.target.value) }))} />

@@ -9,7 +9,21 @@ import Landing from '../modules/auth/components/Landing'
 const { BASE_URL } = import.meta.env
 
 const AppRoutes: FC = () => {
-  const { isAuth } = useAuth();
+  const { isAuth, hydrated } = useAuth();
+
+  // Evitar redirecciones equivocadas hasta hidratar el estado de sesión
+  if (!hydrated) {
+    return (
+      <div style={{minHeight: '100vh'}} className='d-flex align-items-center justify-content-center'>
+        <div className='text-center'>
+          <div className='spinner-border text-primary mb-4' role='status'>
+            <span className='visually-hidden'>Cargando...</span>
+          </div>
+          <div className='fw-semibold'>Cargando...</div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <BrowserRouter basename={BASE_URL}>

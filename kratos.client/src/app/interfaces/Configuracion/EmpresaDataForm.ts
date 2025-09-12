@@ -8,6 +8,8 @@ export interface EmpresaDataForm {
     step2: {
         telefono: string
         representanteLegal: string
+        imagenFile?: File | null
+        imagenPreview?: string | null
     };
     step3: {
         tiposociedadId: number
@@ -28,7 +30,9 @@ export const defaultDataEmpresa : EmpresaDataForm = {
     },
     step2: {
         telefono: '',
-        representanteLegal: ''
+        representanteLegal: '',
+        imagenFile: null,
+        imagenPreview: null
     },
     step3: {
         tiposociedadId: 0,

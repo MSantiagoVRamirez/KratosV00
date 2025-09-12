@@ -6,8 +6,10 @@ import { ActividadEconomica } from '../../../interfaces/Configuracion/ActividadE
 import { RegimenTributario } from '../../../interfaces/Configuracion/RegimenTributario';
 import { TipoSociedad } from '../../../interfaces/Configuracion/TipoSociedad';
 import {RegistroEmpresaStepper } from './RegistroEmpresaStepper';
+import { RegistroUsuarioStepper } from './RegistroUsuarioStepper'
 import { Empresa } from '../../../interfaces/seguridad/Empresa';
 import loginService from '../../../services/seguridad/loginService'
+import axiosInstance from '../../../api/axiosInstance'
 import consultasRegistroService from '../../../services/seguridad/consultasRegistroService';
 import { ModalDialog } from "../../../pages/components/ModalDialog"
 import { useFormValidation } from '../../../hooks/useFormValidation'
@@ -20,7 +22,7 @@ function Landing() {
     const [actividad, setActividad] = useState<ActividadEconomica[]>([])
     const [rigimenes, setRigimenes] = useState<RegimenTributario[]>([])
     const [tiposSociedad, setTiposSociedad] = useState<TipoSociedad[]>([])
-    const [modalType, setModalType] = useState<'registroEmpresa' | 'registroUsuario' | 'loginEmpresa' | 'loginUsuario' | null>(null);
+    const [modalType, setModalType] = useState<'registroEmpresa' | 'registroUsuario' | 'registroSeleccion' | 'loginSeleccion' | 'loginEmpresa' | 'loginUsuario' | null>(null);
     const defaultEmpresa: Empresa = {
         id: 0,
         contraseña: '',
@@ -48,21 +50,42 @@ function Landing() {
         email: { value: login.email, required: true, type: 'string' },
         contraseña: { value: login.contraseña, required: true, type: 'string' }
     });
-    const { invertAuth, saveUser, saveRole } = useAuth();
+    const { invertAuth, saveUser, saveRole, setSession } = useAuth();
 
-    // Registrar Empresa
-    const RegistrarEmpresa = (data: Empresa) => {
-        loginService.registroEmpresa(data)
-        .then(() => {
-            alert("Empresa registrada exitosamente");
-           
-        })
-        .catch((error) => {
-            console.error("Hubo un error al registrar la empresa", error)
-         alert(`Error al Registrar la Empresa: ${error.response?.data || error.response?.data?.message || error.message}`);
+    // Registrar Empresa (con imagen opcional)
+    const RegistrarEmpresa = (data: Empresa, imagenFile?: File | null) => {
+        const fd = new FormData();
+        // Campos básicos
+        fd.append('email', data.email);
+        fd.append('token', data.token);
+        fd.append('razonSocial', data.razonSocial);
+        fd.append('nombreComercial', data.nombreComercial);
+        fd.append('nit', data.nit);
+        fd.append('dv', data.dv);
+        fd.append('telefono', data.telefono);
+        fd.append('representanteLegal', data.representanteLegal);
+        fd.append('tiposociedadId', String(data.tiposociedadId));
+        fd.append('actividadId', String(data.actividadId));
+        fd.append('regimenId', String(data.regimenId));
+        fd.append('activo', String(data.activo));
+        // Contraseñas (con clave unicode correcta)
+        fd.append('contraseña', (data as any)['contrase\u00f1a'] ?? '');
+        fd.append('confirmarContraseña', (data as any)['confirmarContrase\u00f1a'] ?? '');
+        // Imagen
+        if (imagenFile) {
+          fd.append('ImagenArchivo', imagenFile);
+        }
+
+        loginService.registroEmpresaForm(fd)
+          .then(() => {
+            alert('Empresa registrada exitosamente');
           })
+          .catch((error) => {
+            console.error('Hubo un error al registrar la empresa', error);
+            alert(`Error al Registrar la Empresa: ${error.response?.data || error.response?.data?.message || error.message}`);
+          });
     }
-    //llamar servicio para loguear se como empresa
+//llamar servicio para loguear se como empresa
 const handleLoginEmpresa = async () => {
   try {
     const { data } = await loginService.loginEmpresa(login.email, login.contraseña);
@@ -74,10 +97,34 @@ const handleLoginEmpresa = async () => {
     const roleResp =
       data?.empresa ? 'Empresa' : (data?.usuario?.rol ?? 'Usuario');
 
+    // Resolver avatar si viene en la entidad
+    let avatarUrl: string | null = null;
+    try {
+      const entidad: any = (data as any)?.empresa ?? (data as any)?.usuario ?? null;
+      const imagenCampo: string | undefined = entidad?.imagenUrl ?? entidad?.ImagenUrl;
+      if (imagenCampo) {
+        const apiBase = (axiosInstance as any)?.defaults?.baseURL?.replace(/\/api$/, '') || '';
+        avatarUrl = String(imagenCampo).startsWith('http')
+          ? String(imagenCampo)
+          : `${apiBase}/${String(imagenCampo).replace(/^\//, '')}`;
+      }
+    } catch {}
+
+    // Guardar sesión extendida
+    setSession({
+      isAuth: true,
+      user: emailResp,
+      role: roleResp,
+      tipoLogin: 'empresa',
+      id: (data as any)?.empresa?.id ?? null,
+      empresaId: (data as any)?.empresa?.id ?? null,
+      empresaNombre: (data as any)?.empresa?.razonSocial ?? (data as any)?.empresa?.nombreComercial ?? null,
+      roleId: null,
+      avatarUrl: avatarUrl,
+    });
+
     saveUser(emailResp);
     saveRole(roleResp);
-    // si invertAuth() solo “alterna”, asegúrate que parte de "false" -> "true"
-    invertAuth();
 
     // 2) Cierra el modal (si aplica) y navega
     closeModal?.();
@@ -101,6 +148,47 @@ const handleLoginEmpresa = async () => {
             console.error("Hubo un error al iniciar sesión como Usuario", error);
             alert(`Error al iniciar sesión como Usuario: ${error.response?.data || error.response?.data?.message || error.message}`);
         });
+    }
+
+    // Version unificada: inicia sesion como usuario y redirige a dashboard
+    const handleLoginUsuarioV2 = async () => {
+      try {
+        const { data } = await loginService.loginUsuario(login.email, (login as any)['contrase\u00f1a']);
+        const emailResp = data?.usuario?.email ?? (data as any)?.usuario?.correo ?? login.email;
+        const roleResp = data?.usuario?.rol ?? 'Usuario';
+        // Resolver avatar si viene en la entidad
+        let avatarUrl: string | null = null;
+        try {
+          const entidad: any = (data as any)?.usuario ?? (data as any)?.empresa ?? null;
+          const imagenCampo: string | undefined = entidad?.imagenUrl ?? entidad?.ImagenUrl;
+          if (imagenCampo) {
+            const apiBase = (axiosInstance as any)?.defaults?.baseURL?.replace(/\/api$/, '') || '';
+            avatarUrl = String(imagenCampo).startsWith('http')
+              ? String(imagenCampo)
+              : `${apiBase}/${String(imagenCampo).replace(/^\//, '')}`;
+          }
+        } catch {}
+
+        // Guardar sesión extendida
+        setSession({
+          isAuth: true,
+          user: emailResp,
+          role: roleResp,
+          tipoLogin: 'usuario',
+          id: (data as any)?.usuario?.id ?? null,
+          empresaId: (data as any)?.usuario?.empresaId ?? null,
+          empresaNombre: null,
+          roleId: (data as any)?.usuario?.rolesId ?? (data as any)?.usuario?.rolId ?? null,
+          avatarUrl: avatarUrl,
+        });
+        saveUser(emailResp);
+        saveRole(roleResp);
+        closeModal?.();
+        navigate('/usuarios/home', { replace: true });
+      } catch (error: any) {
+        console.error('Hubo un error al iniciar sesion como Usuario', error);
+        alert(`Error al iniciar sesion como Usuario: ${error.response?.data || error.response?.data?.message || error.message}`);
+      }
     }
 
     // traer actividades economicas
@@ -148,14 +236,14 @@ return (
                     <button
                         style={{ marginTop: '0px' }}
                         className="boton-formulario"
-                        onClick={() => setModalType('loginEmpresa')}
+                        onClick={() => setModalType('loginSeleccion')}
                     >
                         Iniciar Sesión
                     </button>
                     <button
                         style={{ marginTop: '0px' }}
                         className="boton-formulario"
-                        onClick={() => setModalType('registroEmpresa')}
+                        onClick={() => setModalType('registroSeleccion')}
                     >
                         Registro
                     </button>
@@ -264,13 +352,33 @@ return (
                     <a href="/registro" className="boton-formulario">¡Empezar Ahora!</a>
                 </div>
             </div>
+        {/* Selección de tipo de Registro */}
+        {modalType === 'registroSeleccion' && (
+          <ModalDialog
+            title={'Elige cómo registrarte'}
+            isFormValid={false}
+            content={
+              <div style={{ display: 'grid', gap: 12 }}>
+                <button className="boton-formulario" onClick={() => setModalType('registroEmpresa')}>
+                  Registrar Empresa
+                </button>
+                <button className="boton-formulario" onClick={() => setModalType('registroUsuario')}>
+                  Registrar Usuario
+                </button>
+              </div>
+            }
+            textBtn={'Continuar'}
+            onConfirm={() => {}}
+            closeModal={closeModal}
+          />
+        )}
         {/* Modal Stepper de Creación/Registro de Empresa */}
         <RegistroEmpresaStepper
-          show={modalType === 'registroEmpresa' || modalType === 'registroUsuario'}
+          show={modalType === 'registroEmpresa'}
           handleClose={closeModal}
-          onSubmit={(Empresa) => {
+          onSubmit={(Empresa, imagenFile) => {
             if (modalType === 'registroEmpresa') {
-              RegistrarEmpresa(Empresa);
+              RegistrarEmpresa(Empresa, imagenFile ?? null);
             }
           }}
           modalType={modalType === 'registroEmpresa' ? 'create' : 'edit'}
@@ -278,6 +386,53 @@ return (
           rigimenes={rigimenes}             
           tiposSociedad={tiposSociedad} 
         />
+        {/* Stepper de Registro de Usuario */}
+        <RegistroUsuarioStepper
+          show={modalType === 'registroUsuario'}
+          handleClose={closeModal}
+          onSubmit={(u) => {
+            const fd = new FormData()
+            fd.append('email', u.email)
+            fd.append('contraseña', u.contraseña)
+            fd.append('confirmarContraseña', u.confirmarContraseña)
+            fd.append('token', u.token)
+            fd.append('nombres', u.nombres)
+            fd.append('apellidos', u.apellidos)
+            fd.append('telefono', u.telefono)
+            fd.append('rolesId', String(u.rolesId))
+            if (u.imagenFile) fd.append('ImagenArchivo', u.imagenFile)
+
+            loginService.registroUsuarioForm(fd)
+              .then(() => {
+                alert('Usuario registrado exitosamente')
+              })
+              .catch((error) => {
+                console.error('Error al registrar usuario', error)
+                alert(`Error al registrar usuario: ${error.response?.data || error.response?.data?.message || error.message}`)
+              })
+          }}
+        />
+        {/* Selección de tipo de Login */}
+        {modalType === 'loginSeleccion' && (
+          <ModalDialog
+            title={'Elige cómo iniciar sesión'}
+            isFormValid={false}
+            content={
+              <div style={{ display: 'grid', gap: 12 }}>
+                <button className="boton-formulario" onClick={() => setModalType('loginEmpresa')}>
+                  Ingresar como Empresa
+                </button>
+                <button className="boton-formulario" onClick={() => setModalType('loginUsuario')}>
+                  Ingresar como Usuario
+                </button>
+              </div>
+            }
+            textBtn={'Continuar'}
+            onConfirm={() => {}}
+            closeModal={closeModal}
+          />
+        )}
+
         {/* Formulario de Login */}
             {(modalType === 'loginEmpresa' || modalType == 'loginUsuario') && (
               <ModalDialog
@@ -323,7 +478,7 @@ return (
               if (modalType === 'loginEmpresa') {
                 handleLoginEmpresa();
               } else if (modalType === 'loginUsuario') {
-                handleLoginUsuario();
+                handleLoginUsuarioV2();
               }
             }}
             closeModal={closeModal}

@@ -25,32 +25,14 @@ import { StockServiciosWidget } from '../pages/Inventario/StockServiciosWidget'
 import { ProveedoresWidget } from '../pages/Ventas/ProveedoresWidget'
 import { OrdenCompraWidget } from '../pages/Ventas/OrdenCompraWidget'
 import { ComprasWidget } from '../pages/Ventas/ComprasWidget'
-// Contratos y ODs 
-import { TroncalesWidget } from '../pages/contratos-ods/TroncalesWidget'
-import { ProyectosWidget } from '../pages/contratos-ods/ProyectosWidget'
-import { ContratosWidget } from '../pages/contratos-ods/ContratosWidget'
-import { ContratoDetails } from '../pages/contratos-ods/ContratoDetails'
-import { ActasContratoWidget } from '../pages/contratos-ods/ActasContratoWidget'
-import { AmpliacionesContratoWidget } from '../pages/contratos-ods/AmpliacionesContratoWidget'
-import { OrdenesServicioWidget } from '../pages/contratos-ods/OrdenesServicioWidget'
-import { ODSDetails } from '../pages/contratos-ods/ODSDetails'
-import { SubOrdenesServicioWidget } from '../pages/contratos-ods/SubOrdenesServicioWidget'
-import { SubODSDetails } from '../pages/contratos-ods/SubODSDetails'
-import { ActasODSWidget } from '../pages/contratos-ods/ActasODSWidget'
-import { OrdenesCambioWidget } from '../pages/contratos-ods/OrdenesCambioWidget'
-import { SuspensionesWidget } from '../pages/contratos-ods/SuspensionesWidget'
-import { PlantasWidget } from '../pages/contratos-ods/PlantasWidget'
-import { SistemasWidget } from '../pages/contratos-ods/SistemasWidget'
-import { HitosPagoWidget } from '../pages/contratos-ods/HitosPagoWidget'
+import { RecepcionProductosWidget } from '../pages/Ventas/RecepcionProductosWidget'
 
-// Talleres y Hallazgos
-import { TiposTallerWidget } from '../pages/talleres-hallazgos/TiposTallerWidget'
-import { DisciplinasWidget } from '../pages/talleres-hallazgos/DisciplinasWidget'
-import { TalleresWidget } from '../pages/talleres-hallazgos/TalleresWidget'
-import { TallerDetails } from '../pages/talleres-hallazgos/TallerDetails'
-import { HallazgosWidget } from '../pages/talleres-hallazgos/HallazgosWidget'
-import { HallazgosDetails } from '../pages/talleres-hallazgos/HallazgoDetails'
-import { AccionesCierreWidget } from '../pages/talleres-hallazgos/AccionesCierreWidget'
+// Catálogo / Vitrina
+import { OfertasWidget } from '../pages/Vitrina/OfertasWidget'
+import { CatalogoProductosWidget } from '../pages/Vitrina/CatalogoProductosWidget'
+import { CatalogoServiciosWidget } from '../pages/Vitrina/CatalogoServiciosWidget'
+import { VitrinaEmpresa } from '../pages/Vitrina/VitrinaEmpresa'
+import { UsuariosHome } from '../pages/usuarios/UsuariosHome'
 
 const PrivateRoutes = () => {
   return (
@@ -79,6 +61,7 @@ const PrivateRoutes = () => {
         <Route path="ventas/proveedores-widget" element={<ProveedoresWidget />} />
         <Route path="ventas/orden-compra-Widget" element={<OrdenCompraWidget />} />
         <Route path="ventas/compras-widget" element={<ComprasWidget />} />
+        <Route path="ventas/recepcion-productos-widget" element={<RecepcionProductosWidget />} />
         <Route path="compras/compras-widget" element={<ComprasWidget />} />
         <Route path="ventas/ventas-widget" element={<VentasWidget />} />
         <Route path="ventas/POS" element={<POSWidget />} />
@@ -87,35 +70,14 @@ const PrivateRoutes = () => {
         <Route path="inventario/Stock-Productos-widget" element={<StockProductosWidget />} />
         <Route path="inventario/Agenda-Servicios-widget" element={<StockServiciosWidget />} />
 
-        
 
-
-        {/* Contratos y ODS */}
-        <Route path="contratos-ods/proyectos-widget" element={<ProyectosWidget />} />
-        <Route path="contratos-ods/contratos-widget" element={<ContratosWidget />} />
-        <Route path="contratos-ods/contrato-details" element={<ContratoDetails propsContratoId={0} />} />
-        <Route path="contratos-ods/actas-contrato-widget" element={<ActasContratoWidget selectedContratoId={0} />} />
-        <Route path="contratos-ods/ampliaciones-contrato-widget" element={<AmpliacionesContratoWidget selectedContratoId={0} />} />
-        <Route path="contratos-ods/troncales-widget" element={<TroncalesWidget />} />
-        <Route path="contratos-ods/ordenes-servicio-widget" element={<OrdenesServicioWidget selectedContratoId={0} />} />
-        <Route path="contratos-ods/ods-details" element={<ODSDetails propsODSId={0} />} />
-        <Route path="contratos-ods/sub-ordenes-servicio-widget" element={<SubOrdenesServicioWidget selectedODSId={0} />} />
-        <Route path="contratos-ods/sub-ods-details" element={<SubODSDetails propsODSId={0} />} />
-        <Route path="contratos-ods/actas-ods-widget" element={<ActasODSWidget selectedODSId={0} />} />
-        <Route path="contratos-ods/ordenes-cambio-widget" element={<OrdenesCambioWidget selectedODSId={0} />} />
-        <Route path="contratos-ods/suspensiones-widget" element={<SuspensionesWidget selectedOdsId={0} />} />
-        <Route path="contratos-ods/plantas-widget" element={<PlantasWidget />} />
-        <Route path="contratos-ods/sistemas-widget" element={<SistemasWidget />} />
-        <Route path="contratos-ods/hitos-pago-widget" element={<HitosPagoWidget selectedODSId={0} />} />
-
-        {/* Talleres y Hallazgos */}
-        <Route path="talleres-hallazgos/tipos-taller-widget" element={<TiposTallerWidget />} />
-        <Route path="talleres-hallazgos/disciplinas-widget" element={<DisciplinasWidget />} />
-        <Route path="talleres-hallazgos/talleres-widget" element={<TalleresWidget selectedODSId={0} />} />
-        <Route path="talleres-hallazgos/taller-details" element={<TallerDetails propsTallerId={0} />} />
-        <Route path="talleres-hallazgos/hallazgos-widget" element={<HallazgosWidget selectedTallerId={0} />} />
-        <Route path="talleres-hallazgos/hallazgo-details" element={<HallazgosDetails propsHallazgoId={0} />} />
-        <Route path="talleres-hallazgos/acciones-cierre-widget" element={<AccionesCierreWidget selectedHallazgoId={0} />} />
+        {/* Catálogo / Vitrina */}
+        <Route path="vitrina/ofertas-widget" element={<OfertasWidget />} />
+        <Route path="vitrina/productos-widget" element={<CatalogoProductosWidget />} />
+        <Route path="vitrina/servicios-Wdget" element={<CatalogoServiciosWidget />} />
+        <Route path="vitrina/empresa/:empresaId" element={<VitrinaEmpresa />} />
+        {/* Usuarios */}
+        <Route path="usuarios/home" element={<UsuariosHome />} />
       </Route>
     </Routes>
   )

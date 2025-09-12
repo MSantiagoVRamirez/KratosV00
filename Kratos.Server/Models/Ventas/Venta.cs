@@ -36,7 +36,7 @@ namespace Kratos.Server.Models.Ventas
         }
         public TipoVenta tipoVenta { get; set; } = TipoVenta.Contado;
 
-        public enum TipoPago
+        public enum TipoPagoVenta
         {
             Efectivo,
             TarjetaCredito,
@@ -44,7 +44,7 @@ namespace Kratos.Server.Models.Ventas
             TransferenciaBancaria,
             Otro
         }
-        public TipoPago tipoPago { get; set; } = TipoPago.Efectivo;
+        public TipoPagoVenta tipoPago { get; set; } = TipoPagoVenta.Efectivo;
 
         public enum EstadoVenta
         {

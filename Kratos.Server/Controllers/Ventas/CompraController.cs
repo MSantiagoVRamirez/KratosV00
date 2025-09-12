@@ -26,7 +26,7 @@ namespace Kratos.Server.Controllers.Ventas
             public int? solicitanteId { get; set; }
             public string? numeroFactura { get; set; }
             public Compra.TipoCompra tipoCompra { get; set; } = Compra.TipoCompra.Contado;
-            public Compra.TipoPago tipoPago { get; set; } = Compra.TipoPago.Efectivo;
+            public Compra.TipoPagoCompra tipoPago { get; set; } = Compra.TipoPagoCompra.Efectivo;
         }
 
         [HttpPost("crearPendiente")]
@@ -186,8 +186,15 @@ namespace Kratos.Server.Controllers.Ventas
         }
 
         // Variante que afecta inventario al finalizar (aumenta stock)
+        public class CompraFinalizarDto
+        {
+            [Required]
+            public int compraId { get; set; }
+            public string siguienteEstado { get; set; } = "Pagada"; // Pagada o PorCobrar
+        }
+
         [HttpPost("finalizarConInventario")]
-        public async Task<IActionResult> FinalizarConInventario([FromBody] FinalizarDto dto)
+        public async Task<IActionResult> FinalizarConInventario([FromBody] CompraFinalizarDto dto)
         {
             var compra = await _context.Compra.FindAsync(dto.compraId);
             if (compra == null) return NotFound();
@@ -206,64 +213,21 @@ namespace Kratos.Server.Controllers.Ventas
             else
                 return BadRequest("Estado siguiente inválido. Use 'Pagada' o 'PorCobrar'.");
 
-            var lineas = await _context.Pedido
-                .Include(p => p.productoCompraFk)
-                .Where(p => p.compraId == compra.id)
-                .ToListAsync();
-
-            await using var tx = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                foreach (var linea in lineas)
-                {
-                    // Servicios no afectan inventario
-                    var esServicio = linea.productoCompraFk != null && linea.productoCompraFk.productoServicio;
-                    if (esServicio) continue;
-
-                    var inventario = await _context.Inventario
-                        .FirstOrDefaultAsync(i => i.productoId == linea.productoId && i.puntoventaId == compra.puntoVentaId);
-
-                    if (inventario == null)
-                    {
-                        // Si no existe inventario, crearlo en 0 y sumar
-                        inventario = new Inventario
-                        {
-                            productoId = linea.productoId,
-                            puntoventaId = compra.puntoVentaId,
-                            cantidad = 0,
-                            productoServicio = false,
-                            creadoEn = DateTime.Now,
-                            actualizadoEn = DateTime.Now
-                        };
-                        await _context.Inventario.AddAsync(inventario);
-                    }
-                    inventario.cantidad += linea.cantidad;
-                    inventario.actualizadoEn = DateTime.Now;
-                    _context.Inventario.Update(inventario);
-                }
-
-                compra.estado = nuevoEstado;
-                compra.activo = false;
-                await _context.SaveChangesAsync();
-                await tx.CommitAsync();
-            }
-            catch
-            {
-                await tx.RollbackAsync();
-                throw;
-            }
-
+            // Nueva regla: el inventario se afecta solo mediante RecepcionesController
+            compra.estado = nuevoEstado;
+            compra.activo = false;
+            await _context.SaveChangesAsync();
             return Ok();
         }
 
-        public class CancelarDto
+        public class CompraCancelarDto
         {
             [Required]
             public int compraId { get; set; }
         }
 
         [HttpPost("cancelar")]
-        public async Task<IActionResult> Cancelar([FromBody] CancelarDto dto)
+        public async Task<IActionResult> Cancelar([FromBody] CompraCancelarDto dto)
         {
             var compra = await _context.Compra.FindAsync(dto.compraId);
             if (compra == null) return NotFound();
@@ -280,14 +244,14 @@ namespace Kratos.Server.Controllers.Ventas
             return Ok();
         }
 
-        public class ReabrirDto
+        public class CompraReabrirDto
         {
             [Required]
             public int compraId { get; set; }
         }
 
         [HttpPost("reabrir")]
-        public async Task<IActionResult> Reabrir([FromBody] ReabrirDto dto)
+        public async Task<IActionResult> Reabrir([FromBody] CompraReabrirDto dto)
         {
             var compra = await _context.Compra.FindAsync(dto.compraId);
             if (compra == null) return NotFound();
